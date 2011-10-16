@@ -21,20 +21,21 @@ package pl.lewica.api.url;
  */
 public class AnnouncementURL implements IWebServiceURL {
 
-	public static final String webService	= "http://lewica.pl/api/ogloszenia.php";
+	public static final String WEB_SERVICE				= "http://lewica.pl/api/ogloszenia.php";
+
+	public static final String PARAM_NEWER_THAN	= "od"; 
+	public static final String PARAM_LIMIT				= "limit"; 
+
 	// URL parameters
 	private int newerThan	= 0;
 	private int limit				= 0;
-	
-	static final String PARAM_NEWER_THAN	= "od"; 
-	static final String PARAM_LIMIT				= "limit"; 
 
 
 	public AnnouncementURL() {}
 
 
 	public String buildURL() {
-		StringBuilder sb	= new StringBuilder(webService);
+		StringBuilder sb	= new StringBuilder(WEB_SERVICE);
 
 		if (newerThan > 0) {
 			sb.append("&");
@@ -51,7 +52,7 @@ public class AnnouncementURL implements IWebServiceURL {
 		}
 
 		// If the query string has length, that means that the first char is "&" and it has to be replaced with "?".
-		int qsStart	= webService.length();
+		int qsStart	= WEB_SERVICE.length();
 		sb.replace(qsStart, qsStart + 1, "?");
 
 		return sb.toString();
