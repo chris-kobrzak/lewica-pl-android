@@ -21,24 +21,27 @@ package pl.lewica.api.url;
  */
 public class ArticleURL implements IWebServiceURL {
 
-	public static final String webService	= "http://lewica.pl/api/publikacje.php";
-	// URL parameters
+	public static final String WEB_SERVICE		= "http://lewica.pl/api/publikacje.php";
+	public static final String PATH_IMAGE			= "http://lewica.pl/im/";
+	public static final String PATH_THUMBNAIL	= "http://lewica.pl/im/thumbs/";
+
+	public static final String PARAM_NEWER_THAN	= "od";
+	public static final String PARAM_LIMIT				= "limit";
+	public static final String PARAM_SECTIONS			= "dzialy";
+	public static final String PARAM_FORMAT			= "format";
+
+	// Web Service URL parameters
 	private int newerThan		= 0;
 	private int limit					= 0;
 	private String sectionList	= "";
 	private String format			= "xml";
-
-	static final String PARAM_NEWER_THAN	= "od"; 
-	static final String PARAM_LIMIT				= "limit"; 
-	static final String PARAM_SECTIONS		= "dzialy"; 
-	static final String PARAM_FORMAT			= "format"; 
 
 
 	public ArticleURL() {}
 
 
 	public String buildURL() {
-		StringBuilder sb	= new StringBuilder(webService);
+		StringBuilder sb	= new StringBuilder(WEB_SERVICE);
 
 		if (newerThan > 0) {
 			sb.append("&");
@@ -69,8 +72,43 @@ public class ArticleURL implements IWebServiceURL {
 		}
 
 		// If the query string has length, that means that the first char is "&" and it has to be replaced with "?".
-		int qsStart	= webService.length();
+		int qsStart	= WEB_SERVICE.length();
 		sb.replace(qsStart, qsStart + 1, "?");
+
+		return sb.toString();
+	}
+
+
+	/**
+	 * Returns a URL for a given image, e.g. http://lewica.pl/im/25365.jpg
+	 * @param id
+	 * @param extension
+	 * @return
+	 */
+	public static String buildURLImage(long id, String extension) {
+		StringBuilder sb	= new StringBuilder(PATH_IMAGE);
+
+		sb.append(id);
+		sb.append(".");
+		sb.append(extension);
+
+		return sb.toString();
+	}
+	
+	
+	/**
+	 * Returns a URL for a given thumbnail image, e.g. http://lewica.pl/im/thumbs/th_25365.jpg
+	 * @param id
+	 * @param extension
+	 * @return
+	 */
+	public static String buildURLThumbnail(long id, String extension) {
+		StringBuilder sb	= new StringBuilder(PATH_THUMBNAIL);
+
+		sb.append("th_");
+		sb.append(id);
+		sb.append(".");
+		sb.append(extension);
 
 		return sb.toString();
 	}

@@ -21,22 +21,23 @@ package pl.lewica.api.url;
  */
 public class CalendarEntryURL implements IWebServiceURL {
 
-	public static final String webService	= "http://lewica.pl/api/kalendarium.php";
+	public static final String WEB_SERVICE		= "http://lewica.pl/api/kalendarium.php";
+
+	public static final String PARAM_DAY			= "dzien"; 
+	public static final String PARAM_MONTH	= "miesiac"; 
+	public static final String PARAM_LIMIT		= "limit"; 
+
 	// URL parameters
 	private int day		= 0;
 	private int month	= 0;
 	private int limit		= 0;
-
-	static final String PARAM_DAY		= "dzien"; 
-	static final String PARAM_MONTH	= "miesiac"; 
-	static final String PARAM_LIMIT		= "limit"; 
 
 
 	public CalendarEntryURL() {}
 
 
 	public String buildURL() {
-		StringBuilder sb	= new StringBuilder(webService);
+		StringBuilder sb	= new StringBuilder(WEB_SERVICE);
 
 		if (day > 0) {
 			sb.append("&");
@@ -60,7 +61,7 @@ public class CalendarEntryURL implements IWebServiceURL {
 		}
 
 		// If the query string has length, that means that the first char is "&" and it has to be replaced with "?".
-		int qsStart	= webService.length();
+		int qsStart	= WEB_SERVICE.length();
 		sb.replace(qsStart, qsStart + 1, "?");
 
 		return sb.toString();
