@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent" 
+	android:layout_height="wrap_content" 
+	android:paddingTop="1dp" 
+	android:paddingRight="5dp"
+	android:paddingBottom="1dp" 
+	android:paddingLeft="5dp">
+	<ImageView 
+		android:src="@android:drawable/ic_menu_report_image" 
+		android:id="@+id/article_item_icon" 
+		android:layout_width="60dp" 
+		android:layout_height="60dp" 
+		android:layout_marginLeft="2dp"/>
+    <TextView 
+		android:id="@+id/article_item_title" 
+		android:layout_above="@+id/article_item_date" 
+		android:layout_alignTop="@+id/article_item_icon" 
+		android:layout_width="235dp" 
+		android:layout_height="wrap_content" 
+		android:layout_marginLeft="72dp" 
+		android:layout_marginRight="16dp"
+		android:gravity="center_vertical|left" 
+		android:text="Title" 
+		android:ellipsize="end" 
+		style="@style/ListItemLabel" 
+		/>
+    <TextView 
+		android:id="@+id/article_item_date" 
+		android:layout_width="match_parent" 
+		android:layout_height="wrap_content" 
+		android:layout_alignBottom="@+id/article_item_icon" 
+		android:layout_alignLeft="@+id/article_item_title" 
+		android:layout_alignRight="@+id/article_item_title"
+		android:text="Date" 
+		style="@style/ListItemDetailLabel"
+	/>
+    <ImageView
+		android:src="@drawable/ic_pencil" 
+	    android:id="@+id/ico_pencil" 
+	    android:layout_width="14.7dp" 
+	    android:layout_height="18dp" 
+		android:layout_marginRight="6dp"
+	    android:layout_alignParentRight="true" 
+	    android:layout_alignBottom="@+id/article_item_date"/>
+</RelativeLayout>
