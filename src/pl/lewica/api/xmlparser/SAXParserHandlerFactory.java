@@ -14,8 +14,9 @@
  limitations under the Licence. 
 */
 package pl.lewica.api.xmlparser;
+
 import org.xml.sax.helpers.DefaultHandler;
-import pl.lewica.api.model.ModelType;
+import pl.lewica.api.model.DataModelType;
 
 /**
  * @author Krzysztof Kobrzak
@@ -30,19 +31,19 @@ public class SAXParserHandlerFactory {
 
 	/**
 	 * Class constructor using the factory design pattern.
-	 * @param typeID
+	 * @param modelType
 	 * @return
 	 */
-	public static DefaultHandler create(ModelType typeID) {
-		switch (typeID) {
+	public static DefaultHandler create(DataModelType modelType) {
+		switch (modelType) {
 			case ARTICLE:
 				return (DefaultHandler) new ArticleSAXParserDelegate();
 
 			case ANNOUNCEMENT:
 				return (DefaultHandler) new AnnouncementSAXParserDelegate();
 
-			case CALENDAR_ENTRY:
-				return (DefaultHandler) new CalendarEntrySAXParserDelegate();
+			case HISTORY:
+				return (DefaultHandler) new HistorySAXParserDelegate();
 
 			default :
 				return new DefaultHandler();

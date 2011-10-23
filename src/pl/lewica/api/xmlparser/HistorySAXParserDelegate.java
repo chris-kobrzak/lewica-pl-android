@@ -22,16 +22,16 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import pl.lewica.api.model.CalendarEntry;
-import pl.lewica.api.model.IModel;
+import pl.lewica.api.model.History;
+import pl.lewica.api.model.DataModel;
 
 /**
- *
+ * History events feed XML parser using the SAX engine.
  * @author Krzysztof Kobrzak
  */
-public class CalendarEntrySAXParserDelegate extends DefaultHandler implements ISAXParserDelegate {
-	List<IModel> calendarEntries;
-	private CalendarEntry currentEntry;
+public class HistorySAXParserDelegate extends DefaultHandler implements SAXParserDelegate {
+	List<DataModel> calendarEntries;
+	private History currentEntry;
 	private int	 entryDay;
 	private int	 entryMonth;
 	private StringBuilder builder;
@@ -44,7 +44,11 @@ public class CalendarEntrySAXParserDelegate extends DefaultHandler implements IS
 	static final  String CALENDAR_ENTRY_CONTENT	= "tytul";
 
 
-	public List<IModel> getElements() {
+	/**
+	 * Returns an array populated with data parsed by SAX.
+	 * @see pl.lewica.api.xmlparser.SAXParserDelegate#getElements()
+	 */
+	public List<DataModel> getElements() {
 		return this.calendarEntries;
 	}
 
@@ -52,7 +56,7 @@ public class CalendarEntrySAXParserDelegate extends DefaultHandler implements IS
 	@Override
 	public void startDocument() throws SAXException {
 		super.startDocument();
-		calendarEntries	= new ArrayList<IModel>();
+		calendarEntries	= new ArrayList<DataModel>();
 		builder			= new StringBuilder();
 		entryDay		= 0;
 		entryMonth		= 0;
@@ -65,7 +69,7 @@ public class CalendarEntrySAXParserDelegate extends DefaultHandler implements IS
 		super.startElement(uri, localName, name, attributes);
 
 		if (name.equalsIgnoreCase(CALENDAR_ENTRY) ) {
-			this.currentEntry	= new CalendarEntry();
+			this.currentEntry	= new History();
 		}
 		else if (name.equalsIgnoreCase(CALENDAR_ENTRY_DAY) || name.equalsIgnoreCase(CALENDAR_ENTRY_MONTH) ) {
 			builder.setLength(0);

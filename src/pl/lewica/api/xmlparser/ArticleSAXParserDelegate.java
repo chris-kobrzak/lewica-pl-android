@@ -30,35 +30,39 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import pl.lewica.api.model.Article;
-import pl.lewica.api.model.IModel;
+import pl.lewica.api.model.DataModel;
+import pl.lewica.util.DateUtil;
 
 /**
- * XML parser using SAX engine.
+ * Articles feed XML parser using the SAX engine.
  * @author Krzysztof Kobrzak
  */
-public class ArticleSAXParserDelegate extends DefaultHandler implements ISAXParserDelegate {
+public class ArticleSAXParserDelegate extends DefaultHandler implements SAXParserDelegate {
 	// XML nodes as per http://lewica.pl/api/ docs.
-	static final  String ARTICLE									= "publikacja";
-	static final  String ARTICLE_ID							= "id";
-	static final  String ARTICLE_CATEGORY_ID			= "id_dzial";
-	static final  String ARTICLE_RELATED_IDS			= "id_pokrewne";
-	static final  String ARTICLE_PUB_DATE				= "data";
-	static final  String ARTICLE_URL							= "url";
-	static final  String ARTICLE_IMAGE						= "obrazek";
-	static final  String ARTICLE_TITLE						= "tytul";
-	static final  String ARTICLE_CONTENT					= "tekst";
-	static final  String ARTICLE_EDITOR_COMMENT	= "opinia";
-	static final String DATE_MASK							= "yyyy-MM-dd HH:mm:ss";
+	public static final  String ARTICLE								= "publikacja";
+	public static final  String ARTICLE_ID							= "id";
+	public static final  String ARTICLE_CATEGORY_ID			= "id_dzial";
+	public static final  String ARTICLE_RELATED_IDS			= "id_pokrewne";
+	public static final  String ARTICLE_PUB_DATE				= "data";
+	public static final  String ARTICLE_URL						= "url";
+	public static final  String ARTICLE_IMAGE					= "obrazek";
+	public static final  String ARTICLE_TITLE						= "tytul";
+	public static final  String ARTICLE_CONTENT				= "tekst";
+	public static final  String ARTICLE_EDITOR_COMMENT	= "opinia";
 
 	// In case any parsing problems the date falls back to this value:
 	public String defaultDate	= "2000-01-01";
 
-	private List<IModel>	articles;
-	private Article			currentArticle;
-	private StringBuilder	builder;
+	private List<DataModel> articles;
+	private Article currentArticle;
+	private StringBuilder builder;
 
 
-	public List<IModel> getElements() {
+	/**
+	 * Returns an array populated with data parsed by SAX.
+	 * @see pl.lewica.api.xmlparser.SAXParserDelegate#getElements()
+	 */
+	public List<DataModel> getElements() {
 		return this.articles;
 	}
 
@@ -67,7 +71,7 @@ public class ArticleSAXParserDelegate extends DefaultHandler implements ISAXPars
 	public void startDocument()
 			throws SAXException {
 		super.startDocument();
-		articles	= new ArrayList<IModel>();
+		articles	= new ArrayList<DataModel>();
 		builder		= new StringBuilder();
 	}
 
@@ -117,7 +121,7 @@ public class ArticleSAXParserDelegate extends DefaultHandler implements ISAXPars
 			currentArticle.setRelatedIDs(articleIDs);
 		}
 		else if (name.equalsIgnoreCase(ARTICLE_PUB_DATE) ) {
-			DateFormat df	= new SimpleDateFormat(ArticleSAXParserDelegate.DATE_MASK);
+			DateFormat df	= new SimpleDateFormat(DateUtil.DATE_MASK_SQL);
 			Date pubDate	;
 
 			try {

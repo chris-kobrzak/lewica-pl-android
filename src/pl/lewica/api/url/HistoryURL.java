@@ -15,50 +15,58 @@
 */
 package pl.lewica.api.url;
 
+import java.util.Calendar;
+
 /**
  * Provides lewica.pl API URL based on the parameters set.
  * @author Krzysztof Kobrzak
  */
-public class CalendarEntryURL implements IWebServiceURL {
+public class HistoryURL implements WebServiceURL {
 
-	public static final String WEB_SERVICE		= "http://lewica.pl/api/kalendarium.php";
+	public static final String WEB_SERVICE			= "http://lewica.pl/api/kalendarium.php";
+	public static final int LIMIT						= 100;
 
 	public static final String PARAM_DAY			= "dzien"; 
-	public static final String PARAM_MONTH	= "miesiac"; 
+	public static final String PARAM_MONTH		= "miesiac"; 
 	public static final String PARAM_LIMIT		= "limit"; 
 
+	private Calendar cal;
 	// URL parameters
 	private int day		= 0;
 	private int month	= 0;
 	private int limit		= 0;
 
 
-	public CalendarEntryURL() {}
+	public HistoryURL() {
+		cal			= Calendar.getInstance();
+	}
 
 
 	public String buildURL() {
 		StringBuilder sb	= new StringBuilder(WEB_SERVICE);
 
-		if (day > 0) {
-			sb.append("&");
-			sb.append(PARAM_DAY);
-			sb.append("=");
-			sb.append(day);
+		if (day == 0) {
+			day		= cal.get(Calendar.DATE);
 		}
-
-		if (month > 0) {
-			sb.append("&");
-			sb.append(PARAM_MONTH);
-			sb.append("=");
-			sb.append(month);
+		if (month == 0) {
+			month	= cal.get(Calendar.MONTH) + 1;
 		}
-
-		if (limit > 0 && limit <= 100) {
+		if (limit > 0 && limit <= LIMIT) {
 			sb.append("&");
 			sb.append(PARAM_LIMIT);
 			sb.append("=");
 			sb.append(limit);
 		}
+
+		sb.append("&");
+		sb.append(PARAM_DAY);
+		sb.append("=");
+		sb.append(day);
+
+		sb.append("&");
+		sb.append(PARAM_MONTH);
+		sb.append("=");
+		sb.append(month);
 
 		// If the query string has length, that means that the first char is "&" and it has to be replaced with "?".
 		int qsStart	= WEB_SERVICE.length();
@@ -93,6 +101,9 @@ public class CalendarEntryURL implements IWebServiceURL {
 	}
 
 
+	/**
+	 * @param limit Cannot exceed LIMIT
+	 */
 	public void setLimit(int limit) {
 		this.limit = limit;
 	}

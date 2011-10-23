@@ -16,9 +16,10 @@
 package pl.lewica.api.model;
 
 /**
+ * Represents the data structure of the history feed (kalendarium) available through the lewica.pl REST-like Web Service.
  * @author Krzysztof Kobrzak
  */
-public class CalendarEntry implements IModel {
+public class History implements DataModel {
 	public int year;
 	public int month;
 	public int day;

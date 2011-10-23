@@ -16,22 +16,25 @@
 package pl.lewica.api.url;
 
 /**
- * Provides lewica.pl API URL based on the parameters set.
+ * Provides the lewica.pl announcements Web Service URL. 
+ * You may set the parameters and then request the URL string from the buildURL method.
+ * If you do not call the setters, buildURL will return an address that can be used 
+ * to retrieve a default number of the most recent announcements.
+ * 
  * @author Krzysztof Kobrzak
  */
-public class AnnouncementURL implements IWebServiceURL {
+public class AnnouncementURL implements WebServiceURL {
 
-	public static final String WEB_SERVICE				= "http://lewica.pl/api/ogloszenia.php";
+	public static final String WEB_SERVICE					= "http://lewica.pl/api/ogloszenia.php";
+	// The maximum number of entries that can be downloaded is limited to 10 by the server anyway.
+	public static final int LIMIT								= 10;
 
 	public static final String PARAM_NEWER_THAN	= "od"; 
 	public static final String PARAM_LIMIT				= "limit"; 
 
 	// URL parameters
 	private int newerThan	= 0;
-	private int limit				= 0;
-
-
-	public AnnouncementURL() {}
+	private int limit				= LIMIT;
 
 
 	public String buildURL() {
@@ -44,7 +47,7 @@ public class AnnouncementURL implements IWebServiceURL {
 			sb.append(newerThan);
 		}
 
-		if (limit > 0 && limit <= 10) {
+		if (limit > 0 && limit <= LIMIT) {
 			sb.append("&");
 			sb.append(PARAM_LIMIT);
 			sb.append("=");
@@ -74,6 +77,9 @@ public class AnnouncementURL implements IWebServiceURL {
 	}
 
 
+	/**
+	 * @param limit Maximum value: LIMIT
+	 */
 	public void setLimit(int limit) {
 		this.limit = limit;
 	}

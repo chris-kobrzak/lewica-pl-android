@@ -13,18 +13,13 @@
  See the Licence for the specific language governing permissions and
  limitations under the Licence. 
 */
-package pl.lewica.api.xmlparser;
-
-import java.util.List;
-
-import pl.lewica.api.model.IModel;
-
+package pl.lewica.api.model;
 
 /**
- * Each SAXParserDelegate object should implement this interface
- * so we can retrieve data it collects in a standard fashion (by means of the getElements() method.
- * @author Krzysztof Kobrzak
+ * You can use this interface to signal a class is data model.
+ * It might be useful when declaring e.g. an ArrayList with argument types,
+ * e.g. al = new ArrayList<DataModel>();
+ * 
+ * See http://en.wikipedia.org/wiki/Marker_interface_pattern
  */
-public interface ISAXParserDelegate {
-	public List<IModel> getElements();
-}
+public interface DataModel {}
