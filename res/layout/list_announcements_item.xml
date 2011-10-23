@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	>
+	<TextView 
+		android:text="Title" 
+		android:id="@+id/announcement_item_title" 
+		android:layout_width="match_parent" 
+		android:layout_height="45dp"
+		android:layout_marginLeft="7dp" 
+		android:layout_marginRight="7dp"
+		android:gravity="center_vertical|left" 
+		android:ellipsize="end" 
+		style="@style/ListItemLabel" 
+		android:layout_above="@+id/announcement_item_details" 
+	/>
+    <TextView 
+		android:text="Where and when" 
+		android:id="@+id/announcement_item_details" 
+		android:layout_width="match_parent" 
+		android:layout_height="wrap_content" 
+		android:layout_marginLeft="7dp" 
+		android:layout_marginRight="7dp"
+		android:layout_marginBottom="7dp"
+		style="@style/ListItemDetailLabel" 
+	/>
+</LinearLayout>
