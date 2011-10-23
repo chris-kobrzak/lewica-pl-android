@@ -22,19 +22,16 @@ import java.net.URL;
 import java.net.URLConnection;
 
 /**
- * A collection of utilities related to HTTP connections.
+ * Collection of utilities related to HTTP connections.
  * @author Krzysztof Kobrzak
  */
 public class HTTPUtil {
 	private final URL webURL;
 
 
-	public HTTPUtil(String URL) {
-		try {
-			this.webURL = new URL(URL);
-		} catch (MalformedURLException errMalformedURL) {
-			throw new RuntimeException(errMalformedURL);
-		}
+	public HTTPUtil(String URL) 
+			throws MalformedURLException {
+		this.webURL = new URL(URL);
 	}
 
 

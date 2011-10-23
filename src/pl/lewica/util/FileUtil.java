@@ -50,12 +50,12 @@ public class FileUtil {
 		Scanner s					= new Scanner(is);
 		s.useDelimiter("(; *(\r)?\n)|(--\n)");
 
-		while (s.hasNext()) {
+		while (s.hasNext() ) {
 			String line		= s.next();
 
-			if (line.startsWith("/*!") && line.endsWith("*/")) {
+			if (line.startsWith("/*!") && line.endsWith("*/") ) {
 				int i	= line.indexOf(" ");
-				line	= line.substring(i + 1, line.length() - " */".length());
+				line	= line.substring(i + 1, line.length() - " */".length() );
 			}
 
 			if (line.trim().length() > 0) {
