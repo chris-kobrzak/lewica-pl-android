@@ -18,17 +18,17 @@ package pl.lewica.api.model;
 import java.util.Date;
 
 /**
+ * Represents the data structure of the announcements feed (ogłoszenia) available through the lewica.pl REST-like Web Service.
  * @author Krzysztof Kobrzak
- *
  */
-public class Announcement implements IModel {
+public class Announcement implements DataModel {
 	public int ID;
 	public boolean wasRead;
 	public Date dateExpiry;
 	public String what;
 	public String where;
 	public String when;
-	public String text;
+	public String content;
 	public String publishedBy;
 	public String publishedByEmail;
 
@@ -39,7 +39,7 @@ public class Announcement implements IModel {
 	public void setID(int id) {
 		ID = id;
 	}
-	public boolean isWasRead() {
+	public boolean wasRead() {
 		return wasRead;
 	}
 	public void setWasRead(boolean wasRead) {
@@ -69,11 +69,11 @@ public class Announcement implements IModel {
 	public void setWhen(String when) {
 		this.when = when;
 	}
-	public String getText() {
-		return text;
+	public String getContent() {
+		return content;
 	}
-	public void setText(String text) {
-		this.text = text;
+	public void setContent(String text) {
+		this.content = text;
 	}
 	public String getPublishedBy() {
 		return publishedBy;

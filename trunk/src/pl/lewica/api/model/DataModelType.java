@@ -13,13 +13,15 @@
  See the Licence for the specific language governing permissions and
  limitations under the Licence. 
 */
-package pl.lewica.api.url;
+package pl.lewica.api.model;
 
 /**
- * Allows to mark a class as a lewica.pl Web Service URL handler.
- * Not in use.
+ * Lists all available data entities.  The list might be extended to support the blogs in the future.
+ * Naming convention for enum types: FooType
  * @author Krzysztof Kobrzak
  */
-public interface IWebServiceURL {
-	public String buildURL();
+public enum DataModelType {
+	ARTICLE,
+	ANNOUNCEMENT,
+	HISTORY
 }

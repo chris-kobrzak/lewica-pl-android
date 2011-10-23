@@ -20,9 +20,17 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * Represents the data structure of the articles feed (artykuły) available through the lewica.pl REST-like Web Service.
  * @author Krzysztof Kobrzak
  */
-public class Article implements IModel {
+public class Article implements DataModel {
+	// Article sections dictionary
+	public static final int SECTION_POLAND		= 1;
+	public static final int SECTION_WORLD		= 2;
+	public static final int SECTION_OPINIONS	= 3;
+	public static final int SECTION_REVIEWS		= 4;
+	public static final int SECTION_CULTURE		= 5;
+
 	public int ID;
 	public int articleCategoryID;
 	public List<Integer> relatedIDs;
@@ -61,13 +69,13 @@ public class Article implements IModel {
 	public void setDatePublished(Date datePublished) {
 		this.datePublished = datePublished;
 	}
-	public boolean isWasRead() {
+	public boolean wasRead() {
 		return wasRead;
 	}
 	public void setWasRead(boolean wasRead) {
 		this.wasRead = wasRead;
 	}
-	public boolean isHasThumbnail() {
+	public boolean hasThumbnail() {
 		return hasThumbnail;
 	}
 	public void setHasThumbnail(boolean hasThumbnail) {

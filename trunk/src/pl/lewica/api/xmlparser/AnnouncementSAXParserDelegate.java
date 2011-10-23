@@ -24,29 +24,33 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import pl.lewica.api.model.Announcement;
-import pl.lewica.api.model.IModel;
+import pl.lewica.api.model.DataModel;
 
 /**
+ * Announcements feed XML parser using the SAX engine.
  * @author Krzysztof Kobrzak
- *
  */
-public class AnnouncementSAXParserDelegate extends DefaultHandler implements ISAXParserDelegate {
+public class AnnouncementSAXParserDelegate extends DefaultHandler implements SAXParserDelegate {
 	// XML nodes, see documentation under http://lewica.pl/api/
 	static final  String ANNOUNCEMENT									= "ogloszenie";
 	static final  String ANNOUNCEMENT_ID								= "id";
 	static final  String ANNOUNCEMENT_WHAT							= "co";
-	static final  String ANNOUNCEMENT_WHERE						= "gdzie";
+	static final  String ANNOUNCEMENT_WHERE							= "gdzie";
 	static final  String ANNOUNCEMENT_WHEN							= "kiedy";
 	static final  String ANNOUNCEMENT_CONTENT					= "opis";
 	static final  String ANNOUNCEMENT_PUBLISHED_BY				= "autor";
 	static final  String ANNOUNCEMENT_PUBLISHED_BY_EMAIL	= "autor_email";
 
-	private List<IModel> announcements;
+	private List<DataModel> announcements;
 	private Announcement currentAnnouncement;
 	private StringBuilder builder;
 
 
-	public List<IModel> getElements() {
+	/**
+	 * Returns an array populated with data parsed by SAX.
+	 * @see pl.lewica.api.xmlparser.SAXParserDelegate#getElements()
+	 */
+	public List<DataModel> getElements() {
 		return this.announcements;
 	}
 
@@ -55,7 +59,7 @@ public class AnnouncementSAXParserDelegate extends DefaultHandler implements ISA
 	public void startDocument()
 			throws SAXException {
 		super.startDocument();
-		announcements	= new ArrayList<IModel>();
+		announcements	= new ArrayList<DataModel>();
 		builder				= new StringBuilder();
 	}
 
@@ -102,7 +106,7 @@ public class AnnouncementSAXParserDelegate extends DefaultHandler implements ISA
 			currentAnnouncement.setWhen(builder.toString() );
 		}
 		else if (name.equalsIgnoreCase(ANNOUNCEMENT_CONTENT) ) {
-			currentAnnouncement.setText(builder.toString() );
+			currentAnnouncement.setContent(builder.toString() );
 		}
 		else if (name.equalsIgnoreCase(ANNOUNCEMENT_PUBLISHED_BY) ) {
 			currentAnnouncement.setPublishedBy(builder.toString() );

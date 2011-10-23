@@ -15,7 +15,6 @@
 */
 package pl.lewica.api;
 
-
 import java.util.ArrayList; 
 import java.util.List;
 
@@ -24,16 +23,17 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.helpers.DefaultHandler;
 
-import pl.lewica.api.model.IModel;
-import pl.lewica.api.model.ModelType;
-import pl.lewica.api.xmlparser.ISAXParserDelegate;
+import pl.lewica.api.model.DataModel;
+import pl.lewica.api.model.DataModelType;
+import pl.lewica.api.xmlparser.SAXParserDelegate;
 import pl.lewica.api.xmlparser.SAXParserHandlerFactory;
 import pl.lewica.util.HTTPUtil;
 
 /**
+ * Manages the process of downloading and parsing data from the lewica.pl server.
  * @author Krzysztof Kobrzak, kobrzak@lewica.pl
  */
-public class UpdateManager {
+public class FeedDownloadManager {
 	
 	private SAXParserFactory factory;
 
@@ -41,7 +41,7 @@ public class UpdateManager {
 	/**
 	 * Class constructor
 	 */
-	public UpdateManager(){
+	public FeedDownloadManager(){
 		factory		= SAXParserFactory.newInstance();
 	}
 
@@ -49,31 +49,34 @@ public class UpdateManager {
 	/**
 	 * Loads a SAX parser, sets up its handler based on the argument passed to the method, 
 	 * waits until it finishes downloading and parsing and returns a list of entries.
+	 * Does not currently provide any progress monitoring facilities.
 	 * @param modelType Entity to be updated as per ModelType enum.
 	 * @param URL
 	 * @return List
 	 */
-	public List<IModel> fetchAndParseRemoteData(ModelType modelType, String URL) {
-		List<IModel> elements				= null;
-		HTTPUtil httpUtil						= new HTTPUtil(URL);
+	public List<DataModel> fetchAndParse(DataModelType modelType, String URL) {
+		List<DataModel> elements;
+		HTTPUtil httpUtil;
 		SAXParser saxp;
 
 		try {
+			httpUtil									= new HTTPUtil(URL);
 			DefaultHandler handler			= SAXParserHandlerFactory.create(modelType);
 
-			saxp = factory.newSAXParser();
+			saxp										= factory.newSAXParser();
 			saxp.parse(httpUtil.getInputStream(), handler);
 
-			ISAXParserDelegate delegate	= (ISAXParserDelegate) handler; 
+			SAXParserDelegate delegate	= (SAXParserDelegate) handler; 
 			elements								= delegate.getElements();
 
 			return elements;
 		} catch (Exception e) {
 			// Typically, it's just URL connection time-out so let's just ignore it and return an empty list (see the statements below).
+			e.printStackTrace();
 		}
 
-		// Return empty list
-		elements	= new ArrayList<IModel>();
+		// We are still here and that means there's been a problem in the try block.  Just return a empty list.
+		elements	= new ArrayList<DataModel>();
 		return elements;
 	}
 }

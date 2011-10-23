@@ -16,14 +16,19 @@
 package pl.lewica.api.url;
 
 /**
- * Provides lewica.pl API URL based on the parameters set.
+ * Provides the lewica.pl articles Web Service URL. 
+ * You may set the parameters and then request the URL string from the buildURL method.
+ * If you do not call the setters, buildURL will return an address that can be used 
+ * to retrieve the default number of the most recent articles.
  * @author Krzysztof Kobrzak
  */
-public class ArticleURL implements IWebServiceURL {
+public class ArticleURL implements WebServiceURL {
 
-	public static final String WEB_SERVICE		= "http://lewica.pl/api/publikacje.php";
-	public static final String PATH_IMAGE			= "http://lewica.pl/im/";
-	public static final String PATH_THUMBNAIL	= "http://lewica.pl/im/thumbs/";
+	public static final String WEB_SERVICE					= "http://lewica.pl/api/publikacje.php";
+	public static final String PATH_IMAGE					= "http://lewica.pl/im/";
+	public static final String PATH_THUMBNAIL			= "http://lewica.pl/im/thumbs/";
+	public static final String PREFIX_THUMBNAIL		= "th_";
+	public static final int LIMIT								= 5;
 
 	public static final String PARAM_NEWER_THAN	= "od";
 	public static final String PARAM_LIMIT				= "limit";
@@ -32,12 +37,11 @@ public class ArticleURL implements IWebServiceURL {
 
 	// Web Service URL parameters
 	private int newerThan		= 0;
-	private int limit					= 0;
-	private String sectionList	= "";
+	private int limit					= LIMIT;	// Maximum number of entries per section.
+	private String sectionList	= "";	// Comma-separated list of sections, as per the Article model constants.
 	private String format			= "xml";
+//	private int[] section			= new int[] {};	TODO
 
-
-	public ArticleURL() {}
 
 
 	public String buildURL() {
@@ -50,7 +54,7 @@ public class ArticleURL implements IWebServiceURL {
 			sb.append(newerThan);
 		}
 
-		if (limit > 0 && limit <= 10) {
+		if (limit > 0 && limit <= LIMIT) {
 			sb.append("&");
 			sb.append(PARAM_LIMIT);
 			sb.append("=");
@@ -103,9 +107,14 @@ public class ArticleURL implements IWebServiceURL {
 	 * @return
 	 */
 	public static String buildURLThumbnail(long id, String extension) {
-		StringBuilder sb	= new StringBuilder(PATH_THUMBNAIL);
+		return PATH_THUMBNAIL + buildNameThumbnail(id, extension);
+	}
 
-		sb.append("th_");
+
+	public static String buildNameThumbnail(long id, String extension) {
+		// Thumbnails use the th_ prefix
+		StringBuilder sb	= new StringBuilder(PREFIX_THUMBNAIL);
+
 		sb.append(id);
 		sb.append(".");
 		sb.append(extension);

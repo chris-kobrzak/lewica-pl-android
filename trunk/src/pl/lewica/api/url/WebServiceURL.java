@@ -13,16 +13,12 @@
  See the Licence for the specific language governing permissions and
  limitations under the Licence. 
 */
-package pl.lewica.api.model;
-
+package pl.lewica.api.url;
 
 /**
- * You can use this interface to signal a class is data model.
- * It might be useful when declaring e.g. an ArrayList with argument types,
- * e.g. al = new ArrayList<IModel>();
- * 
- * See http://en.wikipedia.org/wiki/Marker_interface_pattern
+ * Allows to mark a class as a lewica.pl Web Service URL handler.
+ * @author Krzysztof Kobrzak
  */
-public interface IModel {
-
+public interface WebServiceURL {
+	public String buildURL();
 }
