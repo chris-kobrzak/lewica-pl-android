@@ -45,7 +45,7 @@ public class AnnouncementActivity extends Activity {
 //	private static final String TAG = "LewicaPL:AnnouncementActivity";
 
 	private static Typeface categoryTypeface;
-	private static Typeface textTypeface;
+
 	private long annID;
 	private AnnouncementDAO annDAO;
 	private Map<String,Long> nextPrevID;
@@ -69,7 +69,6 @@ public class AnnouncementActivity extends Activity {
 		
 		// Custom font used by the category headings
 		categoryTypeface	= Typeface.createFromAsset(getAssets(), "Impact.ttf");
-		textTypeface			= Typeface.createFromAsset(getAssets(), "Verdana.ttf");
 
 		annID				= filterIDFromUri(getIntent() );
 
@@ -209,14 +208,12 @@ public class AnnouncementActivity extends Activity {
 
 		tv							= (TextView) findViewById(R.id.announcement_content);
 		tv.setText(cursor.getString(colIndex_Content) );
-		tv.setTypeface(textTypeface);
 
 		tv							= (TextView) findViewById(R.id.announcement_where);
 		tvLabel					= (TextView) findViewById(R.id.announcement_where_label);
 		String where			= cursor.getString(colIndex_Where);
 		if (where != null && where.length() > 0) {
 			tv.setText(where);
-			tv.setTypeface(textTypeface);
 			// Reset visibility, may be useful when users navigate between announcements (previous-next facility to be added in the future)
 			tv.setVisibility(View.VISIBLE);
 			
@@ -235,7 +232,6 @@ public class AnnouncementActivity extends Activity {
 		String when			= cursor.getString(colIndex_When);
 		if (when != null && when.length() > 0) {
 			tv.setText(when);
-			tv.setTypeface(textTypeface);
 			// Reset visibility, may be useful when users navigate between announcements (previous-next facility to be added in the future)
 			tv.setVisibility(View.VISIBLE);
 			
