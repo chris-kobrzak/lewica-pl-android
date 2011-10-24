@@ -96,6 +96,15 @@
 				android:paddingTop="5dp"
 				style="@style/StandardText"
 				android:layout_below="@+id/layout_announcement_when"
+			/>
+			<TextView 
+				android:text="published by" 
+				android:id="@+id/announcement_author" 
+				android:layout_width="wrap_content" 
+				android:layout_height="wrap_content" 
+				android:padding="7dp"
+				android:layout_alignRight="@+id/announcement_content"
+				android:layout_below="@+id/announcement_content"
 			/>		    
 	</RelativeLayout>
 </ScrollView>
