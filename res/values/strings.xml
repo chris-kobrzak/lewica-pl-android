@@ -34,4 +34,5 @@
     <string name="label_where">gdzie:</string>
     <string name="label_when">kiedy:</string>
     <string name="path_images">/lewicapl/images/</string>
+    <string name="email_subject_announcement">Pytanie dotyczące ogłoszenie w lewica.pl (wersja dla Androida)</string>
 </resources>

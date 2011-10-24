@@ -26,6 +26,8 @@ import android.database.Cursor;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -42,7 +44,8 @@ public class AnnouncementActivity extends Activity {
 	// This intent's base Uri.  It should have a numeric ID appended to it.
 	public static final String BASE_URI	= "content://lewicapl/announcements/announcement/";
 
-//	private static final String TAG = "LewicaPL:AnnouncementActivity";
+	@SuppressWarnings("unused")
+	private static final String TAG = "LewicaPL:AnnouncementActivity";
 
 	private static Typeface categoryTypeface;
 
@@ -56,8 +59,8 @@ public class AnnouncementActivity extends Activity {
 	private int colIndex_Where;
 	private int colIndex_When;
 	private int colIndex_Content;
-//	private int colIndex_PublishedBy;
-//	private int colIndex_PublishedByEmail;
+	private int colIndex_PublishedBy;
+	private int colIndex_PublishedByEmail;
 
 
 	@Override
@@ -189,8 +192,8 @@ public class AnnouncementActivity extends Activity {
 		colIndex_Content				= cursor.getColumnIndex(AnnouncementDAO.FIELD_TEXT);
 		colIndex_Where					= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHERE);
 		colIndex_When					= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHEN);
-//		colIndex_PublishedBy			= cursor.getColumnIndex(AnnouncementDAO.FIELD_PUBLISHED_BY);
-//		colIndex_PublishedByEmail	= cursor.getColumnIndex(AnnouncementDAO.FIELD_PUBLISHED_EMAIL);
+		colIndex_PublishedBy			= cursor.getColumnIndex(AnnouncementDAO.FIELD_PUBLISHED_BY);
+		colIndex_PublishedByEmail	= cursor.getColumnIndex(AnnouncementDAO.FIELD_PUBLISHED_EMAIL);
 
 		// When using previous-next facility you need to make sure the scroll view's position is at the top of the screen
 		ScrollView sv	= (ScrollView) findViewById(R.id.announcement_scroll_view);
@@ -208,7 +211,7 @@ public class AnnouncementActivity extends Activity {
 
 		tv							= (TextView) findViewById(R.id.announcement_content);
 		tv.setText(cursor.getString(colIndex_Content) );
-
+		// Where
 		tv							= (TextView) findViewById(R.id.announcement_where);
 		tvLabel					= (TextView) findViewById(R.id.announcement_where_label);
 		String where			= cursor.getString(colIndex_Where);
@@ -226,7 +229,7 @@ public class AnnouncementActivity extends Activity {
 			tvLabel.setText("");
 			tvLabel.setVisibility(View.INVISIBLE);
 		}
-
+		// When
 		tv							= (TextView) findViewById(R.id.announcement_when);
 		tvLabel					= (TextView) findViewById(R.id.announcement_when_label);
 		String when			= cursor.getString(colIndex_When);
@@ -245,6 +248,25 @@ public class AnnouncementActivity extends Activity {
 			tvLabel.setVisibility(View.INVISIBLE);
 		}
 
+		tv							= (TextView) findViewById(R.id.announcement_author);
+		String author			= cursor.getString(colIndex_PublishedBy);
+		String authorEmail	= cursor.getString(colIndex_PublishedByEmail);
+
+		if (author.length() == 0 && authorEmail.length() > 0) {
+			author				= authorEmail;
+		}
+		if (author.length() > 0) {
+			if (authorEmail.length() > 0) {
+				tv.setText(Html.fromHtml("<a href=\"mailto:" + authorEmail + "?subject=" + context.getString(R.string.email_subject_announcement) + "\">" + author + "</a>") );
+				tv.setMovementMethod(LinkMovementMethod.getInstance() );
+			} else {
+				tv.setText(author);
+			}
+			tv.setVisibility(View.VISIBLE);
+		} else {
+			tv.setText("");
+			tv.setVisibility(View.INVISIBLE);
+		}
 		// Only mark the announcement as read once.  If it's already marked as such - just stop here.
 		if (cursor.getInt(colIndex_WasRead) == 1) {
 			cursor.close();
