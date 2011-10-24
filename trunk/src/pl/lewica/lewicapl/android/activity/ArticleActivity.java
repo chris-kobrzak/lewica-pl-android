@@ -53,10 +53,11 @@ public class ArticleActivity extends Activity {
 	// This intent's base Uri.  It should have a numeric ID appended to it.
 	public static final String BASE_URI	= "content://lewicapl/articles/article/";
 
-//	private static final String TAG = "LewicaPL:ArticleActivity";
+	@SuppressWarnings("unused")
+	private static final String TAG = "LewicaPL:ArticleActivity";
 
 	private static Typeface categoryTypeface;
-	private static Typeface textTypeface;
+
 	private long articleID;
 	private int categoryID;
 	private ArticleDAO articleDAO;
@@ -84,7 +85,6 @@ public class ArticleActivity extends Activity {
 		
 		// Custom font used by the category headings
 		categoryTypeface	= Typeface.createFromAsset(getAssets(), "Impact.ttf");
-		textTypeface			= Typeface.createFromAsset(getAssets(), "Verdana.ttf");
 
 		articleID				= filterIDFromUri(getIntent() );
 		categoryID				= 0;
@@ -253,14 +253,12 @@ public class ArticleActivity extends Activity {
 
 		tv							= (TextView) findViewById(R.id.article_content);
 		tv.setText(cursor.getString(colIndex_Content) );
-		tv.setTypeface(textTypeface);
 
 		tv							= (TextView) findViewById(R.id.article_editor_comment);
 		tvComment			= (TextView) findViewById(R.id.article_editor_comment_top);
 		String commentString		= cursor.getString(colIndex_Comment);
 		if (commentString != null && commentString.length() > 0) {
 			tv.setText(commentString);
-			tv.setTypeface(textTypeface);
 			// Reset visibility, may be useful when users navigate between articles (previous-next facility to be added in the future)
 			tv.setVisibility(View.VISIBLE);
 			tvComment.setVisibility(View.VISIBLE);
