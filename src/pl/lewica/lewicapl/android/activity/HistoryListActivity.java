@@ -18,9 +18,14 @@ package pl.lewica.lewicapl.android.activity;
 import java.util.Calendar;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.CursorAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -38,7 +43,6 @@ public class HistoryListActivity extends Activity {
 	
 	public static final String BROADCAST_UPDATE_AVAILABLE	= "pl.lewica.lewicapl.android.activity.historylistactivity.reload";
 
-	@SuppressWarnings("unused")
 	private static final String TAG = "LewicaPL:HistoryEventListActivity";
 
 	private static Typeface categoryTypeface;
@@ -46,7 +50,7 @@ public class HistoryListActivity extends Activity {
 	private ListAdapter listAdapter;
 	private ListView listView;
 	private Calendar cal			= Calendar.getInstance();
-//	private PublicationsUpdateBroadcastReceiver receiver;
+	private HistoryUpdateBroadcastReceiver receiver;
 
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -59,16 +63,16 @@ public class HistoryListActivity extends Activity {
 		// Custom font used by the category headings
 		categoryTypeface	= Typeface.createFromAsset(getAssets(), "Impact.ttf");
 
-		// Orange bar
-		TextView tv			= (TextView) findViewById(R.id.history_category);
-		tv.setTypeface(categoryTypeface);
-		tv.setText(this.getString(R.string.heading_history) );
+		// Register to receive content update messages
+		IntentFilter filter		= new IntentFilter();
+		filter.addAction(BROADCAST_UPDATE_AVAILABLE);
+		receiver					= new HistoryUpdateBroadcastReceiver();	// Instance of an inner class
+		registerReceiver(receiver, filter);
 		
 		int month				= cal.get(Calendar.MONTH) + 1;
 		int day					= cal.get(Calendar.DATE);
-		tv							= (TextView) findViewById(R.id.history_date);
-		tv.setText(Integer.toString(day) + "/" + Integer.toString(month) + " w historii");
-		
+		loadView(month, day);
+
 		// Access data
 		historyDAO			= new HistoryDAO(this);
 		historyDAO.open();
@@ -87,10 +91,37 @@ public class HistoryListActivity extends Activity {
 	}
 
 
+	public void loadView(int month, int day) {
+		// Orange bar
+		TextView tv			= (TextView) findViewById(R.id.history_category);
+		tv.setTypeface(categoryTypeface);
+		tv.setText(this.getString(R.string.heading_history) );
+		
+		StringBuilder sb		= new StringBuilder();
+		sb.append(day);
+		sb.append("/");
+		sb.append(month);
+		sb.append(" w historii");
+		
+		tv							= (TextView) findViewById(R.id.history_date);
+		tv.setText(sb.toString() );
+	}
+
+
 	public void reloadRows() {
 		CursorAdapter ca	= (CursorAdapter) listAdapter;
 		// Reload rows
 		Cursor newCursor	= historyDAO.select(cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DATE) );
 		ca.changeCursor(newCursor);
+	}
+
+
+	// INNER CLASSES
+	private class HistoryUpdateBroadcastReceiver extends BroadcastReceiver {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.i(TAG, "HistoryUpdateBroadcastReceiver got a message!");
+			reloadRows();
+		}
 	}
 }
