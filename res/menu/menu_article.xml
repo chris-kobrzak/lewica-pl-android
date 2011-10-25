@@ -2,4 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:id="@+id/menu_previous" android:icon="@drawable/ic_menu_back" android:title="@string/nav_previous" />
 	<item android:id="@+id/menu_next" android:icon="@drawable/ic_menu_forward" android:title="@string/nav_next" />
+	<item android:id="@+id/menu_share" android:icon="@drawable/ic_menu_share" android:title="@string/nav_share" />
+	<item android:id="@+id/menu_comments" android:icon="@drawable/ic_menu_start_conversation" android:title="@string/nav_readers_comments" />
 </menu>

@@ -117,7 +117,7 @@ public class NewsListActivity extends Activity {
 				// Redirect to article details screen
 				Intent intent	= new Intent(context, ArticleActivity.class);
 				// Builds a uri in the following format: content://lewicapl/articles/article/[0-9]+
-				Uri uri			= Uri.parse(ArticleActivity.BASE_URI + Long.toString(id) );
+				Uri uri			= Uri.parse(ArticleActivity.URI_BASE + Long.toString(id) );
 				// Passes activity Uri as parameter that can be used to work out ID of requested article.
 				intent.setData(uri);
 		        startActivity(intent);
