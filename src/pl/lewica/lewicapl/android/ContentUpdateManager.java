@@ -43,10 +43,16 @@ import pl.lewica.api.model.DataModelType;
 import pl.lewica.api.url.AnnouncementURL;
 import pl.lewica.api.url.ArticleURL;
 import pl.lewica.api.url.HistoryURL;
+import pl.lewica.lewicapl.android.activity.AnnouncementListActivity;
+import pl.lewica.lewicapl.android.activity.HistoryListActivity;
+import pl.lewica.lewicapl.android.activity.NewsListActivity;
+import pl.lewica.lewicapl.android.activity.PublicationsListActivity;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 import pl.lewica.lewicapl.android.database.HistoryDAO;
 import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.util.Log;
 
 
@@ -59,6 +65,27 @@ public class ContentUpdateManager {
 
 	private static final String TAG	= "LewicaPL:ContentUpdateManager";
 
+	// TODO This might be converted to enum or redone completely
+	private enum StatusMessageType {
+		INIT,
+		NEW_PUBLICATIONS,
+		NO_PUBLICATIONS,
+		NEW_PUBLICATION_IMAGES,
+		NO_PUBLICATION_IMAGES,
+		NEW_ANNOUNCEMENTS,
+		NO_ANNOUNCEMENTS,
+		NEW_HISTORY,
+		NO_HISTORY
+	}
+	
+	private File storageDir;
+	private Context context;
+
+
+	ContentUpdateManager (Context context, File storageDir) {
+		this.context		= context;
+		this.storageDir	= storageDir;
+	}
 
 	/**
 	 * Coordinates the process of downloading the articles feed and inserting data to the database.
@@ -282,5 +309,179 @@ public class ContentUpdateManager {
 		status.setTotalUpdated(totalAnns);
 		
 		return status;
+	}
+
+
+	/**
+	 * Convenience method that can be used to trigger the update process.
+	 */
+	public void run() {
+		manageAndBroadcastUpdates(StatusMessageType.INIT);
+	}
+
+	/**
+	 * Manages the process of updating content in a sequential manner.
+	 * 
+	 * If null is passed as an argument, the publications update is requested.
+	 * Every single AsyncTask called by this method is expected to call it once their completed.
+	 * And when this happens, the method triggers another update and also sends a message that activities can listen to 
+	 * to update their data, e.g. list views.
+	 * The order of tasks is as follows:
+	 * 1. publications,
+	 * 2. announcements,
+	 * 3. history
+	 */
+	public void manageAndBroadcastUpdates(StatusMessageType status) {
+		Intent intent			= new Intent();
+
+		switch (status) {
+			case INIT:
+				// Fetch updates from the server.
+				new UpdateArticlesTask().execute();
+				break;
+
+			case NEW_PUBLICATIONS:
+				// Notify the news listing screen
+				intent.setAction(NewsListActivity.BROADCAST_UPDATE_AVAILABLE);
+				context.sendBroadcast(intent);
+				
+				// Notify the publications listing screen
+				intent.setAction(PublicationsListActivity.BROADCAST_UPDATE_AVAILABLE);
+				context.sendBroadcast(intent);
+
+				// New publications have been downloaded, now request new announcements
+				new UpdateAnnouncementsTask().execute();
+				break;
+			
+			case NO_PUBLICATIONS:
+				new UpdateAnnouncementsTask().execute();
+				break;
+				
+				
+			case NEW_PUBLICATION_IMAGES:
+				// Notify the news listing screen
+				intent.setAction(NewsListActivity.BROADCAST_UPDATE_AVAILABLE);
+				context.sendBroadcast(intent);
+				
+				// Notify the publications listing screen
+				intent.setAction(PublicationsListActivity.BROADCAST_UPDATE_AVAILABLE);
+				context.sendBroadcast(intent);
+
+				// We "know" the image update is actually triggered by UpdateArticlesTask so no actions required here.
+				break;
+
+			case NEW_ANNOUNCEMENTS:
+				intent.setAction(AnnouncementListActivity.BROADCAST_UPDATE_AVAILABLE);
+				context.sendBroadcast(intent);
+
+				// New announcements have been downloaded, now request new history events
+				new UpdateHistoryTask().execute();
+			break;
+			
+			case NO_ANNOUNCEMENTS:
+				new UpdateHistoryTask().execute();
+				break;
+
+			case NEW_HISTORY:
+				intent.setAction(HistoryListActivity.BROADCAST_UPDATE_AVAILABLE);
+				context.sendBroadcast(intent);
+				break;
+		}
+	}
+
+
+
+	/**
+	 * Manages publications update and calls the thumbnails update once completed.
+	 * This is an <em>inner class</em>.
+	 * @author Krzysztof Kobrzak
+	 */
+	private class UpdateArticlesTask extends AsyncTask<Void, Void, UpdateStatus> {
+
+		@Override
+		protected UpdateStatus doInBackground(Void... params) {
+			UpdateStatus status					= (UpdateStatus) fetchAndSaveArticles(context);
+
+			return status;
+		}
+
+		protected void onPostExecute(UpdateStatus status) {
+			if (status.getTotalUpdated() == 0) {
+				manageAndBroadcastUpdates(StatusMessageType.NO_PUBLICATIONS);
+				return;
+			}
+			// Notify the update manager straight away so it can kick off the other update tasks.
+			manageAndBroadcastUpdates(StatusMessageType.NEW_PUBLICATIONS);
+
+			// We are still here and that means there is at least one thumbnail to be downloaded.
+			new DownloadArticleThumbnailsTask().execute(status);
+		}
+	}
+
+
+	private class DownloadArticleThumbnailsTask extends AsyncTask<UpdateStatus, Integer, Integer> {
+		private static final String TAG	= "DownloadArticleThumbnailsTask";
+
+		@Override
+		protected Integer doInBackground(UpdateStatus... statuses) {
+			UpdateStatus status						= statuses[0];
+			ArticleUpdateStatus articleStatus		= (ArticleUpdateStatus) status;
+			Set<Map<String,String>> set			= articleStatus.getImages();
+
+			if (fetchAndSaveArticleThumbnails(set, storageDir) ) {
+				return set.size();
+			}
+
+			return -1;
+		}
+
+		protected void onProgressUpdate(Integer... progress) {
+			Log.i(TAG, "Downloaded image " + Integer.toString(progress[0]) );
+		}
+
+		protected void onPostExecute(Integer status) {
+			if (status == 0) {
+				return;
+			}
+			manageAndBroadcastUpdates(StatusMessageType.NEW_PUBLICATION_IMAGES);
+		}
+	}
+
+
+	private class UpdateAnnouncementsTask extends AsyncTask<Void, Integer, UpdateStatus> {
+
+		@Override
+		protected UpdateStatus doInBackground(Void... params) {
+			UpdateStatus status					= (UpdateStatus) fetchAndSaveAnnouncements(context);
+
+			return status;
+		}
+
+		protected void onPostExecute(UpdateStatus status) {
+			if (status.getTotalUpdated() == 0) {
+				manageAndBroadcastUpdates(StatusMessageType.NO_ANNOUNCEMENTS);
+				return;
+			}
+			manageAndBroadcastUpdates(StatusMessageType.NEW_ANNOUNCEMENTS);
+		}
+	}
+
+
+	private class UpdateHistoryTask extends AsyncTask<Void, Integer, UpdateStatus> {
+
+		@Override
+		protected UpdateStatus doInBackground(Void... params) {
+			UpdateStatus status					= (UpdateStatus) fetchAndSaveHistoryEvents(context);
+
+			return status;
+		}
+
+		protected void onPostExecute(UpdateStatus status) {
+			if (status.getTotalUpdated() == 0) {
+				manageAndBroadcastUpdates(StatusMessageType.NO_HISTORY);
+				return;
+			}
+			manageAndBroadcastUpdates(StatusMessageType.NEW_HISTORY);
+		}
 	}
 }
