@@ -19,14 +19,6 @@ import java.io.File;
 import java.util.Map;
 import java.util.Set;
 
-import pl.lewica.api.model.DataModelType;
-import pl.lewica.lewicapl.R;
-import pl.lewica.lewicapl.android.activity.AnnouncementListActivity;
-import pl.lewica.lewicapl.android.activity.HistoryListActivity;
-import pl.lewica.lewicapl.android.activity.MoreActivity;
-import pl.lewica.lewicapl.android.activity.NewsListActivity;
-import pl.lewica.lewicapl.android.activity.PublicationsListActivity;
-
 import android.app.TabActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -42,12 +34,24 @@ import android.view.View;
 import android.view.ViewParent;
 import android.widget.TabHost;
 
+import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.activity.AnnouncementListActivity;
+import pl.lewica.lewicapl.android.activity.HistoryListActivity;
+import pl.lewica.lewicapl.android.activity.MoreActivity;
+import pl.lewica.lewicapl.android.activity.NewsListActivity;
+import pl.lewica.lewicapl.android.activity.PublicationsListActivity;
+
 /**
  * @author Krzysztof Kobrzak
  */
 public class ApplicationRootActivity extends TabActivity {
 
 	private static File storageDir;
+
+	public static final int ENTITY_PUBLICATION				= 1;
+	public static final int ENTITY_PUBLICATION_IMAGE	= 2;
+	public static final int ENTITY_ANNOUNCEMENT		= 3;
+	public static final int ENTITY_HISTORY					= 4;
 
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -100,14 +104,8 @@ public class ApplicationRootActivity extends TabActivity {
 		// By default, the first tab is selected
 		tabHost.setCurrentTab(0);
 
-		// TODO Make sure these tasks run in a sequence or at least there is a few seconds gap between them.
-		// Fetch updates from the server
-		new UpdateArticlesTask().execute();
-
-		// Wait a few seconds before running the announcements update
-		new UpdateAnnouncementsTask().execute();
-
-		new UpdateHistoryTask().execute();
+		// Trigger content update
+		manageAndBroadcastUpdates(-1);
 	}
 
 
@@ -143,14 +141,23 @@ public class ApplicationRootActivity extends TabActivity {
 
 
 	/**
-	 * Sends a message that activities can listen to to update their data, e.g. list views.
+	 * Manages the process of updating content in a sequential manner.
+	 * 
+	 * If null is passed as an argument, the publications update is requested.
+	 * Every single AsyncTask called by this method is expected to call it once their completed.
+	 * And when this happens, the method triggers another update and also sends a message that activities can listen to 
+	 * to update their data, e.g. list views.
+	 * The order of tasks is as follows:
+	 * 1. publications,
+	 * 2. announcements,
+	 * 3. history
 	 */
-	public void broadcastUpdate(DataModelType type) {
+	public void manageAndBroadcastUpdates(int entity) {
 		Context context		= getApplicationContext();
 		Intent intent			= new Intent();
 
-		switch (type) {
-			case ARTICLE:
+		switch (entity) {
+			case ENTITY_PUBLICATION:
 				// Notify the news listing screen
 				intent.setAction(NewsListActivity.BROADCAST_UPDATE_AVAILABLE);
 				context.sendBroadcast(intent);
@@ -158,25 +165,46 @@ public class ApplicationRootActivity extends TabActivity {
 				// Notify the publications listing screen
 				intent.setAction(PublicationsListActivity.BROADCAST_UPDATE_AVAILABLE);
 				context.sendBroadcast(intent);
+
+				// New publications have been downloaded, now request new announcements
+				new UpdateAnnouncementsTask().execute();
+				break;
+				
+			case ENTITY_PUBLICATION_IMAGE:
+				// Notify the news listing screen
+				intent.setAction(NewsListActivity.BROADCAST_UPDATE_AVAILABLE);
+				context.sendBroadcast(intent);
+				
+				// Notify the publications listing screen
+				intent.setAction(PublicationsListActivity.BROADCAST_UPDATE_AVAILABLE);
+				context.sendBroadcast(intent);
+
+				// We "know" the image update is actually triggered by UpdateArticlesTask so no actions required here.
 			break;
 
-			case ANNOUNCEMENT:
+			case ENTITY_ANNOUNCEMENT:
 				intent.setAction(AnnouncementListActivity.BROADCAST_UPDATE_AVAILABLE);
 				context.sendBroadcast(intent);
+
+				// New announcements have been downloaded, now request new history events
+				new UpdateHistoryTask().execute();
 			break;
 
-			case HISTORY:
+			case ENTITY_HISTORY:
 				intent.setAction(HistoryListActivity.BROADCAST_UPDATE_AVAILABLE);
 				context.sendBroadcast(intent);
 			break;
+
+			default:
+				// Fetch updates from the server.
+				new UpdateArticlesTask().execute();
 		}
 	}
 
 
 
 	/**
-	 * TODO This is temporary code demonstrating how to update the application content.
-	 * Manages data update and refreshes the list of items.
+	 * Manages publications update and calls the thumbnails update once completed.
 	 * This is an <em>inner class</em>.
 	 * @author Krzysztof Kobrzak
 	 */
@@ -194,7 +222,7 @@ public class ApplicationRootActivity extends TabActivity {
 			if (status.getTotalUpdated() == 0) {
 				return;
 			}
-			broadcastUpdate(DataModelType.ARTICLE);
+			manageAndBroadcastUpdates(ENTITY_PUBLICATION);
 
 			new DownloadArticleThumbnailsTask().execute(status);
 		}
@@ -227,7 +255,7 @@ public class ApplicationRootActivity extends TabActivity {
 			if (status == 0) {
 				return;
 			}
-			broadcastUpdate(DataModelType.ARTICLE);
+			manageAndBroadcastUpdates(ENTITY_PUBLICATION_IMAGE);
 		}
 	}
 
@@ -246,7 +274,7 @@ public class ApplicationRootActivity extends TabActivity {
 			if (status.getTotalUpdated() == 0) {
 				return;
 			}
-			broadcastUpdate(DataModelType.ANNOUNCEMENT);
+			manageAndBroadcastUpdates(ENTITY_ANNOUNCEMENT);
 		}
 	}
 
@@ -265,7 +293,7 @@ public class ApplicationRootActivity extends TabActivity {
 			if (status.getTotalUpdated() == 0) {
 				return;
 			}
-			broadcastUpdate(DataModelType.HISTORY);
+			manageAndBroadcastUpdates(ENTITY_HISTORY);
 		}
 	}
 }
