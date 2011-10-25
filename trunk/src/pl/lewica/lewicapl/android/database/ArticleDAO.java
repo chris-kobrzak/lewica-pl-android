@@ -170,7 +170,7 @@ public class ArticleDAO {
 	 */
 	public Cursor selectOne(long articleID) throws SQLException {
 		Cursor cursor = database.query(true, DATABASE_TABLE, new String[] {
-				FIELD_ID, FIELD_CATEGORY_ID, FIELD_DATE_PUBLISHED, FIELD_WAS_READ, FIELD_HAS_IMAGE, FIELD_IMAGE_EXTENSION, FIELD_TITLE, FIELD_TEXT, FIELD_EDITOR_COMMENT, FIELD_HAS_EDITOR_COMMENT },
+				FIELD_ID, FIELD_CATEGORY_ID, FIELD_DATE_PUBLISHED, FIELD_WAS_READ, FIELD_HAS_IMAGE, FIELD_IMAGE_EXTENSION, FIELD_URL, FIELD_TITLE, FIELD_TEXT, FIELD_EDITOR_COMMENT, FIELD_HAS_EDITOR_COMMENT },
 				FIELD_ID + "=" + articleID, null, null, null, null, "1");
 		if (cursor != null) {
 			cursor.moveToFirst();

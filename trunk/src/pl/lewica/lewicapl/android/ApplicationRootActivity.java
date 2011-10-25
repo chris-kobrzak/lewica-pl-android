@@ -208,7 +208,7 @@ public class ApplicationRootActivity extends TabActivity {
 	 * This is an <em>inner class</em>.
 	 * @author Krzysztof Kobrzak
 	 */
-	private class UpdateArticlesTask extends AsyncTask<Void, Integer, UpdateStatus> {
+	private class UpdateArticlesTask extends AsyncTask<Void, Void, UpdateStatus> {
 
 		@Override
 		protected UpdateStatus doInBackground(Void... params) {
@@ -222,8 +222,10 @@ public class ApplicationRootActivity extends TabActivity {
 			if (status.getTotalUpdated() == 0) {
 				return;
 			}
+			// Notify the update manager straight away so it can kick off the other update tasks.
 			manageAndBroadcastUpdates(ENTITY_PUBLICATION);
 
+			// We are still here and that means there is at least one thumbnail to be downloaded.
 			new DownloadArticleThumbnailsTask().execute(status);
 		}
 	}

@@ -24,5 +24,7 @@
         
         <activity android:name=".android.activity.ArticleActivity" android:label="@string/title_article"/>        
         <activity android:name=".android.activity.AnnouncementActivity" android:label="@string/title_announcement"/>
+
+        <activity android:name=".android.activity.ReadersCommentsActivity" android:label="@string/title_readers_comments"/>        
     </application>
 </manifest>

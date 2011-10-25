@@ -52,7 +52,8 @@ import pl.lewica.lewicapl.android.database.ArticleDAO;
 
 public class ArticleActivity extends Activity {
 	// This intent's base Uri.  It should have a numeric ID appended to it.
-	public static final String BASE_URI	= "content://lewicapl/articles/article/";
+	public static final String URI_BASE						= "content://lewicapl/articles/article/";
+	public static final String URI_BASE_COMMENTS	= "content://lewicapl/articles/article/comments/";
 
 	@SuppressWarnings("unused")
 	private static final String TAG = "LewicaPL:ArticleActivity";
@@ -62,6 +63,7 @@ public class ArticleActivity extends Activity {
 
 	private long articleID;
 	private int categoryID;
+	private String articleURL;
 	private ArticleDAO articleDAO;
 	private Map<String,Long> nextPrevID;
 	private ImageLoadTask imageTask;
@@ -70,6 +72,7 @@ public class ArticleActivity extends Activity {
 	private int colIndex_WasRead;
 	private int colIndex_Title;
 	private int colIndex_DatePub;
+	private int colIndex_URL;
 	private int colIndex_Content;
 	private int colIndex_Comment;
 	private int colIndex_HasThumb;
@@ -164,6 +167,7 @@ public class ArticleActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		long id;
+		Intent intent;
 
 		switch (item.getItemId()) {
 			case R.id.menu_previous:
@@ -180,6 +184,23 @@ public class ArticleActivity extends Activity {
 				if (id > 0) {
 					loadArticle(nextPrevID.get(ArticleDAO.MAP_KEY_NEXT), this);
 				}
+				return true;
+
+			case R.id.menu_share:
+				intent	= new Intent(Intent.ACTION_SEND);
+				intent.setType("text/plain");
+				intent.putExtra(Intent.EXTRA_TEXT, articleURL);
+				startActivity(Intent.createChooser(intent, getString(R.string.label_share_link) ) );
+				return true;
+
+			case R.id.menu_comments:
+				// Redirect to article details screen
+				intent	= new Intent(this, ReadersCommentsActivity.class);
+				// Builds a uri in the following format: content://lewicapl/articles/article/[0-9]+
+				Uri uri			= Uri.parse(ArticleActivity.URI_BASE_COMMENTS + Long.toString(articleID) );
+				// Passes activity Uri as parameter that can be used to work out ID of requested article.
+				intent.setData(uri);
+		        startActivity(intent);
 				return true;
 
 			default :
@@ -205,6 +226,7 @@ public class ArticleActivity extends Activity {
 		startManagingCursor(cursor);
 
 		// In order to capture a cell, you need to work what their index
+		colIndex_URL				= cursor.getColumnIndex(ArticleDAO.FIELD_URL);
 		colIndex_CategoryID	= cursor.getColumnIndex(ArticleDAO.FIELD_CATEGORY_ID);
 		colIndex_Title			= cursor.getColumnIndex(ArticleDAO.FIELD_TITLE);
 		colIndex_DatePub		= cursor.getColumnIndex(ArticleDAO.FIELD_DATE_PUBLISHED);
@@ -223,6 +245,9 @@ public class ArticleActivity extends Activity {
 		if (imageTask != null) {
 			imageTask.cancel(true);
 		}
+
+		// Save the URL in memory so the "share link" option in menu can access it easily
+		articleURL				= cursor.getString(colIndex_URL);
 
 		// Now start populating all views with data
 		TextView tv, tvComment;
