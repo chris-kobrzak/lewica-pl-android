@@ -89,7 +89,7 @@ public class HistoryDAO {
 				new String[] { Integer.toString(month), Integer.toString(day) }, 
 				null, 															// GROUP BY
 				null, 															// HAVING
-				FIELD_YEAR + " DESC", 								// ORDER BY
+				FIELD_YEAR + " ASC", 									// ORDER BY
 				"100");														// LIMIT
 
 		if (cursor != null) {
