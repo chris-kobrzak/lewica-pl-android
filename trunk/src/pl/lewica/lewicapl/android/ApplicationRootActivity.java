@@ -16,17 +16,12 @@
 package pl.lewica.lewicapl.android;
 
 import java.io.File;
-import java.util.Map;
-import java.util.Set;
 
 import android.app.TabActivity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -47,11 +42,7 @@ import pl.lewica.lewicapl.android.activity.PublicationsListActivity;
 public class ApplicationRootActivity extends TabActivity {
 
 	private static File storageDir;
-
-	public static final int ENTITY_PUBLICATION				= 1;
-	public static final int ENTITY_PUBLICATION_IMAGE	= 2;
-	public static final int ENTITY_ANNOUNCEMENT		= 3;
-	public static final int ENTITY_HISTORY					= 4;
+	private ContentUpdateManager updateManager;
 
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -105,7 +96,8 @@ public class ApplicationRootActivity extends TabActivity {
 		tabHost.setCurrentTab(0);
 
 		// Trigger content update
-		manageAndBroadcastUpdates(-1);
+		updateManager	= new ContentUpdateManager(getApplicationContext(), storageDir);
+		updateManager.run();
 	}
 
 
@@ -134,168 +126,14 @@ public class ApplicationRootActivity extends TabActivity {
 				Intent intent	= new Intent(this, MoreActivity.class);
 		        this.startActivity(intent);
 				return true;
-			default :
-				return super.onOptionsItemSelected(item);
+	
+			case R.id.menu_refresh:
+				updateManager.run();
+				return true;
+	
+				default :
+					return super.onOptionsItemSelected(item);
 		}
 	}
 
-
-	/**
-	 * Manages the process of updating content in a sequential manner.
-	 * 
-	 * If null is passed as an argument, the publications update is requested.
-	 * Every single AsyncTask called by this method is expected to call it once their completed.
-	 * And when this happens, the method triggers another update and also sends a message that activities can listen to 
-	 * to update their data, e.g. list views.
-	 * The order of tasks is as follows:
-	 * 1. publications,
-	 * 2. announcements,
-	 * 3. history
-	 */
-	public void manageAndBroadcastUpdates(int entity) {
-		Context context		= getApplicationContext();
-		Intent intent			= new Intent();
-
-		switch (entity) {
-			case ENTITY_PUBLICATION:
-				// Notify the news listing screen
-				intent.setAction(NewsListActivity.BROADCAST_UPDATE_AVAILABLE);
-				context.sendBroadcast(intent);
-				
-				// Notify the publications listing screen
-				intent.setAction(PublicationsListActivity.BROADCAST_UPDATE_AVAILABLE);
-				context.sendBroadcast(intent);
-
-				// New publications have been downloaded, now request new announcements
-				new UpdateAnnouncementsTask().execute();
-				break;
-				
-			case ENTITY_PUBLICATION_IMAGE:
-				// Notify the news listing screen
-				intent.setAction(NewsListActivity.BROADCAST_UPDATE_AVAILABLE);
-				context.sendBroadcast(intent);
-				
-				// Notify the publications listing screen
-				intent.setAction(PublicationsListActivity.BROADCAST_UPDATE_AVAILABLE);
-				context.sendBroadcast(intent);
-
-				// We "know" the image update is actually triggered by UpdateArticlesTask so no actions required here.
-			break;
-
-			case ENTITY_ANNOUNCEMENT:
-				intent.setAction(AnnouncementListActivity.BROADCAST_UPDATE_AVAILABLE);
-				context.sendBroadcast(intent);
-
-				// New announcements have been downloaded, now request new history events
-				new UpdateHistoryTask().execute();
-			break;
-
-			case ENTITY_HISTORY:
-				intent.setAction(HistoryListActivity.BROADCAST_UPDATE_AVAILABLE);
-				context.sendBroadcast(intent);
-			break;
-
-			default:
-				// Fetch updates from the server.
-				new UpdateArticlesTask().execute();
-		}
-	}
-
-
-
-	/**
-	 * Manages publications update and calls the thumbnails update once completed.
-	 * This is an <em>inner class</em>.
-	 * @author Krzysztof Kobrzak
-	 */
-	private class UpdateArticlesTask extends AsyncTask<Void, Void, UpdateStatus> {
-
-		@Override
-		protected UpdateStatus doInBackground(Void... params) {
-			ContentUpdateManager updater	= new ContentUpdateManager();
-			UpdateStatus status					= (UpdateStatus) updater.fetchAndSaveArticles(getApplicationContext() );
-
-			return status;
-		}
-
-		protected void onPostExecute(UpdateStatus status) {
-			if (status.getTotalUpdated() == 0) {
-				return;
-			}
-			// Notify the update manager straight away so it can kick off the other update tasks.
-			manageAndBroadcastUpdates(ENTITY_PUBLICATION);
-
-			// We are still here and that means there is at least one thumbnail to be downloaded.
-			new DownloadArticleThumbnailsTask().execute(status);
-		}
-	}
-
-
-	private class DownloadArticleThumbnailsTask extends AsyncTask<UpdateStatus, Integer, Integer> {
-		private static final String TAG	= "DownloadArticleThumbnailsTask";
-
-		@Override
-		protected Integer doInBackground(UpdateStatus... statuses) {
-			UpdateStatus status						= statuses[0];
-			ArticleUpdateStatus articleStatus		= (ArticleUpdateStatus) status;
-			Set<Map<String,String>> set			= articleStatus.getImages();
-
-			ContentUpdateManager updater		= new ContentUpdateManager();
-
-			if (updater.fetchAndSaveArticleThumbnails(set, storageDir) ) {
-				return set.size();
-			}
-
-			return -1;
-		}
-
-		protected void onProgressUpdate(Integer... progress) {
-			Log.i(TAG, "Downloaded image " + Integer.toString(progress[0]) );
-		}
-
-		protected void onPostExecute(Integer status) {
-			if (status == 0) {
-				return;
-			}
-			manageAndBroadcastUpdates(ENTITY_PUBLICATION_IMAGE);
-		}
-	}
-
-
-	private class UpdateAnnouncementsTask extends AsyncTask<Void, Integer, UpdateStatus> {
-
-		@Override
-		protected UpdateStatus doInBackground(Void... params) {
-			ContentUpdateManager updater	= new ContentUpdateManager();
-			UpdateStatus status					= (UpdateStatus) updater.fetchAndSaveAnnouncements(getApplicationContext() );
-
-			return status;
-		}
-
-		protected void onPostExecute(UpdateStatus status) {
-			if (status.getTotalUpdated() == 0) {
-				return;
-			}
-			manageAndBroadcastUpdates(ENTITY_ANNOUNCEMENT);
-		}
-	}
-
-
-	private class UpdateHistoryTask extends AsyncTask<Void, Integer, UpdateStatus> {
-
-		@Override
-		protected UpdateStatus doInBackground(Void... params) {
-			ContentUpdateManager updater	= new ContentUpdateManager();
-			UpdateStatus status					= (UpdateStatus) updater.fetchAndSaveHistoryEvents(getApplicationContext() );
-
-			return status;
-		}
-
-		protected void onPostExecute(UpdateStatus status) {
-			if (status.getTotalUpdated() == 0) {
-				return;
-			}
-			manageAndBroadcastUpdates(ENTITY_HISTORY);
-		}
-	}
 }
