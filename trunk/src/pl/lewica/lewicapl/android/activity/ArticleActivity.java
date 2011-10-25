@@ -81,12 +81,12 @@ public class ArticleActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.detail_article);
 
-		Resources res		= getResources();
+		Resources res			= getResources();
 		
 		// Custom font used by the category headings
 		categoryTypeface	= Typeface.createFromAsset(getAssets(), "Impact.ttf");
 
-		articleID				= filterIDFromUri(getIntent() );
+		articleID					= filterIDFromUri(getIntent() );
 		categoryID				= 0;
 
 		// Access data

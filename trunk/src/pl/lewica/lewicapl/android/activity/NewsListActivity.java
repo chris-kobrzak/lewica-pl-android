@@ -18,6 +18,8 @@ package pl.lewica.lewicapl.android.activity;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -55,7 +57,7 @@ import pl.lewica.lewicapl.android.database.ArticleDAO;
  * @author Krzysztof Kobrzak
  */
 public class NewsListActivity extends Activity {
-	
+
 	public static final String BROADCAST_UPDATE_AVAILABLE	= "pl.lewica.lewicapl.android.activity.newslistactivity.reload";
 
 	private static final String TAG = "LewicaPL:NewsListActivity";
@@ -66,6 +68,10 @@ public class NewsListActivity extends Activity {
 	private ListAdapter listAdapter;
 	private ListView listView;
 	private NewsUpdateBroadcastReceiver receiver;
+	// When users select a new article, navigate back to the list and start scrolling up and down, the cursor won't know this article should be marked as read.
+	// That results in articles still being marked as unread (titles in red rather than blue).
+	// That's why we need to cache the list of clicked articles.  Please note, it is down to ArcticleActivity to flag articles as read in the database.
+	private static Set<Long> clicked	= new HashSet<Long>();
 
 
 
@@ -81,17 +87,17 @@ public class NewsListActivity extends Activity {
 		categoryTypeface	= Typeface.createFromAsset(getAssets(), "Impact.ttf");
 
 		// Thumbnails store
-		File sdDir		= Environment.getExternalStorageDirectory();
-		storageDir		= new File(sdDir + getResources().getString(R.string.path_images) );
+		File sdDir				= Environment.getExternalStorageDirectory();
+		storageDir				= new File(sdDir + getResources().getString(R.string.path_images) );
 		storageDir.mkdirs();
 		
-		// Register to content update messages
+		// Register to receive content update messages
 		IntentFilter filter		= new IntentFilter();
 		filter.addAction(BROADCAST_UPDATE_AVAILABLE);
 		receiver					= new NewsUpdateBroadcastReceiver();	// Instance of an inner class
 		registerReceiver(receiver, filter);
 
-		// Access to data
+		// Access data
 		articleDAO				= new ArticleDAO(this);
 		articleDAO.open();
 		Cursor cursor			= articleDAO.selectLatestNews();
@@ -105,8 +111,8 @@ public class NewsListActivity extends Activity {
 //			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				TextView tv;
-				Context context				= getApplicationContext();
-				Resources mResources	= context.getResources();
+				Context context		= getApplicationContext();
+				Resources res			= context.getResources();
 
 				// Redirect to article details screen
 				Intent intent	= new Intent(context, ArticleActivity.class);
@@ -116,10 +122,12 @@ public class NewsListActivity extends Activity {
 				intent.setData(uri);
 		        startActivity(intent);
 
-		        // Mark current article as read by changing its colour
-		        int colour	= mResources.getColor(R.color.read);
-		        tv				= (TextView) view.findViewById(R.id.article_item_title);
+		        // Mark current article as read by changing its colour...
+		        int colour		= res.getColor(R.color.read);
+		        tv					= (TextView) view.findViewById(R.id.article_item_title);
 		        tv.setTextColor(colour);
+		        // ... and flagging it in the database accordingly
+		        clicked.add(id);
 
 		        return;
 			}
@@ -139,7 +147,7 @@ public class NewsListActivity extends Activity {
 	public class NewsUpdateBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.i(TAG, "UpdateBroadcastReceiver got a message!");
+			Log.i(TAG, "NewsUpdateBroadcastReceiver got a message!");
 			reloadRows();
 		}
 	}
@@ -154,12 +162,12 @@ public class NewsListActivity extends Activity {
 	 */
 	private static final class NewsCursorAdapter extends CursorAdapter {
 		// We have two list item view types
-		private static final int VIEW_TYPE_GROUP_START		= 0;
+		private static final int VIEW_TYPE_GROUP_START			= 0;
 		private static final int VIEW_TYPE_GROUP_CONTINUE	= 1;
 		private static final int VIEW_TYPE_COUNT					= 2;
 		
-		public LayoutInflater mInflater;
-		private static Resources mResources;
+		public LayoutInflater inflater;
+		private static Resources res;
 
 		private int colIndex_ID;
 		private int colIndex_CategoryID;
@@ -170,15 +178,16 @@ public class NewsListActivity extends Activity {
 		private int colIndex_HasThumb;
 		private int colIndex_ThumbExt;
 
-//		private static SimpleDateFormat gDateFormatIn		= new SimpleDateFormat(DateUtil.DATE_FORMAT_SQL);
-		private static SimpleDateFormat gDateFormatOut	= new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		private static SimpleDateFormat dateFormat	= new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
 
 		NewsCursorAdapter(Context context, Cursor cursor, boolean autoRequery) {
 			super(context, cursor, autoRequery);
 
 			// Get the layout inflater
-			mInflater			= LayoutInflater.from(context);
+			inflater				= LayoutInflater.from(context);
+
+			res					= context.getResources();
 
 			// Get and cache column indices
 			colIndex_ID					= cursor.getColumnIndex(ArticleDAO.FIELD_ID);
@@ -189,8 +198,68 @@ public class NewsListActivity extends Activity {
 			colIndex_HasComment	= cursor.getColumnIndex(ArticleDAO.FIELD_HAS_EDITOR_COMMENT);
 			colIndex_HasThumb		= cursor.getColumnIndex(ArticleDAO.FIELD_HAS_IMAGE);
 			colIndex_ThumbExt		= cursor.getColumnIndex(ArticleDAO.FIELD_IMAGE_EXTENSION);
-			
-			mResources		= context.getResources();
+		}
+
+		/**
+		 * Responsible for providing views with content and formatting it.
+		 */
+		@Override
+		public void bindView(View view, Context context, Cursor cursor) {
+			TextView tv;
+			ImageView iv;
+			int colour;
+
+			// Editor's comments icon
+			int hasComment	= cursor.getInt(colIndex_HasComment);
+			iv	= (ImageView) view.findViewById(R.id.ico_pencil);
+			if (hasComment == 0) {
+				iv.setVisibility(View.INVISIBLE);
+			} else {
+				iv.setVisibility(View.VISIBLE);
+			}
+			// Title
+			tv	= (TextView) view.findViewById(R.id.article_item_title);
+			if (cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) ) ) {
+				colour	= res.getColor(R.color.unread);
+			} else {
+				colour	= res.getColor(R.color.read);
+			}
+			tv.setTextColor(colour);
+			tv.setText(cursor.getString(colIndex_Title) );
+			// Datetime
+			tv	= (TextView) view.findViewById(R.id.article_item_date);
+			long unixTime	= cursor.getLong(colIndex_DatePub);	// Dates are stored as Unix timestamps
+			Date d				= new Date(unixTime);
+			tv.setText(dateFormat.format(d) );
+
+			// Thumbnail
+			iv	= (ImageView) view.findViewById(R.id.article_item_icon);
+			iv.setImageBitmap(null);
+			if (cursor.getInt(colIndex_HasThumb) == 0) {
+				iv.setVisibility(View.INVISIBLE);
+			} else {
+				String imgPath	= storageDir.getPath() + "/" + ArticleURL.buildNameThumbnail(cursor.getLong(colIndex_ID), cursor.getString(colIndex_ThumbExt) );
+				Bitmap bMap		= BitmapFactory.decodeFile(imgPath);
+		        iv.setImageBitmap(bMap);
+				// Reset image to avoid issues when navigating between previous and next articles
+				iv.setVisibility(View.VISIBLE);
+			}
+
+			// If there is a group header, set their values
+			tv	= (TextView) view.findViewById(R.id.article_items_heading);
+			if (tv != null) {
+				tv.setTypeface(categoryTypeface);
+
+				switch (cursor.getInt(colIndex_CategoryID) ) {
+					case Article.SECTION_POLAND:
+						tv.setText(context.getString(R.string.heading_poland) );
+						break;
+						
+					case Article.SECTION_WORLD:
+						tv.setText(context.getString(R.string.heading_world) );
+						break;
+				}
+			}
 		}
 
 		@Override
@@ -238,12 +307,12 @@ public class NewsListActivity extends Activity {
 
 			if (nViewType != VIEW_TYPE_GROUP_START) {
 				// Inflate a layout for "regular" items
-				v	= mInflater.inflate(R.layout.list_articles_item, parent, false);
+				v	= inflater.inflate(R.layout.list_articles_item, parent, false);
 				return v; 
 			}
 
 			// Else, inflate the layout to start a new group
-			v	= mInflater.inflate(R.layout.list_articles_item_with_heading, parent, false);
+			v	= inflater.inflate(R.layout.list_articles_item_with_heading, parent, false);
 
 			// Ignore clicks on the list header
 			View vHeader	= v.findViewById(R.id.article_items_heading);
@@ -252,68 +321,6 @@ public class NewsListActivity extends Activity {
 				public void onClick(View v) {}
 			});
 			return v;
-		}
-
-		/**
-		 * Responsible for providing views with content and formatting it.
-		 */
-		@Override
-		public void bindView(View view, Context context, Cursor cursor) {
-			TextView tv;
-			ImageView iv;
-			int colour;
-
-			// Editor's comments
-			int hasComment	= cursor.getInt(colIndex_HasComment);
-			iv	= (ImageView) view.findViewById(R.id.ico_pencil);
-			if (hasComment == 0) {
-				iv.setVisibility(View.INVISIBLE);
-			} else {
-				iv.setVisibility(View.VISIBLE);
-			}
-			// Title
-			tv	= (TextView) view.findViewById(R.id.article_item_title);
-			if (cursor.getInt(colIndex_WasRead) == 0) {
-				colour	= mResources.getColor(R.color.unread);
-			} else {
-				colour	= mResources.getColor(R.color.read);
-			}
-			tv.setTextColor(colour);
-			tv.setText(cursor.getString(colIndex_Title) );
-			// Datetime
-			tv	= (TextView) view.findViewById(R.id.article_item_date);
-			long unixTime	= cursor.getLong(colIndex_DatePub);	// Dates are stored as Unix timestamps
-			Date d				= new Date(unixTime);
-			tv.setText(gDateFormatOut.format(d) );
-
-			// Thumbnail
-			iv	= (ImageView) view.findViewById(R.id.article_item_icon);
-			iv.setImageBitmap(null);
-			if (cursor.getInt(colIndex_HasThumb) == 0) {
-				iv.setVisibility(View.INVISIBLE);
-			} else {
-				String imgPath	= storageDir.getPath() + "/" + ArticleURL.buildNameThumbnail(cursor.getLong(colIndex_ID), cursor.getString(colIndex_ThumbExt) );
-				Bitmap bMap		= BitmapFactory.decodeFile(imgPath);
-		        iv.setImageBitmap(bMap);
-				// Reset image to avoid issues when navigating between previous and next articles
-				iv.setVisibility(View.VISIBLE);
-			}
-
-			// If there is a group header, set their values
-			tv	= (TextView) view.findViewById(R.id.article_items_heading);
-			if (tv != null) {
-				tv.setTypeface(categoryTypeface);
-
-				switch (cursor.getInt(colIndex_CategoryID) ) {
-					case Article.SECTION_POLAND:
-						tv.setText(context.getString(R.string.heading_poland) );
-						break;
-						
-					case Article.SECTION_WORLD:
-						tv.setText(context.getString(R.string.heading_world) );
-						break;
-				}
-			}
 		}
 
 		/**

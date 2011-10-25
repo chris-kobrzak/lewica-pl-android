@@ -15,6 +15,9 @@
 */
 package pl.lewica.lewicapl.android.activity;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -43,7 +46,7 @@ import pl.lewica.lewicapl.android.database.AnnouncementDAO;
  * @author Krzysztof Kobrzak
  */
 public class AnnouncementListActivity extends Activity {
-	
+
 	public static final String BROADCAST_UPDATE_AVAILABLE	= "pl.lewica.lewicapl.android.activity.announcementslistactivity.reload";
 
 	private static final String TAG = "LewicaPL:AnnouncementListActivity";
@@ -52,8 +55,14 @@ public class AnnouncementListActivity extends Activity {
 	private ListAdapter listAdapter;
 	private ListView listView;
 	private AnnouncementsUpdateBroadcastReceiver receiver;
+	// When users select a new article, navigate back to the list and start scrolling up and down, the cursor won't know this article should be marked as read.
+	// That results in articles still being marked as unread (titles in red rather than blue).
+	// That's why we need to cache the list of clicked articles.  Please note, it is down to ArcticleActivity to flag articles as read in the database.
+	private static Set<Long> clicked	= new HashSet<Long>();
 
 
+
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.list_announcements);	// This comes from this file's name /res/list_announcements.xml
@@ -61,7 +70,7 @@ public class AnnouncementListActivity extends Activity {
 		// Load a list view container from list_announcements.xml
 		listView					= (ListView) findViewById(R.id.list_announcements);
 
-		// Register to content update messages
+		// Register to receive content update messages
 		IntentFilter filter		= new IntentFilter();
 		filter.addAction(BROADCAST_UPDATE_AVAILABLE);
 		receiver					= new AnnouncementsUpdateBroadcastReceiver();	// Instance of an inner class
@@ -81,8 +90,8 @@ public class AnnouncementListActivity extends Activity {
 //			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				TextView tv;
-				Context context				= getApplicationContext();
-				Resources mResources	= context.getResources();
+				Context context		= getApplicationContext();
+				Resources res			= context.getResources();
 
 				// Redirect to article details screen
 				Intent intent	= new Intent(context, AnnouncementActivity.class);
@@ -92,10 +101,12 @@ public class AnnouncementListActivity extends Activity {
 				intent.setData(uri);
 		        startActivity(intent);
 
-		        // Mark current announcement as read by changing its colour
-		        int colour	= mResources.getColor(R.color.read);
-		        tv				= (TextView) view.findViewById(R.id.announcement_item_title);
+		        // Mark current announcement as read by changing its colour...
+		        int colour		= res.getColor(R.color.read);
+		        tv					= (TextView) view.findViewById(R.id.announcement_item_title);
 		        tv.setTextColor(colour);
+		        // ... and flagging it in local cache accordingly
+		        clicked.add(id);
 
 		        return;
 			}
@@ -121,12 +132,18 @@ public class AnnouncementListActivity extends Activity {
 	}
 
 
-	private static final class AnnouncementsCursorAdapter extends CursorAdapter {
-		
-		public LayoutInflater mInflater;
-		private static Resources mResources;
 
-//		private int colIndex_ID;
+	/**
+	 * Populates the list and makes sure announcements that have already been read are marked accordingly.
+	 * It is static nested class, see http://download.oracle.com/javase/tutorial/java/javaOO/nested.html
+	 * @author Krzysztof Kobrzak
+	 */
+	private static final class AnnouncementsCursorAdapter extends CursorAdapter {
+
+		public LayoutInflater inflater;
+		private static Resources res;
+
+		private int colIndex_ID;
 		private int colIndex_WasRead;
 		private int colIndex_Title;
 		private int colIndex_Where;
@@ -137,22 +154,16 @@ public class AnnouncementListActivity extends Activity {
 			super(context, cursor, autoRequery);
 
 			// Get the layout inflater
-			mInflater			= LayoutInflater.from(context);
+			inflater				= LayoutInflater.from(context);
+
+			res					= context.getResources();
 
 			// Get and cache column indices
-//			colIndex_ID					= cursor.getColumnIndex(AnnouncementDAO.FIELD_ID);
+			colIndex_ID					= cursor.getColumnIndex(AnnouncementDAO.FIELD_ID);
 			colIndex_WasRead			= cursor.getColumnIndex(AnnouncementDAO.FIELD_WAS_READ);
 			colIndex_Title				= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHAT);
 			colIndex_Where				= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHERE);
 			colIndex_When				= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHEN);
-			
-			mResources		= context.getResources();
-		}
-
-
-		@Override
-		public View newView(Context context, Cursor cursor, ViewGroup parent) {
-			return mInflater.inflate(R.layout.list_announcements_item, parent, false);
 		}
 
 		/**
@@ -164,10 +175,10 @@ public class AnnouncementListActivity extends Activity {
 			int colour;
 			// Title
 			tv	= (TextView) view.findViewById(R.id.announcement_item_title);
-			if (cursor.getInt(colIndex_WasRead) == 0) {
-				colour	= mResources.getColor(R.color.unread);
+			if (cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) ) ) {
+				colour	= res.getColor(R.color.unread);
 			} else {
-				colour	= mResources.getColor(R.color.read);
+				colour	= res.getColor(R.color.read);
 			}
 			tv.setTextColor(colour);
 			tv.setText(cursor.getString(colIndex_Title) );
@@ -196,6 +207,12 @@ public class AnnouncementListActivity extends Activity {
 			}
 			// We are still here - that means both where and when info is empty.
 			tv.setText("");
+		}
+
+
+		@Override
+		public View newView(Context context, Cursor cursor, ViewGroup parent) {
+			return inflater.inflate(R.layout.list_announcements_item, parent, false);
 		}
 	}
 	// End of NewsCursorAdapter
