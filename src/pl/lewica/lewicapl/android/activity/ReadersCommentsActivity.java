@@ -16,6 +16,7 @@
 package pl.lewica.lewicapl.android.activity;
 
 import pl.lewica.lewicapl.R;
+import pl.lewica.util.URLDictionary;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -28,8 +29,6 @@ import android.webkit.WebView;
  */
 public class ReadersCommentsActivity extends Activity {
 
-	public static final String URL_BASE		= "http://lewica.pl/forum/index.php?format=minimal&fuse=messages.";
-
 	private long articleID;
 
 
@@ -41,7 +40,7 @@ public class ReadersCommentsActivity extends Activity {
 		articleID					= filterIDFromUri(getIntent() );
 		
 		WebView tv			= (WebView) findViewById(R.id.web_comments);
-		tv.loadUrl(URL_BASE + articleID);
+		tv.loadUrl(URLDictionary.BASE_READERS_COMMENTS + articleID);
 	}
 
 	/**

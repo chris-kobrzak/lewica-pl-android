@@ -8,6 +8,7 @@
     <color name="grey_light">#eee</color>
     <color name="grey_dark">#aaa</color>
     <color name="grey_darker">#303030</color>
+    <color name="blue_facebook">#1D4088</color>
     <color name="unread">#BF0000</color>
     <color name="read">#136F80</color>    
     <string name="title_news">LewicaPL: informacje</string>
@@ -34,10 +35,16 @@
     <string name="heading_culture">kultura</string>
     <string name="heading_announcements">ogłoszenia</string>
     <string name="heading_history">historia</string>
+    <string name="heading_homepage">lewica.pl</string>
+    <string name="heading_facebook">facebook</string>
+    <string name="heading_blogs">blogi</string>
+    <string name="heading_links">katalog</string>
+    <string name="heading_search">wyszukiwarka</string>
+    <string name="heading_team">redakcja</string>
     <string name="label_where">gdzie:</string>
     <string name="label_when">kiedy:</string>
     <string name="label_share_link">Poleć artykuł via:</string>
     <string name="path_images">/lewicapl/images/</string>
     <string name="email_subject_announcement">Pytanie nt. ogłoszenia w lewica.pl (wersja dla Androida)</string>
-    <string name="message_please_wait">Trwa oczekiwanie na aktualizację...</string>
+    <string name="paragraph_more_intro">Kliknięcie na poniższe nagłówki powoduje przejście do wybranej strony w przeglądarce systemowej.</string>
 </resources>
