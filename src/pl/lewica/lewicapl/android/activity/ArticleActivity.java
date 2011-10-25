@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import android.app.Activity;
@@ -57,11 +58,13 @@ public class ArticleActivity extends Activity {
 	private static final String TAG = "LewicaPL:ArticleActivity";
 
 	private static Typeface categoryTypeface;
+	private static Map<Long,Bitmap> images	= new HashMap<Long,Bitmap>();
 
 	private long articleID;
 	private int categoryID;
 	private ArticleDAO articleDAO;
 	private Map<String,Long> nextPrevID;
+	private ImageLoadTask imageTask;
 
 	private int colIndex_CategoryID;
 	private int colIndex_WasRead;
@@ -72,7 +75,7 @@ public class ArticleActivity extends Activity {
 	private int colIndex_HasThumb;
 	private int colIndex_ThumbExt;
 
-	private static SimpleDateFormat gDateFormatOut	= new SimpleDateFormat("dd/MM/yyyy HH:mm");
+	private static SimpleDateFormat dateFormat	= new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
 
 
@@ -216,6 +219,11 @@ public class ArticleActivity extends Activity {
 		sv.fullScroll(View.FOCUS_UP);
 		sv.setSmoothScrollingEnabled(true);
 
+		// On the same token, make sure an image belonging to another article never appears here as a result of an async process.
+		if (imageTask != null) {
+			imageTask.cancel(true);
+		}
+
 		// Now start populating all views with data
 		TextView tv, tvComment;
 		tv							= (TextView) findViewById(R.id.article_title);
@@ -249,7 +257,7 @@ public class ArticleActivity extends Activity {
 		tv							= (TextView) findViewById(R.id.article_date);
 		long unixTime		= cursor.getLong(colIndex_DatePub);	// Dates are stored as Unix timestamps
 		Date d					= new Date(unixTime);
-		tv.setText(gDateFormatOut.format(d) );
+		tv.setText(dateFormat.format(d) );
 
 		tv							= (TextView) findViewById(R.id.article_content);
 		tv.setText(cursor.getString(colIndex_Content) );
@@ -273,11 +281,17 @@ public class ArticleActivity extends Activity {
 		ImageView iv			= (ImageView) findViewById(R.id.article_image);
 		iv.setImageBitmap(null);
 		if (cursor.getInt(colIndex_HasThumb) == 1) {
-			String imageUrl		= ArticleURL.buildURLImage(ID, cursor.getString(colIndex_ThumbExt) );
-
-			// Images need to be downloaded in a separate thread as we cannot block the UI thread.
-			// Note: we do not currently cache images on this screen and they are downloaded from the Internet on every request.
-			new ImageLoadTask().execute(imageUrl);
+			if (images.containsKey(articleID) ) {
+//				Log.i(TAG, "Pulling image from cache");
+				loadImage(images.get(articleID) );
+			} else {
+				String imageUrl		= ArticleURL.buildURLImage(ID, cursor.getString(colIndex_ThumbExt) );
+	
+				// Images need to be downloaded in a separate thread as we cannot block the UI thread.
+				// Note: we do not currently cache images on this screen and they are downloaded from the Internet on every request.
+				imageTask	= new ImageLoadTask();
+				imageTask.execute(imageUrl);
+			}
 		}
 		
 
@@ -300,6 +314,10 @@ public class ArticleActivity extends Activity {
 	}
 
 
+	/**
+	 * Puts a bitmap in the image view.  Adds the bitmap to the local cache.
+	 * @param bm
+	 */
 	public void loadImage(Bitmap bm) {
 		ImageView iv			= (ImageView) findViewById(R.id.article_image);
 
@@ -328,19 +346,24 @@ public class ArticleActivity extends Activity {
 		protected Bitmap doInBackground(String... imageURLs) {
 			InputStream is;
 			URL url;
+			Bitmap bitmap	= null;
 
 			try {
 				url		= new URL(imageURLs[0]);
 				is	= (InputStream) url.getContent();
 
-				return BitmapFactory.decodeStream(is);
+				bitmap 	= BitmapFactory.decodeStream(is);
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
-			return null;
+			// The parent process might have requested this thread to be stopped.
+			if (isCancelled() ) {
+//				Log.i(TAG, "Cancelled image download task");
+				return null;
+			}
+			return bitmap;
 		}
 
 		/*protected void onProgressUpdate(Integer... progress) {
@@ -349,7 +372,15 @@ public class ArticleActivity extends Activity {
 
 
 		protected void onPostExecute(Bitmap bitmap) {
+			if (bitmap == null) {
+				return;
+			}
+
 			loadImage(bitmap);
+			// Even though relying on articleID might seem risky, loading a wrong image shouldn't ever be the case.
+			// This is because we cancel image loading operations every time loadArticle is called, ie. when users 
+			// navigate between articles using the previous-next facility.
+			images.put(articleID, bitmap);
 		}
 	}
 }
