@@ -33,6 +33,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.ContentUpdateManager;
 import pl.lewica.lewicapl.android.database.HistoryDAO;
 
 
@@ -49,8 +50,9 @@ public class HistoryListActivity extends Activity {
 	private HistoryDAO historyDAO;
 	private ListAdapter listAdapter;
 	private ListView listView;
-	private Calendar cal			= Calendar.getInstance();
 	private HistoryUpdateBroadcastReceiver receiver;
+	private 	int month;
+	private 	int day;
 
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -68,9 +70,10 @@ public class HistoryListActivity extends Activity {
 		filter.addAction(RELOAD_VIEW);
 		receiver					= new HistoryUpdateBroadcastReceiver();	// Instance of an inner class
 		registerReceiver(receiver, filter);
-		
-		int month				= cal.get(Calendar.MONTH) + 1;
-		int day					= cal.get(Calendar.DATE);
+
+		Calendar cal		= Calendar.getInstance();
+		month				= cal.get(Calendar.MONTH) + 1;
+		day					= cal.get(Calendar.DATE);
 		loadView(month, day);
 
 		// Access data
@@ -91,6 +94,34 @@ public class HistoryListActivity extends Activity {
 	}
 
 
+	/**
+	 * When this activity is created, it saves the current day and month.  We compare the current date
+	 * with these values to work out if we should update the content.
+	 * @see android.app.Activity#onResume()
+	 */
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		Calendar cal		= Calendar.getInstance();
+		int monthNow	= cal.get(Calendar.MONTH) + 1;
+		int dayNow		= cal.get(Calendar.DATE);
+		
+		if (day == dayNow && month == monthNow) {
+			return;
+		}
+		Log.i("HISTORY", "resumed, update required");
+		// Update current date
+		day		= dayNow;
+		month	= monthNow;
+
+		ContentUpdateManager updateManager	= ContentUpdateManager.getInstance(getApplicationContext(), null);
+		if (! updateManager.isRunning() ) {
+			updateManager.manageAndBroadcastUpdates(ContentUpdateManager.StatusMessageType.INIT_HISTORY);
+		}
+	}
+
+
 	public void loadView(int month, int day) {
 		// Orange bar
 		TextView tv			= (TextView) findViewById(R.id.history_category);
@@ -101,7 +132,8 @@ public class HistoryListActivity extends Activity {
 		sb.append(day);
 		sb.append("/");
 		sb.append(month);
-		sb.append(" w historii");
+		sb.append(" ");
+		sb.append(this.getString(R.string.heading_history_extra) );
 		
 		tv							= (TextView) findViewById(R.id.history_date);
 		tv.setText(sb.toString() );
@@ -109,6 +141,7 @@ public class HistoryListActivity extends Activity {
 
 
 	public void reloadRows() {
+		Calendar cal			= Calendar.getInstance();
 		CursorAdapter ca	= (CursorAdapter) listAdapter;
 		// Reload rows
 		Cursor newCursor	= historyDAO.select(cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DATE) );
