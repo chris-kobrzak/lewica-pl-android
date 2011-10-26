@@ -34,7 +34,9 @@ import pl.lewica.lewicapl.android.activity.AnnouncementListActivity;
 import pl.lewica.lewicapl.android.activity.HistoryListActivity;
 import pl.lewica.lewicapl.android.activity.MoreActivity;
 import pl.lewica.lewicapl.android.activity.NewsListActivity;
-import pl.lewica.lewicapl.android.activity.PublicationsListActivity;
+import pl.lewica.lewicapl.android.activity.PublicationListActivity;
+import pl.lewica.lewicapl.android.database.AnnouncementDAO;
+import pl.lewica.lewicapl.android.database.ArticleDAO;
 
 /**
  * @author Krzysztof Kobrzak
@@ -67,7 +69,7 @@ public class ApplicationRootActivity extends TabActivity {
 		tabHost.addTab(spec);
 
 		// Do the same for the other tabs
-		intent	= new Intent(this, PublicationsListActivity.class);
+		intent	= new Intent(this, PublicationListActivity.class);
 		spec		= tabHost.newTabSpec("texts").setIndicator(res.getString(R.string.tab_texts),
 				res.getDrawable(R.drawable.ic_96book) ).setContent(intent);
 		tabHost.addTab(spec);
@@ -115,7 +117,6 @@ public class ApplicationRootActivity extends TabActivity {
 	}
 
 
-
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
 	 */
@@ -131,9 +132,24 @@ public class ApplicationRootActivity extends TabActivity {
 				updateManager.run();
 				return true;
 	
+			case R.id.menu_mark_as_read:
+				ArticleDAO articleDAO			= new ArticleDAO(this);
+				articleDAO.open();
+				articleDAO.updateMarkAllAsRead();
+				articleDAO.close();
+				
+				AnnouncementDAO annDAO	= new AnnouncementDAO(this);
+				annDAO.open();
+				annDAO.updateMarkAllAsRead();
+				annDAO.close();
+
+				updateManager.broadcastDataReload_News();
+				updateManager.broadcastDataReload_Publications();
+				updateManager.broadcastDataReload_Announcements();
+				return true;
+	
 				default :
 					return super.onOptionsItemSelected(item);
 		}
 	}
-
 }
