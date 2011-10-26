@@ -60,15 +60,22 @@ import pl.lewica.lewicapl.android.database.HistoryDAO;
 /**
  * Collection of methods the coordinate the process of downloading feeds from the server 
  * and saving them in the device's database.
+ * The class uses the singleton design pattern.
  * @author Krzysztof Kobrzak
  */
 public class ContentUpdateManager {
 
 	private static final String TAG	= "LewicaPL:ContentUpdateManager";
 
-	// TODO This might be converted to enum or redone completely
-	private enum StatusMessageType {
+	private static ContentUpdateManager _instance;
+	
+	private File storageDir;
+	private Context context;
+	private boolean isRunning;
+
+	public static enum StatusMessageType {
 		INIT,
+		INIT_HISTORY,
 		NEW_PUBLICATIONS,
 		NO_PUBLICATIONS,
 		NEW_PUBLICATION_IMAGES,
@@ -78,22 +85,49 @@ public class ContentUpdateManager {
 		NEW_HISTORY,
 		NO_HISTORY
 	}
-	
-	private File storageDir;
-	private Context context;
 
 
-	ContentUpdateManager (Context context, File storageDir) {
+	/**
+	 * Private constructor, see singleton design pattern.
+	 * @param context
+	 * @param storageDir
+	 */
+	private ContentUpdateManager(Context context, File storageDir) {
 		this.context		= context;
 		this.storageDir	= storageDir;
 	}
+
+
+	/**
+	 * Standard singleton constructor.
+	 * @param context
+	 * @param storageDir
+	 * @return
+	 */
+	public static synchronized ContentUpdateManager getInstance(Context context, File storageDir) {
+		if (_instance == null) {
+			_instance	= new ContentUpdateManager(context, storageDir);
+		}
+
+		return _instance;
+	}
+
+	public boolean isRunning() {
+		return isRunning;
+	}
+
+
+	public void setRunning(boolean isRunning) {
+		this.isRunning = isRunning;
+	}
+
 
 	/**
 	 * Coordinates the process of downloading the articles feed and inserting data to the database.
 	 * @param context
 	 * @return
 	 */
-	public UpdateStatus fetchAndSaveArticles(Context context) {
+	private UpdateStatus fetchAndSaveArticles(Context context) {
 		ArticleUpdateStatus status		= new ArticleUpdateStatus();
 		FeedDownloadManager fdm	= new FeedDownloadManager();
 		ArticleURL articleURL				= new ArticleURL();
@@ -156,7 +190,7 @@ public class ContentUpdateManager {
 	 * @param storageDir
 	 * @return
 	 */
-	public boolean fetchAndSaveArticleThumbnails(Set<Map<String,String>> imageSet, File storageDir) {
+	private boolean fetchAndSaveArticleThumbnails(Set<Map<String,String>> imageSet, File storageDir) {
 		if (! storageDir.canWrite() ) {
 			return false;
 		}
@@ -224,7 +258,7 @@ public class ContentUpdateManager {
 	 * @param context
 	 * @return
 	 */
-	public UpdateStatus fetchAndSaveAnnouncements(Context context) {
+	private UpdateStatus fetchAndSaveAnnouncements(Context context) {
 		UpdateStatus status						= new UpdateStatus();
 		FeedDownloadManager fdm			= new FeedDownloadManager();
 		AnnouncementURL annURL				= new AnnouncementURL();
@@ -263,7 +297,7 @@ public class ContentUpdateManager {
 	}
 
 
-	public UpdateStatus fetchAndSaveHistoryEvents(Context context) {
+	private UpdateStatus fetchAndSaveHistoryEvents(Context context) {
 		UpdateStatus status				= new UpdateStatus();
 		FeedDownloadManager fdm	= new FeedDownloadManager();
 		HistoryURL historyURL			= new HistoryURL();
@@ -314,7 +348,7 @@ public class ContentUpdateManager {
 
 
 	/**
-	 * Broadcasts BROADCAST_UPDATE_AVAILABLE messages to all activities that display content from the database.
+	 * Broadcasts RELOAD_VIEW messages to all activities that display content from the database.
 	 */
 	public void broadcastDataReload() {
 		Intent intent	= new Intent();
@@ -403,14 +437,20 @@ public class ContentUpdateManager {
 	 * 3. history
 	 */
 	public void manageAndBroadcastUpdates(StatusMessageType status) {
+		setRunning(true);
+
 		switch (status) {
 			case INIT:
+				broadcastNetworkActivity_On();
 				// Fetch news and opinions updates from the server.
 				new UpdateArticlesTask().execute();
-
-				broadcastNetworkActivity_On();
 				break;
 
+			case INIT_HISTORY:
+				broadcastNetworkActivity_On();
+				new UpdateHistoryTask().execute();
+				break;
+				
 			case NEW_PUBLICATIONS:
 				// Notify the news listing screen
 				broadcastDataReload_News();
@@ -452,10 +492,12 @@ public class ContentUpdateManager {
 				broadcastDataReload_History();
 
 				broadcastNetworkActivity_Off();
+				setRunning(false);
 				break;
 
 			case NO_HISTORY:
 				broadcastNetworkActivity_Off();
+				setRunning(false);
 				break;
 		}
 	}

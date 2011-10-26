@@ -116,8 +116,10 @@ public class ApplicationRootActivity extends TabActivity {
 		registerReceiver(receiver, filter);
 
 		// Trigger content update
-		updateManager	= new ContentUpdateManager(getApplicationContext(), storageDir);
-		updateManager.run();
+		updateManager	= ContentUpdateManager.getInstance(getApplicationContext(), storageDir);
+		if (! updateManager.isRunning() ) {
+			updateManager.run();
+		}
 	}
 
 
@@ -135,6 +137,18 @@ public class ApplicationRootActivity extends TabActivity {
 	}
 
 
+	@Override
+	public boolean onPrepareOptionsMenu (Menu menu) {
+		// Don't let them run the refresh if it's already running.
+		menu.getItem(0).setEnabled(true);
+
+		if (updateManager.isRunning() ) {
+			menu.getItem(0).setEnabled(false);
+		}
+		
+		return true;
+	}
+
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
 	 */
@@ -151,6 +165,9 @@ public class ApplicationRootActivity extends TabActivity {
 				return true;
 	
 			case R.id.menu_mark_as_read:
+				if (updateManager.isRunning() ) {
+					return true;
+				}
 				ArticleDAO articleDAO			= new ArticleDAO(this);
 				articleDAO.open();
 				articleDAO.updateMarkAllAsRead();
