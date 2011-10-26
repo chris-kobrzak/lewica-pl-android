@@ -78,7 +78,7 @@ public class AnnouncementDAO {
 		ContentValues cv	= new ContentValues();
 		
 		cv.put(FIELD_ID,							announcement.getID() );
-		cv.put(FIELD_WAS_READ,				"");
+		cv.put(FIELD_WAS_READ,				0);	// It's a new announcement so it couldn't be read yet
 		cv.put(FIELD_DATE_EXPIRY,			DateUtil.convertDateToString(announcement.getDateExpiry(), DateUtil.DATE_MASK_SQL) );
 		cv.put(FIELD_WHAT,					announcement.getWhat() );
 		cv.put(FIELD_WHERE,					announcement.getWhere() );
@@ -109,6 +109,25 @@ public class AnnouncementDAO {
 			FIELD_ID + "=" + articleID, 
 			null
 		);
+		databaseWritable.close();
+		
+		return totalUpdates;
+	}
+
+
+	public int updateMarkAllAsRead() {
+		ContentValues cv	= new ContentValues();
+		
+		cv.put(FIELD_WAS_READ, 1);
+		
+		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
+		
+		int totalUpdates	= databaseWritable.update(
+				DATABASE_TABLE, 
+				cv, 
+				FIELD_WAS_READ + "=" + 0, 
+				null
+				);
 		databaseWritable.close();
 		
 		return totalUpdates;
