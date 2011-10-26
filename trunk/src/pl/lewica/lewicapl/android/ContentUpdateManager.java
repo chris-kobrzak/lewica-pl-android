@@ -34,6 +34,11 @@ import java.util.Set;
 
 import org.apache.http.util.ByteArrayBuffer;
 
+import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.util.Log;
+
 import pl.lewica.api.FeedDownloadManager;
 import pl.lewica.api.model.Announcement;
 import pl.lewica.api.model.Article;
@@ -50,10 +55,6 @@ import pl.lewica.lewicapl.android.activity.PublicationListActivity;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 import pl.lewica.lewicapl.android.database.HistoryDAO;
-import android.content.Context;
-import android.content.Intent;
-import android.os.AsyncTask;
-import android.util.Log;
 
 
 /**
@@ -363,6 +364,26 @@ public class ContentUpdateManager {
 
 
 	/**
+	 * Attempts to switch the top bar network activity indicator on. 
+	 */
+	public void broadcastNetworkActivity_On() {
+		Intent intent	= new Intent();
+		intent.setAction(ApplicationRootActivity.START_INDETERMINATE_PROGRESS);
+		context.sendBroadcast(intent);
+	}
+	
+	
+	/**
+	 * Attempts to switch the top bar network activity indicator off. 
+	 */
+	public void broadcastNetworkActivity_Off() {
+		Intent intent	= new Intent();
+		intent.setAction(ApplicationRootActivity.STOP_INDETERMINATE_PROGRESS);
+		context.sendBroadcast(intent);
+	}
+
+
+	/**
 	 * Convenience method that can be used to trigger the update process.
 	 */
 	public void run() {
@@ -386,6 +407,8 @@ public class ContentUpdateManager {
 			case INIT:
 				// Fetch news and opinions updates from the server.
 				new UpdateArticlesTask().execute();
+
+				broadcastNetworkActivity_On();
 				break;
 
 			case NEW_PUBLICATIONS:
@@ -427,6 +450,12 @@ public class ContentUpdateManager {
 
 			case NEW_HISTORY:
 				broadcastDataReload_History();
+
+				broadcastNetworkActivity_Off();
+				break;
+
+			case NO_HISTORY:
+				broadcastNetworkActivity_Off();
 				break;
 		}
 	}

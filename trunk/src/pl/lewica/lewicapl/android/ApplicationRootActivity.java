@@ -18,7 +18,10 @@ package pl.lewica.lewicapl.android;
 import java.io.File;
 
 import android.app.TabActivity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Environment;
@@ -27,6 +30,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewParent;
+import android.view.Window;
 import android.widget.TabHost;
 
 import pl.lewica.lewicapl.R;
@@ -43,12 +47,19 @@ import pl.lewica.lewicapl.android.database.ArticleDAO;
  */
 public class ApplicationRootActivity extends TabActivity {
 
+	public static final String START_INDETERMINATE_PROGRESS		= "pl.lewica.lewicapl.android.applicationrootactivity.reloadon";
+	public static final String STOP_INDETERMINATE_PROGRESS		= "pl.lewica.lewicapl.android.applicationrootactivity.reloadoff";
+
 	private static File storageDir;
 	private ContentUpdateManager updateManager;
 
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// This allows to show and hide the progress indicator in the top bar.
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+
 		setContentView(R.layout.tab_layout);
 		
 		// Tabs layout based on http://developer.android.com/resources/tutorials/views/hello-tabwidget.html
@@ -96,6 +107,13 @@ public class ApplicationRootActivity extends TabActivity {
 
 		// By default, the first tab is selected
 		tabHost.setCurrentTab(0);
+
+		// Register to receive notifications
+		IntentFilter filter		= new IntentFilter();
+		filter.addAction(START_INDETERMINATE_PROGRESS);
+		filter.addAction(STOP_INDETERMINATE_PROGRESS);
+		ApplicationBroadcastReceiver receiver	= new ApplicationBroadcastReceiver();	// Instance of an inner class
+		registerReceiver(receiver, filter);
 
 		// Trigger content update
 		updateManager	= new ContentUpdateManager(getApplicationContext(), storageDir);
@@ -150,6 +168,24 @@ public class ApplicationRootActivity extends TabActivity {
 	
 				default :
 					return super.onOptionsItemSelected(item);
+		}
+	}
+
+
+	// INNER CLASSES
+	private class ApplicationBroadcastReceiver extends BroadcastReceiver {
+		@SuppressWarnings("unused")
+		private static final String TAG = "ApplicationBroadcastReceiver";
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent.getAction().equals(START_INDETERMINATE_PROGRESS) ) {
+				setProgressBarIndeterminateVisibility(true);
+			}
+			
+			if (intent.getAction().equals(STOP_INDETERMINATE_PROGRESS) ) {
+				setProgressBarIndeterminateVisibility(false);
+			}
 		}
 	}
 }
