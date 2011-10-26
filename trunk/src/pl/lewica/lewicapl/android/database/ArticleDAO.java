@@ -162,6 +162,25 @@ public class ArticleDAO {
 	}
 
 
+	public int updateMarkAllAsRead() {
+		ContentValues cv	= new ContentValues();
+		
+		cv.put(FIELD_WAS_READ, 1);
+		
+		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
+		
+		int totalUpdates	= databaseWritable.update(
+				DATABASE_TABLE, 
+				cv, 
+				FIELD_WAS_READ + "=" + 0, 
+				null
+				);
+		databaseWritable.close();
+		
+		return totalUpdates;
+	}
+
+
 	/**
 	 * A wrapper method that fetches one article record from the database.
 	 * @param articleID
