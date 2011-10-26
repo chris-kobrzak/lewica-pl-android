@@ -56,9 +56,9 @@ import pl.lewica.lewicapl.android.database.ArticleDAO;
 /**
  * @author Krzysztof Kobrzak
  */
-public class PublicationsListActivity extends Activity {
+public class PublicationListActivity extends Activity {
 
-	public static final String BROADCAST_UPDATE_AVAILABLE	= "pl.lewica.lewicapl.android.activity.publicationslistactivity.reload";
+	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.publicationslistactivity.reload";
 
 	private static final String TAG = "LewicaPL:NewsListActivity";
 
@@ -93,7 +93,7 @@ public class PublicationsListActivity extends Activity {
 		
 		// Register to receive content update messages
 		IntentFilter filter		= new IntentFilter();
-		filter.addAction(BROADCAST_UPDATE_AVAILABLE);
+		filter.addAction(RELOAD_VIEW);
 		receiver					= new PublicationsUpdateBroadcastReceiver();	// Instance of an inner class
 		registerReceiver(receiver, filter);
 

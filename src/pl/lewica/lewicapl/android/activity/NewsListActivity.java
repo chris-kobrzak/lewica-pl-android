@@ -58,7 +58,7 @@ import pl.lewica.lewicapl.android.database.ArticleDAO;
  */
 public class NewsListActivity extends Activity {
 
-	public static final String BROADCAST_UPDATE_AVAILABLE	= "pl.lewica.lewicapl.android.activity.newslistactivity.reload";
+	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.newslistactivity.reload";
 
 	private static final String TAG = "LewicaPL:NewsListActivity";
 
@@ -93,7 +93,7 @@ public class NewsListActivity extends Activity {
 		
 		// Register to receive content update messages
 		IntentFilter filter		= new IntentFilter();
-		filter.addAction(BROADCAST_UPDATE_AVAILABLE);
+		filter.addAction(RELOAD_VIEW);
 		receiver					= new NewsUpdateBroadcastReceiver();	// Instance of an inner class
 		registerReceiver(receiver, filter);
 

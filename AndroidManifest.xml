@@ -17,7 +17,7 @@
         </activity>
 
         <activity android:name=".android.activity.NewsListActivity" android:label="@string/title_news"/>
-        <activity android:name=".android.activity.PublicationsListActivity" android:label="@string/title_opinions"/>
+        <activity android:name=".android.activity.PublicationListActivity" android:label="@string/title_opinions"/>
         <activity android:name=".android.activity.AnnouncementListActivity" android:label="@string/title_announcements"/>
         <activity android:name=".android.activity.HistoryListActivity" android:label="@string/title_history"/>
         <activity android:name=".android.activity.MoreActivity" android:label="@string/title_more"/>

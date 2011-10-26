@@ -41,7 +41,7 @@ import pl.lewica.lewicapl.android.database.HistoryDAO;
  */
 public class HistoryListActivity extends Activity {
 	
-	public static final String BROADCAST_UPDATE_AVAILABLE	= "pl.lewica.lewicapl.android.activity.historylistactivity.reload";
+	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.historylistactivity.reload";
 
 	private static final String TAG = "LewicaPL:HistoryEventListActivity";
 
@@ -65,7 +65,7 @@ public class HistoryListActivity extends Activity {
 
 		// Register to receive content update messages
 		IntentFilter filter		= new IntentFilter();
-		filter.addAction(BROADCAST_UPDATE_AVAILABLE);
+		filter.addAction(RELOAD_VIEW);
 		receiver					= new HistoryUpdateBroadcastReceiver();	// Instance of an inner class
 		registerReceiver(receiver, filter);
 		

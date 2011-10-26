@@ -46,7 +46,7 @@ import pl.lewica.api.url.HistoryURL;
 import pl.lewica.lewicapl.android.activity.AnnouncementListActivity;
 import pl.lewica.lewicapl.android.activity.HistoryListActivity;
 import pl.lewica.lewicapl.android.activity.NewsListActivity;
-import pl.lewica.lewicapl.android.activity.PublicationsListActivity;
+import pl.lewica.lewicapl.android.activity.PublicationListActivity;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 import pl.lewica.lewicapl.android.database.HistoryDAO;
@@ -313,6 +313,56 @@ public class ContentUpdateManager {
 
 
 	/**
+	 * Broadcasts BROADCAST_UPDATE_AVAILABLE messages to all activities that display content from the database.
+	 */
+	public void broadcastDataReload() {
+		Intent intent	= new Intent();
+
+		// Notify the news listing screen
+		intent.setAction(NewsListActivity.RELOAD_VIEW);
+		context.sendBroadcast(intent);
+
+		// Notify the publications listing screen
+		intent.setAction(PublicationListActivity.RELOAD_VIEW);
+		context.sendBroadcast(intent);
+
+		intent.setAction(AnnouncementListActivity.RELOAD_VIEW);
+		context.sendBroadcast(intent);
+
+		intent.setAction(HistoryListActivity.RELOAD_VIEW);
+		context.sendBroadcast(intent);
+	}
+
+
+	public void broadcastDataReload_News() {
+		Intent intent	= new Intent();
+		intent.setAction(NewsListActivity.RELOAD_VIEW);
+		context.sendBroadcast(intent);
+	}
+	
+	
+	public void broadcastDataReload_Publications() {
+		Intent intent	= new Intent();
+		intent.setAction(PublicationListActivity.RELOAD_VIEW);
+		context.sendBroadcast(intent);
+	}
+	
+	
+	public void broadcastDataReload_Announcements() {
+		Intent intent	= new Intent();
+		intent.setAction(AnnouncementListActivity.RELOAD_VIEW);
+		context.sendBroadcast(intent);
+	}
+	
+	
+	public void broadcastDataReload_History() {
+		Intent intent	= new Intent();
+		intent.setAction(HistoryListActivity.RELOAD_VIEW);
+		context.sendBroadcast(intent);
+	}
+
+
+	/**
 	 * Convenience method that can be used to trigger the update process.
 	 */
 	public void run() {
@@ -332,22 +382,18 @@ public class ContentUpdateManager {
 	 * 3. history
 	 */
 	public void manageAndBroadcastUpdates(StatusMessageType status) {
-		Intent intent			= new Intent();
-
 		switch (status) {
 			case INIT:
-				// Fetch updates from the server.
+				// Fetch news and opinions updates from the server.
 				new UpdateArticlesTask().execute();
 				break;
 
 			case NEW_PUBLICATIONS:
 				// Notify the news listing screen
-				intent.setAction(NewsListActivity.BROADCAST_UPDATE_AVAILABLE);
-				context.sendBroadcast(intent);
+				broadcastDataReload_News();
 				
 				// Notify the publications listing screen
-				intent.setAction(PublicationsListActivity.BROADCAST_UPDATE_AVAILABLE);
-				context.sendBroadcast(intent);
+				broadcastDataReload_Publications();
 
 				// New publications have been downloaded, now request new announcements
 				new UpdateAnnouncementsTask().execute();
@@ -360,35 +406,30 @@ public class ContentUpdateManager {
 				
 			case NEW_PUBLICATION_IMAGES:
 				// Notify the news listing screen
-				intent.setAction(NewsListActivity.BROADCAST_UPDATE_AVAILABLE);
-				context.sendBroadcast(intent);
+				broadcastDataReload_News();
 				
 				// Notify the publications listing screen
-				intent.setAction(PublicationsListActivity.BROADCAST_UPDATE_AVAILABLE);
-				context.sendBroadcast(intent);
+				broadcastDataReload_Publications();
 
 				// We "know" the image update is actually triggered by UpdateArticlesTask so no actions required here.
 				break;
 
 			case NEW_ANNOUNCEMENTS:
-				intent.setAction(AnnouncementListActivity.BROADCAST_UPDATE_AVAILABLE);
-				context.sendBroadcast(intent);
+				broadcastDataReload_Announcements();
 
 				// New announcements have been downloaded, now request new history events
 				new UpdateHistoryTask().execute();
-			break;
-			
+				break;
+
 			case NO_ANNOUNCEMENTS:
 				new UpdateHistoryTask().execute();
 				break;
 
 			case NEW_HISTORY:
-				intent.setAction(HistoryListActivity.BROADCAST_UPDATE_AVAILABLE);
-				context.sendBroadcast(intent);
+				broadcastDataReload_History();
 				break;
 		}
 	}
-
 
 
 	/**

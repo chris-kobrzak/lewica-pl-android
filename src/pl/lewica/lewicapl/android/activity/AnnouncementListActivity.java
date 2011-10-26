@@ -47,18 +47,18 @@ import pl.lewica.lewicapl.android.database.AnnouncementDAO;
  */
 public class AnnouncementListActivity extends Activity {
 
-	public static final String BROADCAST_UPDATE_AVAILABLE	= "pl.lewica.lewicapl.android.activity.announcementslistactivity.reload";
+	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.announcementslistactivity.reload";
 
 	private static final String TAG = "LewicaPL:AnnouncementListActivity";
+	// When users select a new article, navigate back to the list and start scrolling up and down, the cursor won't know this article should be marked as read.
+	// That results in articles still being marked as unread (titles in red rather than blue).
+	// That's why we need to cache the list of clicked articles.  Please note, it is down to ArcticleActivity to flag articles as read in the database.
+	private static Set<Long> clicked	= new HashSet<Long>();
 
 	private AnnouncementDAO annDAO;
 	private ListAdapter listAdapter;
 	private ListView listView;
 	private AnnouncementsUpdateBroadcastReceiver receiver;
-	// When users select a new article, navigate back to the list and start scrolling up and down, the cursor won't know this article should be marked as read.
-	// That results in articles still being marked as unread (titles in red rather than blue).
-	// That's why we need to cache the list of clicked articles.  Please note, it is down to ArcticleActivity to flag articles as read in the database.
-	private static Set<Long> clicked	= new HashSet<Long>();
 
 
 
@@ -72,7 +72,7 @@ public class AnnouncementListActivity extends Activity {
 
 		// Register to receive content update messages
 		IntentFilter filter		= new IntentFilter();
-		filter.addAction(BROADCAST_UPDATE_AVAILABLE);
+		filter.addAction(RELOAD_VIEW);
 		receiver					= new AnnouncementsUpdateBroadcastReceiver();	// Instance of an inner class
 		registerReceiver(receiver, filter);
 
