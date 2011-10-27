@@ -18,9 +18,14 @@ package pl.lewica.api;
 import java.util.ArrayList; 
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 import pl.lewica.api.model.DataModel;
@@ -41,8 +46,19 @@ public class FeedDownloadManager {
 	/**
 	 * Class constructor
 	 */
-	public FeedDownloadManager(){
+	public FeedDownloadManager() {
 		factory		= SAXParserFactory.newInstance();
+
+		try {
+			factory.setFeature("http://xml.org/sax/features/namespaces", false);
+			factory.setFeature("http://xml.org/sax/features/namespace-prefixes", true);
+		} catch (SAXNotRecognizedException e) {
+			e.printStackTrace();
+		} catch (SAXNotSupportedException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
 	}
 
 
@@ -60,11 +76,14 @@ public class FeedDownloadManager {
 		SAXParser saxp;
 
 		try {
-			httpUtil									= new HTTPUtil(URL);
-			DefaultHandler handler			= SAXParserHandlerFactory.create(modelType);
-
 			saxp										= factory.newSAXParser();
-			saxp.parse(httpUtil.getInputStream(), handler);
+			httpUtil									= new HTTPUtil(URL);
+			final InputSource source			= new InputSource(httpUtil.getInputStream() );
+			final XMLReader xmlreader		= saxp.getXMLReader();
+			final DefaultHandler handler	= SAXParserHandlerFactory.create(modelType);
+
+			xmlreader.setContentHandler(handler);
+			xmlreader.parse(source);
 
 			SAXParserDelegate delegate	= (SAXParserDelegate) handler; 
 			elements								= delegate.getElements();

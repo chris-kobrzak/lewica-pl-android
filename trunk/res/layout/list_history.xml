@@ -8,7 +8,7 @@
 >
     <LinearLayout
 		android:id="@+id/info_bar_history"
-		android:layout_width="match_parent"
+		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:background="@color/orange"
 		>
@@ -34,7 +34,7 @@
     </LinearLayout>
 	<ListView 
 		android:id="@+id/list_history_events" 
-		android:layout_width="match_parent"
+		android:layout_width="fill_parent"
 		android:layout_height="wrap_content" 
 	></ListView>
 </LinearLayout>

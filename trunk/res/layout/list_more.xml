@@ -2,20 +2,20 @@
 <LinearLayout 
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_height="wrap_content" 
-	android:layout_width="match_parent"
+	android:layout_width="fill_parent"
 	android:orientation="vertical"
 	>
 		<TextView
 			android:text="TextView"
 			android:id="@+id/more_introduction"
-			android:layout_width="match_parent"
+			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:padding="7dp"
 		/>
 		<TextView
 			android:text="TextView"
 			android:id="@+id/more_homepage"
-			android:layout_width="match_parent"
+			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:padding="7dp"
 			style="@style/ListItemHeading"
@@ -23,7 +23,7 @@
 		<TextView
 			android:text="TextView"
 			android:id="@+id/more_facebook"
-			android:layout_width="match_parent"
+			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:padding="7dp"
 			android:textColor="@color/blue_facebook"
@@ -32,7 +32,7 @@
 		<TextView
 			android:text="TextView"
 			android:id="@+id/more_blogs"
-			android:layout_width="match_parent"
+			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:padding="7dp"
 			style="@style/ListItemHeading"
@@ -40,7 +40,7 @@
 		<TextView
 			android:text="TextView"
 			android:id="@+id/more_links"
-			android:layout_width="match_parent"
+			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:padding="7dp"
 			style="@style/ListItemHeading"
@@ -48,7 +48,7 @@
 		<TextView
 			android:text="TextView"
 			android:id="@+id/more_search"
-			android:layout_width="match_parent"
+			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:padding="7dp"
 			style="@style/ListItemHeading"
@@ -56,7 +56,7 @@
 		<TextView
 			android:text="TextView"
 			android:id="@+id/more_team"
-			android:layout_width="match_parent"
+			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:padding="7dp"
 			style="@style/ListItemHeading"

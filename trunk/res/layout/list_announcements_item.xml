@@ -2,13 +2,13 @@
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:orientation="vertical"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
 	>
 	<TextView 
 		android:text="Title" 
 		android:id="@+id/announcement_item_title" 
-		android:layout_width="match_parent" 
+		android:layout_width="fill_parent" 
 		android:layout_height="45dp"
 		android:layout_marginLeft="7dp" 
 		android:layout_marginRight="7dp"
@@ -20,7 +20,7 @@
     <TextView 
 		android:text="Where and when" 
 		android:id="@+id/announcement_item_details" 
-		android:layout_width="match_parent" 
+		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content" 
 		android:layout_marginLeft="7dp" 
 		android:layout_marginRight="7dp"

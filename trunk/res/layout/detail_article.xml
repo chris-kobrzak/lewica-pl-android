@@ -5,7 +5,7 @@
 	android:layout_width="wrap_content"
 	android:layout_height="wrap_content">
 	<RelativeLayout
-		android:layout_width="match_parent" 
+		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content" 
 		android:paddingTop="0dp" 
 		android:paddingRight="0dp"
@@ -34,7 +34,7 @@
 		<TextView
 			android:text="title"
 			android:id="@+id/article_title"
-			android:layout_width="match_parent"
+			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:paddingTop="5dp"
 			android:paddingBottom="5dp"
@@ -57,7 +57,7 @@
 		<TextView
 			android:text="content"
 			android:id="@+id/article_content"
-			android:layout_width="match_parent"
+			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:paddingLeft="7dp"
 			android:paddingRight="7dp"
@@ -69,7 +69,7 @@
 		<TextView
 			android:text=""
 			android:id="@+id/article_editor_comment_top"
-			android:layout_width="match_parent"
+			android:layout_width="fill_parent"
 			android:layout_height="9dp"
 			android:layout_marginLeft="7dp"
 			android:layout_marginRight="7dp"
@@ -79,7 +79,7 @@
 		<TextView
 			android:text="editor's comment"
 			android:id="@+id/article_editor_comment"
-			android:layout_width="match_parent"
+			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:padding="7dp"
 			android:layout_marginLeft="7dp"
