@@ -60,7 +60,7 @@ public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
 		} catch (IOException e) {
 			// This is unlikely to happen but if it does, there's not much you can do as the application
 			// cannot run without the database.  So let's at least make sure this event is logged.
-			Log.wtf(TAG, "Failed to create the database");
+			Log.e(TAG, "Failed to create database");
 			e.printStackTrace();
 		}
 	}
