@@ -100,7 +100,7 @@ public class ArticleActivity extends Activity {
 		articleDAO.open();
 		
 		// Fill views with data
-		loadArticle(articleID, this);
+		loadContent(articleID, this);
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
 		View titleView = getWindow().findViewById(android.R.id.title);
@@ -174,7 +174,7 @@ public class ArticleActivity extends Activity {
 				id	= nextPrevID.get(ArticleDAO.MAP_KEY_PREVIOUS);
 				// If there are no newer articles the ID is set to zero by fetchPreviousNextID()
 				if (id > 0) {
-					loadArticle(nextPrevID.get(ArticleDAO.MAP_KEY_PREVIOUS), this);
+					loadContent(nextPrevID.get(ArticleDAO.MAP_KEY_PREVIOUS), this);
 				}
 				return true;
 
@@ -182,7 +182,7 @@ public class ArticleActivity extends Activity {
 				id	= nextPrevID.get(ArticleDAO.MAP_KEY_NEXT);
 				// If there are no older articles the ID is set to zero by fetchPreviousNextID()
 				if (id > 0) {
-					loadArticle(nextPrevID.get(ArticleDAO.MAP_KEY_NEXT), this);
+					loadContent(nextPrevID.get(ArticleDAO.MAP_KEY_NEXT), this);
 				}
 				return true;
 
@@ -217,7 +217,7 @@ public class ArticleActivity extends Activity {
 	 * or navigating between articles using the previous-next facility (not yet implemented).
 	 * @param id
 	 */
-	public void loadArticle(long ID, Context context) {
+	public void loadContent(long ID, Context context) {
 		// Save it in this object's field
 		articleID	= ID;
 		// Fetch database record
@@ -285,7 +285,8 @@ public class ArticleActivity extends Activity {
 		tv.setText(dateFormat.format(d) );
 
 		tv							= (TextView) findViewById(R.id.article_content);
-		tv.setText(cursor.getString(colIndex_Content) );
+		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
+		tv.setText(cursor.getString(colIndex_Content).replace("\r", "") );
 
 		tv							= (TextView) findViewById(R.id.article_editor_comment);
 		tvComment			= (TextView) findViewById(R.id.article_editor_comment_top);

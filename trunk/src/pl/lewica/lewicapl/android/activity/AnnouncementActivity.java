@@ -80,7 +80,7 @@ public class AnnouncementActivity extends Activity {
 		annDAO.open();
 		
 		// Fill views with data
-		loadArticle(annID, this);
+		loadContent(annID, this);
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
 		View titleView = getWindow().findViewById(android.R.id.title);
@@ -153,7 +153,7 @@ public class AnnouncementActivity extends Activity {
 				id	= nextPrevID.get(AnnouncementDAO.MAP_KEY_PREVIOUS);
 				// If there are no newer announcements the ID is set to zero by fetchPreviousNextID()
 				if (id > 0) {
-					loadArticle(nextPrevID.get(AnnouncementDAO.MAP_KEY_PREVIOUS), this);
+					loadContent(nextPrevID.get(AnnouncementDAO.MAP_KEY_PREVIOUS), this);
 				}
 				return true;
 
@@ -161,7 +161,7 @@ public class AnnouncementActivity extends Activity {
 				id	= nextPrevID.get(AnnouncementDAO.MAP_KEY_NEXT);
 				// If there are no older announcements the ID is set to zero by fetchPreviousNextID()
 				if (id > 0) {
-					loadArticle(nextPrevID.get(AnnouncementDAO.MAP_KEY_NEXT), this);
+					loadContent(nextPrevID.get(AnnouncementDAO.MAP_KEY_NEXT), this);
 				}
 				return true;
 
@@ -179,7 +179,7 @@ public class AnnouncementActivity extends Activity {
 	 * or navigating between announcements using the previous-next facility (not yet implemented).
 	 * @param id
 	 */
-	public void loadArticle(long ID, Context context) {
+	public void loadContent(long ID, Context context) {
 		// Save it in this object's field
 		annID	= ID;
 		// Fetch database record
@@ -210,7 +210,9 @@ public class AnnouncementActivity extends Activity {
 		tv.setText(context.getString(R.string.heading_announcements) );
 
 		tv							= (TextView) findViewById(R.id.announcement_content);
-		tv.setText(cursor.getString(colIndex_Content) );
+		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
+		tv.setText(cursor.getString(colIndex_Content).replace("\r", "") );
+
 		// Where
 		tv							= (TextView) findViewById(R.id.announcement_where);
 		tvLabel					= (TextView) findViewById(R.id.announcement_where_label);
