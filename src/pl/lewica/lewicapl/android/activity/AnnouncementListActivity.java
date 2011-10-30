@@ -27,7 +27,6 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +48,6 @@ public class AnnouncementListActivity extends Activity {
 
 	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.announcementslistactivity.reload";
 
-	private static final String TAG = "LewicaPL:AnnouncementListActivity";
 	// When users select a new article, navigate back to the list and start scrolling up and down, the cursor won't know this article should be marked as read.
 	// That results in articles still being marked as unread (titles in red rather than blue).
 	// That's why we need to cache the list of clicked articles.  Please note, it is down to ArcticleActivity to flag articles as read in the database.
@@ -126,7 +124,6 @@ public class AnnouncementListActivity extends Activity {
 	private class AnnouncementsUpdateBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.i(TAG, "AnnouncementsUpdateBroadcastReceiver got a message!");
 			reloadRows();
 		}
 	}

@@ -21,14 +21,12 @@ import java.util.List;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 /**
  * Standard Android SQLite database management class responsible for creating and updating the schema.
  * @author Krzysztof Kobrzak
  */
 public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
-	private static final String TAG						= "LewicaPLSQLiteOpenHelper";
 
 	private static final String DATABASE_NAME		= "LewicaPL.db";
 	private static final int DATABASE_VERSION		= 1;
@@ -60,7 +58,6 @@ public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
 		} catch (IOException e) {
 			// This is unlikely to happen but if it does, there's not much you can do as the application
 			// cannot run without the database.  So let's at least make sure this event is logged.
-			Log.e(TAG, "Failed to create database");
 			e.printStackTrace();
 		}
 	}
