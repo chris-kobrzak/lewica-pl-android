@@ -97,16 +97,16 @@ public class AnnouncementListActivity extends Activity {
 				Uri uri			= Uri.parse(AnnouncementActivity.BASE_URI + Long.toString(id) );
 				// Passes activity Uri as parameter that can be used to work out ID of requested article.
 				intent.setData(uri);
-		        startActivity(intent);
+				startActivity(intent);
 
-		        // Mark current announcement as read by changing its colour...
-		        int colour		= res.getColor(R.color.read);
-		        tv					= (TextView) view.findViewById(R.id.announcement_item_title);
-		        tv.setTextColor(colour);
-		        // ... and flagging it in local cache accordingly
-		        clicked.add(id);
+				// Mark current announcement as read by changing its colour...
+				int colour		= res.getColor(R.color.read);
+				tv					= (TextView) view.findViewById(R.id.announcement_item_title);
+				tv.setTextColor(colour);
+				// ... and flagging it in local cache accordingly
+				clicked.add(id);
 
-		        return;
+				return;
 			}
 		});
 	}
