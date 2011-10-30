@@ -25,7 +25,6 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.CursorAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -43,8 +42,6 @@ import pl.lewica.lewicapl.android.database.HistoryDAO;
 public class HistoryListActivity extends Activity {
 	
 	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.historylistactivity.reload";
-
-	private static final String TAG = "LewicaPL:HistoryEventListActivity";
 
 	private static Typeface categoryTypeface;
 	private HistoryDAO historyDAO;
@@ -116,7 +113,6 @@ public class HistoryListActivity extends Activity {
 		if (day == dayNow && month == monthNow) {
 			return;
 		}
-		Log.i("HISTORY", "resumed, update required");
 		// Update current date
 		day		= dayNow;
 		month	= monthNow;
@@ -133,14 +129,14 @@ public class HistoryListActivity extends Activity {
 		TextView tv			= (TextView) findViewById(R.id.history_category);
 		tv.setTypeface(categoryTypeface);
 		tv.setText(this.getString(R.string.heading_history) );
-		
+
 		StringBuilder sb		= new StringBuilder();
 		sb.append(day);
 		sb.append("/");
 		sb.append(month);
 		sb.append(" ");
 		sb.append(this.getString(R.string.heading_history_extra) );
-		
+
 		tv							= (TextView) findViewById(R.id.history_date);
 		tv.setText(sb.toString() );
 	}
@@ -159,7 +155,6 @@ public class HistoryListActivity extends Activity {
 	private class HistoryUpdateBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.i(TAG, "HistoryUpdateBroadcastReceiver got a message!");
 			reloadRows();
 		}
 	}

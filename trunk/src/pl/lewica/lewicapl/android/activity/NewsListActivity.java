@@ -34,7 +34,6 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -59,8 +58,6 @@ import pl.lewica.lewicapl.android.database.ArticleDAO;
 public class NewsListActivity extends Activity {
 
 	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.newslistactivity.reload";
-
-	private static final String TAG = "LewicaPL:NewsListActivity";
 
 	private static Typeface categoryTypeface;
 	private static File storageDir;
@@ -147,7 +144,6 @@ public class NewsListActivity extends Activity {
 	public class NewsUpdateBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.i(TAG, "NewsUpdateBroadcastReceiver got a message!");
 			reloadRows();
 		}
 	}
