@@ -18,13 +18,10 @@ package pl.lewica.api;
 import java.util.ArrayList; 
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -49,16 +46,11 @@ public class FeedDownloadManager {
 	public FeedDownloadManager() {
 		factory		= SAXParserFactory.newInstance();
 
+		// Android 1.6 fix.  Without it the parser would not work at all.
 		try {
 			factory.setFeature("http://xml.org/sax/features/namespaces", false);
 			factory.setFeature("http://xml.org/sax/features/namespace-prefixes", true);
-		} catch (SAXNotRecognizedException e) {
-			e.printStackTrace();
-		} catch (SAXNotSupportedException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		}
+		} catch (Exception e) {}
 	}
 
 

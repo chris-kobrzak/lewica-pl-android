@@ -37,7 +37,7 @@ import pl.lewica.util.DateUtil;
  * Articles feed XML parser using the SAX engine.
  * @author Krzysztof Kobrzak
  */
-public class ArticleSAXParserDelegate extends DefaultHandler implements SAXParserDelegate {
+public class ArticleSAXHandler extends DefaultHandler implements SAXParserDelegate {
 	// XML nodes as per http://lewica.pl/api/ docs.
 	public static final  String ARTICLE								= "publikacja";
 	public static final  String ARTICLE_ID							= "id";

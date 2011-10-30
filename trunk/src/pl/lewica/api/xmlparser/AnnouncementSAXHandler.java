@@ -30,7 +30,7 @@ import pl.lewica.api.model.DataModel;
  * Announcements feed XML parser using the SAX engine.
  * @author Krzysztof Kobrzak
  */
-public class AnnouncementSAXParserDelegate extends DefaultHandler implements SAXParserDelegate {
+public class AnnouncementSAXHandler extends DefaultHandler implements SAXParserDelegate {
 	// XML nodes, see documentation under http://lewica.pl/api/
 	static final  String ANNOUNCEMENT									= "ogloszenie";
 	static final  String ANNOUNCEMENT_ID								= "id";

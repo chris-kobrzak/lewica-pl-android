@@ -29,7 +29,7 @@ import pl.lewica.api.model.DataModel;
  * History events feed XML parser using the SAX engine.
  * @author Krzysztof Kobrzak
  */
-public class HistorySAXParserDelegate extends DefaultHandler implements SAXParserDelegate {
+public class HistorySAXHandler extends DefaultHandler implements SAXParserDelegate {
 	List<DataModel> calendarEntries;
 	private History currentEntry;
 	private int	 entryDay;
