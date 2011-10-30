@@ -89,7 +89,13 @@ public class HistoryListActivity extends Activity {
 				cursor, 
 				new String[] { HistoryDAO.FIELD_YEAR, HistoryDAO.FIELD_EVENT },
 				new int[] { R.id.history_year, R.id.history_event }
-		);
+		) {
+			// Disables the onClick event attached to the rows (and also the default, orange background colour).
+			// In order to get rid of lines dividing the rows, you might want to implement areAllItemsEnabled() as well.
+			public boolean isEnabled(int position) { 
+				return false; 
+			} 
+		}; 
 		listView.setAdapter(listAdapter);
 	}
 
