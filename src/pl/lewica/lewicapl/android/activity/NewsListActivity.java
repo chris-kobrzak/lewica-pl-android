@@ -57,7 +57,7 @@ import pl.lewica.lewicapl.android.database.ArticleDAO;
  */
 public class NewsListActivity extends Activity {
 
-	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.newslistactivity.reload";
+	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.newslistactivity.RELOAD";
 
 	private static Typeface categoryTypeface;
 	private static File storageDir;
@@ -117,16 +117,16 @@ public class NewsListActivity extends Activity {
 				Uri uri			= Uri.parse(ArticleActivity.URI_BASE + Long.toString(id) );
 				// Passes activity Uri as parameter that can be used to work out ID of requested article.
 				intent.setData(uri);
-		        startActivity(intent);
+				startActivity(intent);
 
-		        // Mark current article as read by changing its colour...
-		        int colour		= res.getColor(R.color.read);
-		        tv					= (TextView) view.findViewById(R.id.article_item_title);
-		        tv.setTextColor(colour);
-		        // ... and flagging it in the database accordingly
-		        clicked.add(id);
+				// Mark current article as read by changing its colour...
+				int colour		= res.getColor(R.color.read);
+				tv					= (TextView) view.findViewById(R.id.article_item_title);
+				tv.setTextColor(colour);
+				// ... and flagging it in the database accordingly
+				clicked.add(id);
 
-		        return;
+				return;
 			}
 		});
 	}

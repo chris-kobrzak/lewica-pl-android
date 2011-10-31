@@ -57,7 +57,7 @@ import pl.lewica.lewicapl.android.database.ArticleDAO;
  */
 public class PublicationListActivity extends Activity {
 
-	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.publicationslistactivity.reload";
+	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.publicationslistactivity.RELOAD";
 
 	private static Typeface categoryTypeface;
 	private static File storageDir;

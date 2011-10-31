@@ -34,8 +34,6 @@ import android.widget.TextView;
  */
 public class MoreActivity extends Activity {
 
-	@SuppressWarnings("unused")
-	private static final String TAG = null;
 	private static Typeface categoryTypeface;
 
 

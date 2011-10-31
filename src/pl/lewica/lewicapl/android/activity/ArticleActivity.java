@@ -55,9 +55,6 @@ public class ArticleActivity extends Activity {
 	public static final String URI_BASE						= "content://lewicapl/articles/article/";
 	public static final String URI_BASE_COMMENTS	= "content://lewicapl/articles/article/comments/";
 
-	@SuppressWarnings("unused")
-	private static final String TAG = "LewicaPL:ArticleActivity";
-
 	private static Typeface categoryTypeface;
 	private static Map<Long,Bitmap> images	= new HashMap<Long,Bitmap>();
 
@@ -308,7 +305,6 @@ public class ArticleActivity extends Activity {
 		iv.setImageBitmap(null);
 		if (cursor.getInt(colIndex_HasThumb) == 1) {
 			if (images.containsKey(articleID) ) {
-//				Log.i(TAG, "Pulling image from cache");
 				loadImage(images.get(articleID) );
 			} else {
 				String imageUrl		= ArticleURL.buildURLImage(ID, cursor.getString(colIndex_ThumbExt) );
@@ -386,7 +382,6 @@ public class ArticleActivity extends Activity {
 			}
 			// The parent process might have requested this thread to be stopped.
 			if (isCancelled() ) {
-//				Log.i(TAG, "Cancelled image download task");
 				return null;
 			}
 			return bitmap;

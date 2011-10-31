@@ -46,7 +46,7 @@ import pl.lewica.lewicapl.android.database.AnnouncementDAO;
  */
 public class AnnouncementListActivity extends Activity {
 
-	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.announcementslistactivity.reload";
+	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.announcementslistactivity.RELOAD";
 
 	// When users select a new article, navigate back to the list and start scrolling up and down, the cursor won't know this article should be marked as read.
 	// That results in articles still being marked as unread (titles in red rather than blue).
