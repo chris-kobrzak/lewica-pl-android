@@ -47,8 +47,8 @@ import pl.lewica.lewicapl.android.database.ArticleDAO;
  */
 public class ApplicationRootActivity extends TabActivity {
 
-	public static final String START_INDETERMINATE_PROGRESS		= "pl.lewica.lewicapl.android.applicationrootactivity.reloadon";
-	public static final String STOP_INDETERMINATE_PROGRESS		= "pl.lewica.lewicapl.android.applicationrootactivity.reloadoff";
+	public static final String START_INDETERMINATE_PROGRESS		= "pl.lewica.lewicapl.android.applicationrootactivity.RELOADON";
+	public static final String STOP_INDETERMINATE_PROGRESS		= "pl.lewica.lewicapl.android.applicationrootactivity.RELOADOFF";
 
 	private static File storageDir;
 	private ContentUpdateManager updateManager;
@@ -157,13 +157,13 @@ public class ApplicationRootActivity extends TabActivity {
 		switch (item.getItemId() ) {
 			case R.id.menu_more:
 				Intent intent	= new Intent(this, MoreActivity.class);
-		        this.startActivity(intent);
+				this.startActivity(intent);
 				return true;
-	
+
 			case R.id.menu_refresh:
 				updateManager.run();
 				return true;
-	
+
 			case R.id.menu_mark_as_read:
 				if (updateManager.isRunning() ) {
 					return true;
@@ -172,7 +172,7 @@ public class ApplicationRootActivity extends TabActivity {
 				articleDAO.open();
 				articleDAO.updateMarkAllAsRead();
 				articleDAO.close();
-				
+
 				AnnouncementDAO annDAO	= new AnnouncementDAO(this);
 				annDAO.open();
 				annDAO.updateMarkAllAsRead();
@@ -182,7 +182,7 @@ public class ApplicationRootActivity extends TabActivity {
 				updateManager.broadcastDataReload_Publications();
 				updateManager.broadcastDataReload_Announcements();
 				return true;
-	
+
 				default :
 					return super.onOptionsItemSelected(item);
 		}
@@ -191,16 +191,14 @@ public class ApplicationRootActivity extends TabActivity {
 
 	// INNER CLASSES
 	private class ApplicationBroadcastReceiver extends BroadcastReceiver {
-		@SuppressWarnings("unused")
-		private static final String TAG = "ApplicationBroadcastReceiver";
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent.getAction().equals(START_INDETERMINATE_PROGRESS) ) {
+			if (intent.getAction().equals(ApplicationRootActivity.START_INDETERMINATE_PROGRESS) ) {
 				setProgressBarIndeterminateVisibility(true);
 			}
-			
-			if (intent.getAction().equals(STOP_INDETERMINATE_PROGRESS) ) {
+
+			if (intent.getAction().equals(ApplicationRootActivity.STOP_INDETERMINATE_PROGRESS) ) {
 				setProgressBarIndeterminateVisibility(false);
 			}
 		}

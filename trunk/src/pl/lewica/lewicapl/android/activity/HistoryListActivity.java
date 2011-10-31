@@ -41,7 +41,7 @@ import pl.lewica.lewicapl.android.database.HistoryDAO;
  */
 public class HistoryListActivity extends Activity {
 	
-	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.historylistactivity.reload";
+	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.historylistactivity.RELOAD";
 
 	private static Typeface categoryTypeface;
 	private HistoryDAO historyDAO;

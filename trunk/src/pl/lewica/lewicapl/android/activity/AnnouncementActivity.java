@@ -44,9 +44,6 @@ public class AnnouncementActivity extends Activity {
 	// This intent's base Uri.  It should have a numeric ID appended to it.
 	public static final String BASE_URI	= "content://lewicapl/announcements/announcement/";
 
-	@SuppressWarnings("unused")
-	private static final String TAG = "LewicaPL:AnnouncementActivity";
-
 	private static Typeface categoryTypeface;
 
 	private long annID;
