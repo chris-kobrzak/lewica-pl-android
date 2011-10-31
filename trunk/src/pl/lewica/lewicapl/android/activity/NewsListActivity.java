@@ -236,7 +236,7 @@ public class NewsListActivity extends Activity {
 			} else {
 				String imgPath	= storageDir.getPath() + "/" + ArticleURL.buildNameThumbnail(cursor.getLong(colIndex_ID), cursor.getString(colIndex_ThumbExt) );
 				Bitmap bMap		= BitmapFactory.decodeFile(imgPath);
-		        iv.setImageBitmap(bMap);
+				iv.setImageBitmap(bMap);
 				// Reset image to avoid issues when navigating between previous and next articles
 				iv.setVisibility(View.VISIBLE);
 			}
