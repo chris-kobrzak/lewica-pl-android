@@ -12,25 +12,32 @@
 		android:paddingBottom="5dp" 
 		android:paddingLeft="0dp"
 	>
-		<TextView
-			android:text="category"
-			android:id="@+id/article_category"
-			android:layout_width="160dp"
-			android:layout_height="20dp" 
-			android:paddingTop="0dp"
-			android:paddingLeft="7dp"
-			style="@style/InfoBarCategory"
-		/>
-		<TextView
-			android:text="date"
-			android:id="@+id/article_date"
-			android:layout_width="160dp"
-			android:layout_height="20dp"
-			android:layout_marginLeft="160dp" 
-			android:paddingTop="2dp"
-			android:paddingRight="7dp"
-			style="@style/InfoBarDate"
-		/>
+		<LinearLayout
+			android:id="@+id/info_bar_article"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:background="@color/orange"
+			>
+			<TextView
+				android:text="category"
+				android:id="@+id/article_category"
+				android:layout_width="wrap_content"
+				android:layout_height="20dp" 
+				android:paddingTop="2dp"
+				android:paddingLeft="7dp"
+				style="@style/InfoBarCategory"
+			/>
+			<TextView
+				android:text="date"
+				android:id="@+id/article_date"
+				android:layout_width="fill_parent"
+				android:layout_height="20dp" 
+				android:paddingTop="2dp"
+				android:paddingRight="7dp"
+				style="@style/InfoBarDate"
+				android:textSize="12dp"
+			/>
+		</LinearLayout>
 		<TextView
 			android:text="title"
 			android:id="@+id/article_title"
@@ -43,7 +50,7 @@
 			android:typeface="serif"
 			android:textColor="@color/read"
 			android:textAppearance="?android:attr/textAppearanceLarge"
-			android:layout_below="@+id/article_category"
+			android:layout_below="@+id/info_bar_article"
 		/>
 		<ImageView
 			android:src="@drawable/background_comment"

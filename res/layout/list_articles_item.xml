@@ -19,7 +19,7 @@
 		android:id="@+id/article_item_title" 
 		android:layout_above="@+id/article_item_date" 
 		android:layout_alignTop="@+id/article_item_icon" 
-		android:layout_width="235dp" 
+		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content" 
 		android:layout_marginLeft="72dp" 
 		android:layout_marginRight="16dp"
@@ -41,9 +41,10 @@
 	<ImageView
 		android:src="@drawable/ic_pencil" 
 		android:id="@+id/ico_pencil" 
-		android:layout_width="14.7dp" 
-		android:layout_height="18dp" 
+		android:layout_width="16.3dp" 
+		android:layout_height="20dp" 
 		android:layout_marginRight="6dp"
+		android:layout_marginBottom="2dp"
 		android:layout_alignParentRight="true" 
 		android:layout_alignBottom="@+id/article_item_date"
 	/>

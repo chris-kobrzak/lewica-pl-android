@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="ListItemHeading">
-        <item name="android:textSize">22dp</item>
-        <item name="android:typeface">serif</item>
-        <item name="android:textColor">@color/red</item>
-    </style>
-    <style name="ListItemLabel">
-        <item name="android:textSize">13dp</item>
-        <item name="android:typeface">serif</item>
-        <item name="android:textColor">@color/read</item>
-    </style>
-    <style name="ListItemDetailLabel">
-        <item name="android:textSize">11dp</item>
-    </style>
-    <style name="InfoBarDate">
-        <item name="android:gravity">right</item>
-        <item name="android:textSize">11dp</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:background">@color/orange</item>
-    </style>
-    <style name="InfoBarCategory">
-        <item name="android:textSize">12dp</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:background">@color/orange</item>
-    </style>
-    <style name="InfoLabel">
-        <item name="android:textColor">@color/read</item>
-    </style>
-    <style name="StandardText">
-        <item name="android:textColor">@color/grey_darker</item>
-    </style>
+	<style name="ListItemHeading">
+		<item name="android:textSize">22dp</item>
+		<item name="android:typeface">serif</item>
+		<item name="android:textColor">@color/red</item>
+	</style>
+	<style name="ListItemLabel">
+		<item name="android:textSize">13dp</item>
+		<item name="android:typeface">serif</item>
+		<item name="android:textColor">@color/read</item>
+	</style>
+	<style name="ListItemDetailLabel">
+		<item name="android:textSize">11dp</item>
+	</style>
+	<style name="InfoBarDate">
+		<item name="android:gravity">right</item>
+		<item name="android:textSize">11dp</item>
+		<item name="android:textColor">@color/white</item>
+		<item name="android:background">@color/orange</item>
+	</style>
+	<style name="InfoBarCategory">
+		<item name="android:textSize">12dp</item>
+		<item name="android:textColor">@color/white</item>
+		<item name="android:background">@color/orange</item>
+	</style>
+	<style name="InfoLabel">
+		<item name="android:textColor">@color/read</item>
+	</style>
+	<style name="StandardText">
+		<item name="android:textColor">@color/grey_darker</item>
+	</style>
 </resources>
