@@ -197,7 +197,7 @@ public class ArticleActivity extends Activity {
 				Uri uri			= Uri.parse(ArticleActivity.URI_BASE_COMMENTS + Long.toString(articleID) );
 				// Passes activity Uri as parameter that can be used to work out ID of requested article.
 				intent.setData(uri);
-		        startActivity(intent);
+				startActivity(intent);
 				return true;
 
 			default :
