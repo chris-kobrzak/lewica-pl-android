@@ -35,6 +35,11 @@ public class DateUtil {
 	}
 
 
+	public static int currentUnixTime() {
+		return (int) (System.currentTimeMillis() / 1000L);
+	}
+
+
 	/**
 	 * Be cautious when using this method inside a loop as it creates SimpleDateFormat objects every time it's called.
 	 * @param date

@@ -41,6 +41,7 @@ import pl.lewica.lewicapl.android.activity.NewsListActivity;
 import pl.lewica.lewicapl.android.activity.PublicationListActivity;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
+import pl.lewica.util.DateUtil;
 
 /**
  * @author Krzysztof Kobrzak
@@ -54,6 +55,9 @@ public class ApplicationRootActivity extends TabActivity {
 	private IntentFilter filter;
 	private ApplicationBroadcastReceiver receiver;
 	private ContentUpdateManager updateManager;
+	private int lastUpdated;
+	// Number of seconds after which the application will attempt to run an update. 
+	private int updateInterval	= 5 * 60;
 
 
 	@Override
@@ -78,24 +82,20 @@ public class ApplicationRootActivity extends TabActivity {
 		// Create an Intent to launch an Activity for the tab (to be reused)
 		intent	= new Intent(this, NewsListActivity.class);
 		// Initialize a TabSpec for each tab and add it to the TabHost
-		spec		= tabHost.newTabSpec("news").setIndicator(res.getString(R.string.tab_news),
-				res.getDrawable(R.drawable.ic_70tv) ).setContent(intent);
+		spec		= tabHost.newTabSpec("news").setIndicator(res.getString(R.string.tab_news), res.getDrawable(R.drawable.ic_70tv) ).setContent(intent);
 		tabHost.addTab(spec);
 
 		// Do the same for the other tabs
 		intent	= new Intent(this, PublicationListActivity.class);
-		spec		= tabHost.newTabSpec("texts").setIndicator(res.getString(R.string.tab_texts),
-				res.getDrawable(R.drawable.ic_96book) ).setContent(intent);
+		spec		= tabHost.newTabSpec("texts").setIndicator(res.getString(R.string.tab_texts), res.getDrawable(R.drawable.ic_96book) ).setContent(intent);
 		tabHost.addTab(spec);
 
 		intent	= new Intent(this, AnnouncementListActivity.class);
-		spec		= tabHost.newTabSpec("announcements").setIndicator(res.getString(R.string.tab_announcements),
-				res.getDrawable(R.drawable.ic_124bullhorn) ).setContent(intent);
+		spec		= tabHost.newTabSpec("announcements").setIndicator(res.getString(R.string.tab_announcements), res.getDrawable(R.drawable.ic_124bullhorn) ).setContent(intent);
 		tabHost.addTab(spec);
 
 		intent	= new Intent(this, HistoryListActivity.class);
-		spec		= tabHost.newTabSpec("history").setIndicator(res.getString(R.string.tab_history),
-				res.getDrawable(R.drawable.ic_83calendar) ).setContent(intent);
+		spec		= tabHost.newTabSpec("history").setIndicator(res.getString(R.string.tab_history), res.getDrawable(R.drawable.ic_83calendar) ).setContent(intent);
 		tabHost.addTab(spec);
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
@@ -116,19 +116,19 @@ public class ApplicationRootActivity extends TabActivity {
 		filter.addAction(STOP_INDETERMINATE_PROGRESS);
 		receiver	= new ApplicationBroadcastReceiver();
 		registerReceiver(receiver, filter);
+
+		// Required by the content update module
+		updateManager	= ContentUpdateManager.getInstance(getApplicationContext(), storageDir);
 	}
 
 
 	@Override
 	protected void onStart() {
 		super.onStart();
-		
+
 		registerReceiver(receiver, filter);
-		// Trigger content update
-		updateManager	= ContentUpdateManager.getInstance(getApplicationContext(), storageDir);
-		if (! updateManager.isRunning() ) {
-			updateManager.run();
-		}
+
+		runUpdate();
 	}
 
 
@@ -181,13 +181,17 @@ public class ApplicationRootActivity extends TabActivity {
 				return true;
 
 			case R.id.menu_refresh:
+				// Don't call runUpdate() here as this is an action triggered by the user.
+				// The only thing that should prevent it from happening is the fact the update is running already. 
+				if (updateManager.isRunning() ) {
+					return true;
+				}
+
+				setLastUpdated(DateUtil.currentUnixTime() );
 				updateManager.run();
 				return true;
 
 			case R.id.menu_mark_as_read:
-				if (updateManager.isRunning() ) {
-					return true;
-				}
 				ArticleDAO articleDAO			= new ArticleDAO(this);
 				articleDAO.open();
 				articleDAO.updateMarkAllAsRead();
@@ -206,6 +210,41 @@ public class ApplicationRootActivity extends TabActivity {
 				default :
 					return super.onOptionsItemSelected(item);
 		}
+	}
+
+
+	/**
+	 * Checks if the update is not running already and also compares the current time with the one it last ran 
+	 * and makes a decision whether to run the update on this basis.
+	 * This method is meant to be called automatically, not triggered by the user as the time interval check might prevent it from execusion.
+	 */
+	private synchronized void runUpdate() {
+		if (updateManager.isRunning() ) {
+			return;
+		}
+		
+		if (getLastUpdated() > 0 && DateUtil.currentUnixTime() % getLastUpdated() < updateInterval) {
+			return;
+		}
+
+		setLastUpdated(DateUtil.currentUnixTime() );
+		updateManager.run();
+	}
+
+
+	/**
+	 * @return the lastUpdated
+	 */
+	public int getLastUpdated() {
+		return lastUpdated;
+	}
+
+
+	/**
+	 * @param lastUpdated the lastUpdated to set
+	 */
+	public void setLastUpdated(int lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 
 
