@@ -82,20 +82,20 @@ public class ApplicationRootActivity extends TabActivity {
 		// Create an Intent to launch an Activity for the tab (to be reused)
 		intent	= new Intent(this, NewsListActivity.class);
 		// Initialize a TabSpec for each tab and add it to the TabHost
-		spec		= tabHost.newTabSpec("news").setIndicator(res.getString(R.string.tab_news), res.getDrawable(R.drawable.ic_70tv) ).setContent(intent);
+		spec		= tabHost.newTabSpec("news").setIndicator(res.getString(R.string.tab_news), res.getDrawable(R.drawable.ic_tab_tv) ).setContent(intent);
 		tabHost.addTab(spec);
 
 		// Do the same for the other tabs
 		intent	= new Intent(this, PublicationListActivity.class);
-		spec		= tabHost.newTabSpec("texts").setIndicator(res.getString(R.string.tab_texts), res.getDrawable(R.drawable.ic_96book) ).setContent(intent);
+		spec		= tabHost.newTabSpec("texts").setIndicator(res.getString(R.string.tab_texts), res.getDrawable(R.drawable.ic_tab_book) ).setContent(intent);
 		tabHost.addTab(spec);
 
 		intent	= new Intent(this, AnnouncementListActivity.class);
-		spec		= tabHost.newTabSpec("announcements").setIndicator(res.getString(R.string.tab_announcements), res.getDrawable(R.drawable.ic_124bullhorn) ).setContent(intent);
+		spec		= tabHost.newTabSpec("announcements").setIndicator(res.getString(R.string.tab_announcements), res.getDrawable(R.drawable.ic_tab_bullhorn) ).setContent(intent);
 		tabHost.addTab(spec);
 
 		intent	= new Intent(this, HistoryListActivity.class);
-		spec		= tabHost.newTabSpec("history").setIndicator(res.getString(R.string.tab_history), res.getDrawable(R.drawable.ic_83calendar) ).setContent(intent);
+		spec		= tabHost.newTabSpec("history").setIndicator(res.getString(R.string.tab_history), res.getDrawable(R.drawable.ic_tab_calendar) ).setContent(intent);
 		tabHost.addTab(spec);
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
