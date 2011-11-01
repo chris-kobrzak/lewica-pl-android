@@ -117,16 +117,16 @@ public class PublicationListActivity extends Activity {
 				Uri uri			= Uri.parse(ArticleActivity.URI_BASE + Long.toString(id) );
 				// Passes activity Uri as parameter that can be used to work out ID of requested article.
 				intent.setData(uri);
-		        startActivity(intent);
+				startActivity(intent);
 
-		        // Mark current article as read by changing its colour...
-		        int colour		= res.getColor(R.color.read);
-		        tv					= (TextView) view.findViewById(R.id.article_item_title);
-		        tv.setTextColor(colour);
-		        // ... and flagging it in local cache accordingly
-		        clicked.add(id);
+				// Mark current article as read by changing its colour...
+				int colour		= res.getColor(R.color.read);
+				tv					= (TextView) view.findViewById(R.id.article_item_title);
+				tv.setTextColor(colour);
+				// ... and flagging it in local cache accordingly
+				clicked.add(id);
 
-		        return;
+				return;
 			}
 		});
 	}
@@ -135,7 +135,7 @@ public class PublicationListActivity extends Activity {
 	public void reloadRows() {
 		CursorAdapter ca	= (CursorAdapter) listAdapter;
 		// Reload rows
-		Cursor newCursor	= articleDAO.selectLatestNews();
+		Cursor newCursor	= articleDAO.selectLatestTexts();
 		ca.changeCursor(newCursor);
 	}
 
@@ -227,7 +227,7 @@ public class PublicationListActivity extends Activity {
 			} else {
 				String imgPath	= storageDir.getPath() + "/" + ArticleURL.buildNameThumbnail(cursor.getLong(colIndex_ID), cursor.getString(colIndex_ThumbExt) );
 				Bitmap bMap		= BitmapFactory.decodeFile(imgPath);
-		        iv.setImageBitmap(bMap);
+				iv.setImageBitmap(bMap);
 				// Reset image to avoid issues when navigating between previous and next articles
 				iv.setVisibility(View.VISIBLE);
 			}
