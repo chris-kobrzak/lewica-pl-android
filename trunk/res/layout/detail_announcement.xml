@@ -83,7 +83,6 @@
 					android:paddingRight="7dp"
 				/>
 			</LinearLayout>
-
 			<TextView
 				android:text="content"
 				android:id="@+id/announcement_content"
