@@ -51,9 +51,12 @@ public class ApplicationRootActivity extends TabActivity {
 	public static final String STOP_INDETERMINATE_PROGRESS		= "pl.lewica.lewicapl.android.applicationrootactivity.RELOADOFF";
 
 	private static File storageDir;
+	private IntentFilter filter;
+	private ApplicationBroadcastReceiver receiver;
 	private ContentUpdateManager updateManager;
 
 
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -108,18 +111,39 @@ public class ApplicationRootActivity extends TabActivity {
 		// By default, the first tab is selected
 		tabHost.setCurrentTab(0);
 
-		// Register to receive notifications
-		IntentFilter filter		= new IntentFilter();
+		filter		= new IntentFilter();
 		filter.addAction(START_INDETERMINATE_PROGRESS);
 		filter.addAction(STOP_INDETERMINATE_PROGRESS);
-		ApplicationBroadcastReceiver receiver	= new ApplicationBroadcastReceiver();	// Instance of an inner class
+		receiver	= new ApplicationBroadcastReceiver();
 		registerReceiver(receiver, filter);
+	}
 
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		
 		// Trigger content update
 		updateManager	= ContentUpdateManager.getInstance(getApplicationContext(), storageDir);
 		if (! updateManager.isRunning() ) {
 			updateManager.run();
 		}
+	}
+
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		registerReceiver(receiver, filter);
+	}
+	
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		
+		unregisterReceiver(receiver);
 	}
 
 
