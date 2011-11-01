@@ -64,7 +64,7 @@ public class ApplicationRootActivity extends TabActivity {
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
 		setContentView(R.layout.tab_layout);
-		
+
 		// Tabs layout based on http://developer.android.com/resources/tutorials/views/hello-tabwidget.html
 		Resources res			= getResources(); // Resource object to get Drawables
 		TabHost tabHost	= getTabHost();  // The activity TabHost
@@ -123,6 +123,7 @@ public class ApplicationRootActivity extends TabActivity {
 	protected void onStart() {
 		super.onStart();
 		
+		registerReceiver(receiver, filter);
 		// Trigger content update
 		updateManager	= ContentUpdateManager.getInstance(getApplicationContext(), storageDir);
 		if (! updateManager.isRunning() ) {
@@ -132,18 +133,13 @@ public class ApplicationRootActivity extends TabActivity {
 
 
 	@Override
-	protected void onResume() {
-		super.onResume();
-
-		registerReceiver(receiver, filter);
-	}
-	
-	
-	@Override
 	protected void onPause() {
 		super.onPause();
-		
-		unregisterReceiver(receiver);
+
+		// Android API doesn't provide an "isRegisteredReciever" method so need to use a hack to avoid random exceptions thrown when application gets closed.
+		try {
+			unregisterReceiver(receiver);
+		} catch (Exception e) {}
 	}
 
 
