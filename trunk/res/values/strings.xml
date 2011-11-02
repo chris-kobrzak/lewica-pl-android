@@ -43,8 +43,8 @@
 	<string name="heading_team">redakcja</string>
 	<string name="label_refresh">Odśwież</string>
 	<string name="label_mark_as_read">Oznacz jako przeczytane</string>
-	<string name="label_where">gdzie:</string>
-	<string name="label_when">kiedy:</string>
+	<string name="label_where">Gdzie:</string>
+	<string name="label_when">Kiedy:</string>
 	<string name="label_share_link">Poleć artykuł via:</string>
 	<string name="heading_history_extra">w historii</string>
 	<string name="email_subject_announcement">Pytanie nt. ogłoszenia w lewica.pl (wersja dla Androida)</string>
