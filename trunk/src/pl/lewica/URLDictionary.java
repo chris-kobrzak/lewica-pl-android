@@ -16,7 +16,7 @@
 /**
  * 
  */
-package pl.lewica.util;
+package pl.lewica;
 
 /**
  * @author Krzysztof Kobrzak

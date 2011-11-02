@@ -15,8 +15,8 @@
 */
 package pl.lewica.lewicapl.android.activity;
 
+import pl.lewica.URLDictionary;
 import pl.lewica.lewicapl.R;
-import pl.lewica.util.URLDictionary;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;

@@ -119,7 +119,7 @@ public class HistoryListActivity extends Activity {
 
 		ContentUpdateManager updateManager	= ContentUpdateManager.getInstance(getApplicationContext(), null);
 		if (! updateManager.isRunning() ) {
-			updateManager.manageAndBroadcastUpdates(ContentUpdateManager.StatusMessageType.INIT_HISTORY);
+			updateManager.manageAndBroadcastUpdates(ContentUpdateManager.CommandType.INIT_HISTORY, false);
 		}
 	}
 
