@@ -47,10 +47,8 @@
 			android:paddingBottom="5dp"
 			android:paddingLeft="7dp"
 			android:paddingRight="7dp"
-			android:typeface="serif"
-			android:textColor="@color/read"
-			android:textAppearance="?android:attr/textAppearanceLarge"
 			android:layout_below="@+id/info_bar_article"
+			style="@style/StandardHeading"
 		/>
 		<ImageView
 			android:src="@drawable/background_comment"
