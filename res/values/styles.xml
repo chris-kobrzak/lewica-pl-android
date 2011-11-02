@@ -27,6 +27,11 @@
 	<style name="InfoLabel">
 		<item name="android:textColor">@color/read</item>
 	</style>
+	<style name="StandardHeading">
+		<item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+		<item name="android:typeface">serif</item>
+		<item name="android:textColor">@color/read</item>
+	</style>
 	<style name="StandardText">
 		<item name="android:textColor">@color/grey_darker</item>
 	</style>
