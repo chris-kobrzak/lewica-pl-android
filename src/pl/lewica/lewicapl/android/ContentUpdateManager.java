@@ -70,7 +70,7 @@ public class ContentUpdateManager {
 	private Context context;
 	private boolean isRunning;
 
-	public static enum StatusMessageType {
+	public static enum CommandType {
 		INIT,
 		INIT_HISTORY,
 		NEW_PUBLICATIONS,
@@ -263,7 +263,7 @@ public class ContentUpdateManager {
 
 		annURL.setNewerThan(lastAnnID);
 		annURL.setLimit(10);
-		
+
 		List<DataModel> anns	= fdm.fetchAndParse(DataModelType.ANNOUNCEMENT, annURL.buildURL() );
 		int totalAnns					= anns.size();
 
@@ -309,10 +309,10 @@ public class ContentUpdateManager {
 		}
 
 		historyURL.setLimit(50);
-		
+
 		List<DataModel> entries	= fdm.fetchAndParse(DataModelType.HISTORY, historyURL.buildURL() );
 		int totalAnns						= entries.size();
-		
+
 		if (totalAnns == 0) {
 			historyDAO.close();
 			status.setTotalUpdated(0);
@@ -409,25 +409,27 @@ public class ContentUpdateManager {
 	 * Convenience method that can be used to trigger the update process.
 	 */
 	public void run() {
-		manageAndBroadcastUpdates(StatusMessageType.INIT);
+		manageAndBroadcastUpdates(CommandType.INIT, true);
 	}
 
 	/**
 	 * Manages the process of updating content in a sequential manner.
 	 * 
-	 * If null is passed as an argument, the publications update is requested.
-	 * Every single AsyncTask called by this method is expected to call it once their completed.
-	 * And when this happens, the method triggers another update and also sends a message that activities can listen to 
-	 * to update their data, e.g. list views.
+	 * The method calls one subclass of AsyncTask at a time and expects their onPostExecute methods to report back whether there are any updates or not.
+	 * If there are, broadcastDataReload methods are called and if the second argument is set to true, the next task is executed.
+	 * broadcastDataReload methods send messages that activities can listen to to update their data, e.g. list views.
 	 * The order of tasks is as follows:
-	 * 1. publications,
-	 * 2. announcements,
-	 * 3. history
+	 *   1. publications,
+	 *   2. announcements,
+	 *   3. history
+	 * @param command The action which the method starts the updates from.
+	 * @param chainReaction Tells the method if it should continue running other updates as per the order of tasks specified in the method description.
 	 */
-	public void manageAndBroadcastUpdates(StatusMessageType status) {
+	public void manageAndBroadcastUpdates(CommandType command, boolean chainReaction) {
 		setRunning(true);
 
-		switch (status) {
+		// Please note, the order of the case statements matters!
+		switch (command) {
 			case INIT:
 				broadcastNetworkActivity_On();
 				// Fetch news and opinions updates from the server.
@@ -438,27 +440,30 @@ public class ContentUpdateManager {
 				broadcastNetworkActivity_On();
 				new UpdateHistoryTask().execute();
 				break;
-				
+
 			case NEW_PUBLICATIONS:
 				// Notify the news listing screen
 				broadcastDataReload_News();
-				
+
 				// Notify the publications listing screen
 				broadcastDataReload_Publications();
+				
+				// No break statement here, just let it jump to the next NO_PUBLICATIONS case that will take care of deciding what to do next.
 
-				// New publications have been downloaded, now request new announcements
-				new UpdateAnnouncementsTask().execute();
-				break;
-			
 			case NO_PUBLICATIONS:
-				new UpdateAnnouncementsTask().execute();
+				// After publications come the announcements
+				if (chainReaction) {
+					new UpdateAnnouncementsTask().execute();
+				} else {
+					broadcastNetworkActivity_Off();
+					setRunning(false);
+				}
 				break;
-				
-				
+
 			case NEW_PUBLICATION_IMAGES:
 				// Notify the news listing screen
 				broadcastDataReload_News();
-				
+
 				// Notify the publications listing screen
 				broadcastDataReload_Publications();
 
@@ -468,20 +473,22 @@ public class ContentUpdateManager {
 			case NEW_ANNOUNCEMENTS:
 				broadcastDataReload_Announcements();
 
-				// New announcements have been downloaded, now request new history events
-				new UpdateHistoryTask().execute();
-				break;
+				// No break statement here, just let it jump to the next NO_ANNOUNCEMENTS case that will take care of deciding what to do next.
 
 			case NO_ANNOUNCEMENTS:
-				new UpdateHistoryTask().execute();
+				// After announcements come the history
+				if (chainReaction) {
+					new UpdateHistoryTask().execute();
+				} else {
+					broadcastNetworkActivity_Off();
+					setRunning(false);
+				}
 				break;
 
 			case NEW_HISTORY:
 				broadcastDataReload_History();
 
-				broadcastNetworkActivity_Off();
-				setRunning(false);
-				break;
+				// No break statement here, just let it jump to the next NO_HISTORY case that will take care of deciding what to do next.
 
 			case NO_HISTORY:
 				broadcastNetworkActivity_Off();
@@ -508,11 +515,11 @@ public class ContentUpdateManager {
 		@Override
 		protected void onPostExecute(UpdateStatus status) {
 			if (status.getTotalUpdated() == 0) {
-				manageAndBroadcastUpdates(StatusMessageType.NO_PUBLICATIONS);
+				manageAndBroadcastUpdates(CommandType.NO_PUBLICATIONS, true);
 				return;
 			}
 			// Notify the update manager straight away so it can kick off the other update tasks.
-			manageAndBroadcastUpdates(StatusMessageType.NEW_PUBLICATIONS);
+			manageAndBroadcastUpdates(CommandType.NEW_PUBLICATIONS, true);
 
 			// We are still here and that means there is at least one thumbnail to be downloaded.
 			new DownloadArticleThumbnailsTask().execute(status);
@@ -540,7 +547,8 @@ public class ContentUpdateManager {
 			if (status == 0) {
 				return;
 			}
-			manageAndBroadcastUpdates(StatusMessageType.NEW_PUBLICATION_IMAGES);
+			// Images task is branched out by the articles task so we want to be strict and set the chainReaction argument to false.
+			manageAndBroadcastUpdates(CommandType.NEW_PUBLICATION_IMAGES, false);
 		}
 	}
 
@@ -557,10 +565,10 @@ public class ContentUpdateManager {
 		@Override
 		protected void onPostExecute(UpdateStatus status) {
 			if (status.getTotalUpdated() == 0) {
-				manageAndBroadcastUpdates(StatusMessageType.NO_ANNOUNCEMENTS);
+				manageAndBroadcastUpdates(CommandType.NO_ANNOUNCEMENTS, true);
 				return;
 			}
-			manageAndBroadcastUpdates(StatusMessageType.NEW_ANNOUNCEMENTS);
+			manageAndBroadcastUpdates(CommandType.NEW_ANNOUNCEMENTS, true);
 		}
 	}
 
@@ -577,10 +585,10 @@ public class ContentUpdateManager {
 		@Override
 		protected void onPostExecute(UpdateStatus status) {
 			if (status.getTotalUpdated() == 0) {
-				manageAndBroadcastUpdates(StatusMessageType.NO_HISTORY);
+				manageAndBroadcastUpdates(CommandType.NO_HISTORY, true);
 				return;
 			}
-			manageAndBroadcastUpdates(StatusMessageType.NEW_HISTORY);
+			manageAndBroadcastUpdates(CommandType.NEW_HISTORY, true);
 		}
 	}
 }
