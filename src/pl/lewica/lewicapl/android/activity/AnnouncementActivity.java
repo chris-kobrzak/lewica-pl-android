@@ -110,7 +110,7 @@ public class AnnouncementActivity extends Activity {
 		super.onCreateOptionsMenu(menu);
 
 		MenuInflater infl	= getMenuInflater();
-		infl.inflate(R.menu.menu_article, menu);
+		infl.inflate(R.menu.menu_announcement, menu);
 		
 		return true;
 	}
