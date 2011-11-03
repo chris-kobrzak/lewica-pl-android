@@ -150,9 +150,14 @@ public class ApplicationRootActivity extends TabActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 
-		MenuInflater infl	= getMenuInflater();
-		infl.inflate(R.menu.menu_common, menu);
-		
+		MenuInflater inflater	= getMenuInflater();
+		int tab	= getTabHost().getCurrentTab();
+		if (tab != 3) {
+			inflater.inflate(R.menu.menu_common, menu); 
+		} else {
+			inflater.inflate(R.menu.menu_history, menu);
+		}
+
 		return true;
 	}
 
