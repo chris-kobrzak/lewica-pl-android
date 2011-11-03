@@ -25,7 +25,9 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.widget.CursorAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -62,11 +64,9 @@ public class HistoryListActivity extends Activity {
 		// Custom font used by the category headings
 		categoryTypeface	= Typeface.createFromAsset(getAssets(), "Impact.ttf");
 
-		// Register to receive content update messages
-		IntentFilter filter		= new IntentFilter();
-		filter.addAction(RELOAD_VIEW);
-		receiver					= new HistoryUpdateBroadcastReceiver();	// Instance of an inner class
-		registerReceiver(receiver, filter);
+		LayoutInflater inflater	= getLayoutInflater();
+		LinearLayout barLayout	= (LinearLayout) inflater.inflate(R.layout.bar_layout, null);
+		listView.addHeaderView(barLayout);
 
 		Calendar cal		= Calendar.getInstance();
 		month				= cal.get(Calendar.MONTH) + 1;
@@ -94,6 +94,12 @@ public class HistoryListActivity extends Activity {
 			} 
 		}; 
 		listView.setAdapter(listAdapter);
+
+		// Register to receive content update messages
+		IntentFilter filter		= new IntentFilter();
+		filter.addAction(RELOAD_VIEW);
+		receiver					= new HistoryUpdateBroadcastReceiver();	// Instance of an inner class
+		registerReceiver(receiver, filter);
 	}
 
 
@@ -126,7 +132,7 @@ public class HistoryListActivity extends Activity {
 
 	public void loadView(int month, int day) {
 		// Orange bar
-		TextView tv			= (TextView) findViewById(R.id.history_category);
+		TextView tv			= (TextView) findViewById(R.id.bar_category);
 		tv.setTypeface(categoryTypeface);
 		tv.setText(this.getString(R.string.heading_history) );
 
@@ -137,7 +143,7 @@ public class HistoryListActivity extends Activity {
 		sb.append(" ");
 		sb.append(this.getString(R.string.heading_history_extra) );
 
-		tv							= (TextView) findViewById(R.id.history_date);
+		tv							= (TextView) findViewById(R.id.bar_date);
 		tv.setText(sb.toString() );
 	}
 
@@ -148,6 +154,9 @@ public class HistoryListActivity extends Activity {
 		// Reload rows
 		Cursor newCursor	= historyDAO.select(cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DATE) );
 		ca.changeCursor(newCursor);
+
+		// Make sure the top bar data is up-to-date
+		loadView(month, day);
 	}
 
 

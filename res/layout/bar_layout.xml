@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/info_bar"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:background="@color/orange"
+	>
+	<TextView
+		android:text="category"
+		android:id="@+id/bar_category"
+		android:layout_width="wrap_content"
+		android:layout_height="20dp" 
+		android:paddingTop="2dp"
+		android:paddingLeft="7dp"
+		style="@style/InfoBarCategory"
+	/>
+	<TextView
+		android:text="date"
+		android:id="@+id/bar_date"
+		android:layout_width="fill_parent"
+		android:layout_height="20dp" 
+		android:paddingTop="2dp"
+		android:paddingRight="7dp"
+		style="@style/InfoBarDate"
+		android:textSize="12dp"
+	/>
+</LinearLayout>
