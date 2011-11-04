@@ -1,96 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView 
+<ScrollView
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:id="@+id/article_scroll_view"
 	android:layout_width="wrap_content"
-	android:layout_height="wrap_content">
+	android:layout_height="wrap_content"
+>
 	<RelativeLayout
-		android:layout_width="fill_parent" 
-		android:layout_height="wrap_content" 
-		android:paddingTop="0dp" 
-		android:paddingRight="0dp"
-		android:paddingBottom="5dp" 
-		android:paddingLeft="0dp"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:paddingBottom="5dp"
 	>
 		<LinearLayout
 			android:id="@+id/info_bar_article"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:background="@color/orange"
-			>
+		>
 			<TextView
 				android:text="category"
 				android:id="@+id/article_category"
 				android:layout_width="wrap_content"
-				android:layout_height="20dp" 
-				android:paddingTop="2dp"
-				android:paddingLeft="7dp"
 				style="@style/InfoBarCategory"
 			/>
 			<TextView
 				android:text="date"
 				android:id="@+id/article_date"
 				android:layout_width="fill_parent"
-				android:layout_height="20dp" 
-				android:paddingTop="2dp"
-				android:paddingRight="7dp"
 				style="@style/InfoBarDate"
-				android:textSize="12dp"
 			/>
 		</LinearLayout>
 		<TextView
 			android:text="title"
 			android:id="@+id/article_title"
+			android:layout_below="@+id/info_bar_article"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:paddingTop="5dp"
-			android:paddingBottom="5dp"
-			android:paddingLeft="7dp"
-			android:paddingRight="7dp"
-			android:layout_below="@+id/info_bar_article"
 			style="@style/StandardHeading"
 		/>
 		<ImageView
 			android:src="@drawable/background_comment"
 			android:id="@+id/article_image"
+			android:layout_below="@+id/article_title"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="7dp"
 			android:layout_marginRight="7dp"
-			android:layout_below="@+id/article_title"
 		/>
 		<TextView
 			android:text="content"
 			android:id="@+id/article_content"
+			android:layout_below="@+id/article_image"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:paddingLeft="7dp"
-			android:paddingRight="7dp"
-			android:paddingBottom="10dp" 
-			android:paddingTop="5dp"
-			android:layout_below="@+id/article_image"
 			style="@style/StandardText"
 		/>
 		<TextView
 			android:text=""
 			android:id="@+id/article_editor_comment_top"
+			android:layout_below="@+id/article_content"
 			android:layout_width="fill_parent"
 			android:layout_height="9dp"
 			android:layout_marginLeft="7dp"
 			android:layout_marginRight="7dp"
 			android:background="@color/grey_dark"
-			android:layout_below="@+id/article_content" 
 		/>
 		<TextView
 			android:text="editor's comment"
 			android:id="@+id/article_editor_comment"
+			android:layout_below="@+id/article_editor_comment_top"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:padding="7dp"
 			android:layout_marginLeft="7dp"
 			android:layout_marginRight="7dp"
 			android:background="@drawable/background_comment"
-			android:layout_below="@+id/article_editor_comment_top" 
+			style="@style/StandardText"
 		/>
 	</RelativeLayout>
 </ScrollView>
