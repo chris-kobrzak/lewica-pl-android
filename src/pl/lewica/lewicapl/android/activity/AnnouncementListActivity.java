@@ -190,20 +190,21 @@ public class AnnouncementListActivity extends Activity {
 				sb.append(" | ");
 				sb.append(when);
 
-				tv.setTextKeepState(sb.toString() );
+				tv.setText(sb.toString() );
 				return;
 			}
 
 			if (where.length() > 0) {
-				tv.setTextKeepState(where);
+				tv.setText(where);
 				return;
 			}
 			if (when.length() > 0) {
-				tv.setTextKeepState(when);
+				tv.setText(when);
 				return;
 			}
 			// We are still here - that means both where and when info is empty.
 			tv.setText("");
+			tv.setVisibility(View.GONE);
 		}
 
 
