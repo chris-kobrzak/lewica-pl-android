@@ -8,7 +8,7 @@
 	<RelativeLayout
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:paddingBottom="7dp"
+		android:paddingBottom="10dp"
 	>
 		<TextView
 			android:text="category"
@@ -76,7 +76,7 @@
 			android:layout_below="@+id/layout_announcement_when"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="12dp"
+			android:layout_marginTop="10dp"
 			style="@style/StandardText"
 		/>
 		<TextView
