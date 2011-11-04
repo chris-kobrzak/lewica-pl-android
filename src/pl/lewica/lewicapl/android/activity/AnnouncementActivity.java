@@ -223,10 +223,10 @@ public class AnnouncementActivity extends Activity {
 			tvLabel.setVisibility(View.VISIBLE);
 		} else {
 			tv.setText("");
-			tv.setVisibility(View.INVISIBLE);
+			tv.setVisibility(View.GONE);
 			// Hide top, dark grey bar
 			tvLabel.setText("");
-			tvLabel.setVisibility(View.INVISIBLE);
+			tvLabel.setVisibility(View.GONE);
 		}
 		// When
 		tv							= (TextView) findViewById(R.id.announcement_when);
@@ -241,10 +241,10 @@ public class AnnouncementActivity extends Activity {
 			tvLabel.setVisibility(View.VISIBLE);
 		} else {
 			tv.setText("");
-			tv.setVisibility(View.INVISIBLE);
+			tv.setVisibility(View.GONE);
 			// Hide top, dark grey bar
 			tvLabel.setText("");
-			tvLabel.setVisibility(View.INVISIBLE);
+			tvLabel.setVisibility(View.GONE);
 		}
 
 		tv							= (TextView) findViewById(R.id.announcement_author);

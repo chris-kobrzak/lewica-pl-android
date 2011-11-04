@@ -297,7 +297,7 @@ public class ArticleActivity extends Activity {
 			tv.setText("");
 			tv.setVisibility(View.GONE);
 			// Hide top, dark grey bar
-			tvComment.setVisibility(View.INVISIBLE);
+			tvComment.setVisibility(View.GONE);
 		}
 
 		// Reset image to avoid issues when navigating between previous and next articles
