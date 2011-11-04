@@ -289,13 +289,13 @@ public class ArticleActivity extends Activity {
 		tvComment			= (TextView) findViewById(R.id.article_editor_comment_top);
 		String commentString		= cursor.getString(colIndex_Comment);
 		if (commentString != null && commentString.length() > 0) {
-			tv.setText(commentString);
+			tv.setText(commentString.replace("\r", "") );
 			// Reset visibility, may be useful when users navigate between articles (previous-next facility to be added in the future)
 			tv.setVisibility(View.VISIBLE);
 			tvComment.setVisibility(View.VISIBLE);
 		} else {
 			tv.setText("");
-			tv.setVisibility(View.INVISIBLE);
+			tv.setVisibility(View.GONE);
 			// Hide top, dark grey bar
 			tvComment.setVisibility(View.INVISIBLE);
 		}
