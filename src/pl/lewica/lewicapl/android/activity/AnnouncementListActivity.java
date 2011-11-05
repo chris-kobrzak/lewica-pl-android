@@ -183,6 +183,7 @@ public class AnnouncementListActivity extends Activity {
 			tv	= (TextView) view.findViewById(R.id.announcement_item_details);
 			String where	= cursor.getString(colIndex_Where);
 			String when	= cursor.getString(colIndex_When);
+			tv.setVisibility(View.VISIBLE);
 
 			if (where.length() > 0 && when.length() > 0) {
 				StringBuilder sb	= new StringBuilder();
