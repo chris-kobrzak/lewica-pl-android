@@ -111,12 +111,12 @@ public class ContentUpdateManager {
 
 
 	public boolean isRunning() {
-		return isRunning;
+		return _instance.isRunning;
 	}
 
 
 	public void setRunning(boolean isRunning) {
-		this.isRunning = isRunning;
+		_instance.isRunning = isRunning;
 	}
 
 
