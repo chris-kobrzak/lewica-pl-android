@@ -13,9 +13,6 @@
  See the Licence for the specific language governing permissions and
  limitations under the Licence. 
 */
-/**
- * 
- */
 package pl.lewica.lewicapl.android;
 
 import java.io.BufferedInputStream;
@@ -54,11 +51,12 @@ import pl.lewica.lewicapl.android.activity.PublicationListActivity;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 import pl.lewica.lewicapl.android.database.HistoryDAO;
+import pl.lewica.util.DateUtil;
 
 
 /**
- * Collection of methods the coordinate the process of downloading feeds from the server 
- * and saving them in the device's database.
+ * Collection of methods that coordinate the process of downloading feeds from the server,
+ * saving them in the device's database and sending notifications about its progress.
  * The class uses the singleton design pattern.
  * @author Krzysztof Kobrzak
  */
@@ -69,6 +67,8 @@ public class ContentUpdateManager {
 	private File storageDir;
 	private Context context;
 	private boolean isRunning;
+	private int lastUpdated	= 1;		// This actually stores a timestamp the action was triggered, not completed at.
+	private int timeout			= 20;	// Seconds
 
 	public static enum CommandType {
 		INIT,
@@ -99,7 +99,7 @@ public class ContentUpdateManager {
 	 * Standard singleton constructor.
 	 * @param context
 	 * @param storageDir
-	 * @return
+	 * @return ContentUpdateManager
 	 */
 	public static synchronized ContentUpdateManager getInstance(Context context, File storageDir) {
 		if (_instance == null) {
@@ -110,20 +110,76 @@ public class ContentUpdateManager {
 	}
 
 
+	/**
+	 * This method patches a bug that prevents the object from notifying ApplicationRootActivity that it completed the update process.
+	 * As a result of this bug the toolbar indicator keeps spinning around and users are unable to restart the update process manually.
+	 * An assumption here is the update should never take more than [timeout] seconds and if it does we treat it as if it timed out
+	 * and mark the update as not running, reset lastUpdated and also notify the application activity to stop any visual update indicators.
+	 * @return boolean
+	 */
 	public boolean isRunning() {
-		return _instance.isRunning;
+		int sinceLastUpdate	= DateUtil.currentUnixTime() % lastUpdated; 
+		if (isRunning && sinceLastUpdate > timeout) {
+			broadcastNetworkActivity_Off();
+			this.lastUpdated		= 1;
+			this.isRunning		= false;
+		}
+		return isRunning;
 	}
 
 
+	/**
+	 * Sets the isRunning boolean.
+	 * Before it does it it checks if the current value is set to false and the new - to true, meaning they are starting the update process, 
+	 * not running one of their chained parts.
+	 * If this is the case the lastUpdated time stamp is also set to the current time.
+	 * @param isRunning
+	 */
 	public void setRunning(boolean isRunning) {
-		_instance.isRunning = isRunning;
+		if (! this.isRunning && isRunning) {
+			setLastUpdated(DateUtil.currentUnixTime() );
+		}
+		this.isRunning = isRunning;
+	}
+
+
+	/**
+	 * Standard getter for lastUpdated.
+	 * @return int
+	 */
+	public int getLastUpdated() {
+		return lastUpdated;
+	}
+
+
+	/**
+	 * Standard setter for lastUpdated.
+	 * @param lastUpdated
+	 */
+	public void setLastUpdated(int lastUpdated) {
+		this.lastUpdated = lastUpdated;
+	}
+
+	
+	/**
+	 * If lastUpdated is set to its default value i.e. 1 (meaning the update's never run) the method returns 
+	 * the current Unix timestamp.  That should be good enough an indicator that it's time to run another update.
+	 * Otherwise it just returns the number of seconds since the last update that is calculated on the basis of lastUpdated.
+	 * @return
+	 */
+	public int getIntervalSinceLastUpdate() {
+		int currentTimestamp	= DateUtil.currentUnixTime();
+		if (lastUpdated == 1) {
+			return currentTimestamp;
+		}
+		return currentTimestamp % lastUpdated;
 	}
 
 
 	/**
 	 * Coordinates the process of downloading the articles feed and inserting data to the database.
 	 * @param context
-	 * @return
+	 * @return UpdateStatus
 	 */
 	private UpdateStatus fetchAndSaveArticles(Context context) {
 		ArticleUpdateStatus status		= new ArticleUpdateStatus();
@@ -180,11 +236,11 @@ public class ContentUpdateManager {
 
 
 	/**
-	 * Coordinates the process of downloading images and saving them in the file system.
+	 * Coordinates the process of downloading images linked with publications and saving them in the file system.
 	 * 
 	 * @param imageSet
 	 * @param storageDir
-	 * @return
+	 * @return boolean
 	 */
 	private boolean fetchAndSaveArticleThumbnails(Set<Map<String,String>> imageSet, File storageDir) {
 		if (! storageDir.canWrite() ) {
@@ -248,9 +304,9 @@ public class ContentUpdateManager {
 
 
 	/**
-	 * Coordinates the process of downloading the news feed and inserting data to the database.
+	 * Coordinates the process of downloading the announcements feed and inserting data to the database.
 	 * @param context
-	 * @return
+	 * @return UpdateStatus
 	 */
 	private UpdateStatus fetchAndSaveAnnouncements(Context context) {
 		UpdateStatus status						= new UpdateStatus();
@@ -288,6 +344,11 @@ public class ContentUpdateManager {
 	}
 
 
+	/**
+	 * Coordinates the process of downloading the history feed and inserting data to the database.
+	 * @param context
+	 * @return UpdateStatus
+	 */
 	private UpdateStatus fetchAndSaveHistoryEvents(Context context) {
 		UpdateStatus status				= new UpdateStatus();
 		FeedDownloadManager fdm	= new FeedDownloadManager();
@@ -386,7 +447,7 @@ public class ContentUpdateManager {
 
 
 	/**
-	 * Attempts to switch the top bar network activity indicator on. 
+	 * Attempts to switch the top bar network activity indicator on by notifying the application activity.  
 	 */
 	public void broadcastNetworkActivity_On() {
 		Intent intent	= new Intent();
@@ -396,7 +457,7 @@ public class ContentUpdateManager {
 	
 	
 	/**
-	 * Attempts to switch the top bar network activity indicator off. 
+	 * Attempts to switch the top bar network activity indicator off by notifying the application activity. 
 	 */
 	public void broadcastNetworkActivity_Off() {
 		Intent intent	= new Intent();
@@ -412,12 +473,13 @@ public class ContentUpdateManager {
 		manageAndBroadcastUpdates(CommandType.INIT, true);
 	}
 
+
 	/**
 	 * Manages the process of updating content in a sequential manner.
 	 * 
 	 * The method calls one subclass of AsyncTask at a time and expects their onPostExecute methods to report back whether there are any updates or not.
 	 * If there are, broadcastDataReload methods are called and if the second argument is set to true, the next task is executed.
-	 * broadcastDataReload methods send messages that activities can listen to to update their data, e.g. list views.
+	 * broadcastDataReload methods send messages that activities can listen to in order to update their views.
 	 * The order of tasks is as follows:
 	 *   1. publications,
 	 *   2. announcements,

@@ -41,7 +41,6 @@ import pl.lewica.lewicapl.android.activity.NewsListActivity;
 import pl.lewica.lewicapl.android.activity.PublicationListActivity;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
-import pl.lewica.util.DateUtil;
 
 /**
  * @author Krzysztof Kobrzak
@@ -55,7 +54,6 @@ public class ApplicationRootActivity extends TabActivity {
 	private IntentFilter filter;
 	private ApplicationBroadcastReceiver receiver;
 	private ContentUpdateManager updateManager;
-	private int lastUpdated;
 	// Number of seconds after which the application will attempt to run an update. 
 	private int updateInterval	= 5 * 60;
 
@@ -143,9 +141,6 @@ public class ApplicationRootActivity extends TabActivity {
 	}
 
 
-	/* (non-Javadoc)
-	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
-	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
@@ -174,9 +169,7 @@ public class ApplicationRootActivity extends TabActivity {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
-	 */
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId() ) {
@@ -186,13 +179,12 @@ public class ApplicationRootActivity extends TabActivity {
 				return true;
 
 			case R.id.menu_refresh:
-				// Don't call runUpdate() here as this is an action triggered by the user.
 				// The only thing that should prevent it from happening is the fact the update is running already. 
 				if (updateManager.isRunning() ) {
 					return true;
 				}
 
-				setLastUpdated(DateUtil.currentUnixTime() );
+				// Don't call runUpdate() here as this is an action triggered by the user.
 				updateManager.run();
 				return true;
 
@@ -220,37 +212,21 @@ public class ApplicationRootActivity extends TabActivity {
 
 	/**
 	 * Checks if the update is not running already and also compares the current time with the one it last ran 
-	 * and makes a decision whether to run the update on this basis.
-	 * This method is meant to be called automatically, not triggered by the user as the time interval check might prevent it from execusion.
+	 * and makes a decision whether to run the update on this basis.  See updateInterval to check what value is used for comparison. 
+	 * This method is meant to be called automatically, not triggered by the user as the time interval check might prevent it from execution.
 	 */
 	private synchronized void runUpdate() {
 		if (updateManager.isRunning() ) {
 			return;
 		}
-		
-		if (getLastUpdated() > 0 && DateUtil.currentUnixTime() % getLastUpdated() < updateInterval) {
+
+		if (updateManager.getIntervalSinceLastUpdate() < updateInterval) {
 			return;
 		}
 
-		setLastUpdated(DateUtil.currentUnixTime() );
 		updateManager.run();
 	}
 
-
-	/**
-	 * @return the lastUpdated
-	 */
-	public int getLastUpdated() {
-		return lastUpdated;
-	}
-
-
-	/**
-	 * @param lastUpdated the lastUpdated to set
-	 */
-	public void setLastUpdated(int lastUpdated) {
-		this.lastUpdated = lastUpdated;
-	}
 
 
 	// INNER CLASSES
