@@ -189,19 +189,37 @@ public class ApplicationRootActivity extends TabActivity {
 				return true;
 
 			case R.id.menu_mark_as_read:
-				ArticleDAO articleDAO			= new ArticleDAO(this);
-				articleDAO.open();
-				articleDAO.updateMarkAllAsRead();
-				articleDAO.close();
+				int tab	= getTabHost().getCurrentTab();
+				ArticleDAO articleDAO;
 
-				AnnouncementDAO annDAO	= new AnnouncementDAO(this);
-				annDAO.open();
-				annDAO.updateMarkAllAsRead();
-				annDAO.close();
+				switch (tab) {
+					case 0:
+						articleDAO		= new ArticleDAO(this);
+						articleDAO.open();
+						articleDAO.updateMarkNewsAsRead();
+						articleDAO.close();
 
-				updateManager.broadcastDataReload_News();
-				updateManager.broadcastDataReload_Publications();
-				updateManager.broadcastDataReload_Announcements();
+						updateManager.broadcastDataReload_News();
+						break;
+
+					case 1:
+						articleDAO		= new ArticleDAO(this);
+						articleDAO.open();
+						articleDAO.updateMarkTextsAsRead();
+						articleDAO.close();
+
+						updateManager.broadcastDataReload_Publications();
+						break;
+
+					case 2:
+						AnnouncementDAO annDAO	= new AnnouncementDAO(this);
+						annDAO.open();
+						annDAO.updateMarkAllAsRead();
+						annDAO.close();
+
+						updateManager.broadcastDataReload_Announcements();
+						break;
+				}
 				return true;
 
 				default :
