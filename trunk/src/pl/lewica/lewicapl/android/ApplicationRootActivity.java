@@ -165,7 +165,7 @@ public class ApplicationRootActivity extends TabActivity {
 		if (updateManager.isRunning() ) {
 			menu.getItem(0).setEnabled(false);
 		}
-		
+
 		return true;
 	}
 

@@ -92,7 +92,7 @@ public class ArticleDAO {
 	 */
 	public long insert(Article article) {
 		ContentValues cv	= new ContentValues();
-		
+
 //		String ID, String categoryID, String relatedIDs, String datePublished, String hasImage, String imageExt, String URL, String title, String content, String editorComment
 		URL articleURL		= article.getURL();
 		String url;
@@ -228,11 +228,11 @@ public class ArticleDAO {
 
 	public int updateMarkAllAsRead() {
 		ContentValues cv	= new ContentValues();
-		
+
 		cv.put(FIELD_WAS_READ, 1);
-		
+
 		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
-		
+
 		int totalUpdates	= databaseWritable.update(
 				DATABASE_TABLE, 
 				cv, 
@@ -240,7 +240,7 @@ public class ArticleDAO {
 				null
 				);
 		databaseWritable.close();
-		
+
 		return totalUpdates;
 	}
 
@@ -320,7 +320,7 @@ public class ArticleDAO {
 			sbWhere.append( listCatID.substring( 1, listCatID.length() - 1) );
 			sbWhere.append(") ");
 		}
-		
+
 		sbOrderBy.append(FIELD_CATEGORY_ID);
 		sbOrderBy.append( " ASC, ");
 		sbOrderBy.append(FIELD_ID);
@@ -370,7 +370,7 @@ public class ArticleDAO {
 	public Map<String,Long> fetchPreviousNextID(long ID, int categoryID) {
 		Map<String,Long> map	= new HashMap<String,Long>();
 		StringBuilder sb				= new StringBuilder();
-		
+
 		// Building SQL query consisting of two "unioned" parts like this one:
 		// SELECT COALESCE(MAX(_id), 0)AS id, 'Previous' AS type FROM ZArticle WHERE _id < 25365 AND ZIDArticleCategory = 1
 		sb.append("SELECT COALESCE(MAX(");
