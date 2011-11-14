@@ -75,7 +75,7 @@ public class ArticleDAO {
 			throws SQLException {
 		dbHelper	= new LewicaPLSQLiteOpenHelper(context);
 		database	= dbHelper.getReadableDatabase();
-		
+
 		return this;
 	}
 
@@ -119,7 +119,7 @@ public class ArticleDAO {
 			}
 			relatedIDs	= sb.toString();
 		}
-		
+
 		cv.put(FIELD_ID,							article.getID() );
 		cv.put(FIELD_CATEGORY_ID,		article.getArticleCategoryID() );
 		cv.put(FIELD_RELATED_IDS,			relatedIDs);
@@ -157,7 +157,71 @@ public class ArticleDAO {
 			null
 		);
 		databaseWritable.close();
-		
+
+		return totalUpdates;
+	}
+
+
+	public int updateMarkNewsAsRead() {
+		StringBuilder sb		= new StringBuilder();
+		ContentValues cv	= new ContentValues();
+
+		// UPDATE operation
+		cv.put(FIELD_WAS_READ, 1);
+
+		// WHERE clause
+		sb.append(FIELD_CATEGORY_ID);
+		sb.append(" IN (");
+		sb.append(Article.SECTION_POLAND);
+		sb.append(",");
+		sb.append(Article.SECTION_WORLD);
+		sb.append(") AND ");
+		sb.append(FIELD_WAS_READ);
+		sb.append(" = 0");
+
+		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
+
+		int totalUpdates	= databaseWritable.update(
+				DATABASE_TABLE, 
+				cv, 
+				sb.toString(), 
+				null
+				);
+		databaseWritable.close();
+
+		return totalUpdates;
+	}
+
+
+	public int updateMarkTextsAsRead() {
+		StringBuilder sb		= new StringBuilder();
+		ContentValues cv	= new ContentValues();
+
+		// UPDATE operation
+		cv.put(FIELD_WAS_READ, 1);
+
+		// WHERE clause
+		sb.append(FIELD_CATEGORY_ID);
+		sb.append(" IN (");
+		sb.append(Article.SECTION_OPINIONS);
+		sb.append(",");
+		sb.append(Article.SECTION_REVIEWS);
+		sb.append(",");
+		sb.append(Article.SECTION_CULTURE);
+		sb.append(") AND ");
+		sb.append(FIELD_WAS_READ);
+		sb.append(" = 0");
+
+		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
+
+		int totalUpdates	= databaseWritable.update(
+				DATABASE_TABLE, 
+				cv, 
+				sb.toString(), 
+				null
+				);
+		databaseWritable.close();
+
 		return totalUpdates;
 	}
 
@@ -172,7 +236,7 @@ public class ArticleDAO {
 		int totalUpdates	= databaseWritable.update(
 				DATABASE_TABLE, 
 				cv, 
-				FIELD_WAS_READ + "=" + 0, 
+				FIELD_WAS_READ + "= 0", 
 				null
 				);
 		databaseWritable.close();
