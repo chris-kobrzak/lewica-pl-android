@@ -126,6 +126,10 @@ public class ApplicationRootActivity extends TabActivity {
 
 		registerReceiver(receiver, filter);
 
+		if (! updateManager.isRunning() ) {
+			setProgressBarIndeterminateVisibility(false);
+		}
+
 		runUpdate();
 	}
 
