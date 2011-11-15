@@ -37,13 +37,13 @@ public class SAXParserHandlerFactory {
 	public static DefaultHandler create(DataModelType modelType) {
 		switch (modelType) {
 			case ARTICLE:
-				return (DefaultHandler) new ArticleSAXHandler();
+				return new ArticleSAXHandler();
 
 			case ANNOUNCEMENT:
-				return (DefaultHandler) new AnnouncementSAXHandler();
+				return new AnnouncementSAXHandler();
 
 			case HISTORY:
-				return (DefaultHandler) new HistorySAXHandler();
+				return new HistorySAXHandler();
 
 			default :
 				return new DefaultHandler();

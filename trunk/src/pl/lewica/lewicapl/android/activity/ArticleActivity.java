@@ -392,6 +392,7 @@ public class ArticleActivity extends Activity {
 		}*/
 
 
+		@Override
 		protected void onPostExecute(Bitmap bitmap) {
 			if (bitmap == null) {
 				return;

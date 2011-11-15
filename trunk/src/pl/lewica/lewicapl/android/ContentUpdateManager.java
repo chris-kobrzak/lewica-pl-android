@@ -265,7 +265,7 @@ public class ContentUpdateManager {
 		int bufferSize	= 8192;
 
 		while (iter.hasNext() ) {
-			imageMeta	= (Map<String,String>) iter.next();
+			imageMeta	= iter.next();
 			ID									= Long.parseLong(imageMeta.get("ID") );
 
 			imageName					= ArticleURL.buildNameThumbnail(ID, imageMeta.get("Ext") );
@@ -569,7 +569,7 @@ public class ContentUpdateManager {
 
 		@Override
 		protected UpdateStatus doInBackground(Void... params) {
-			UpdateStatus status					= (UpdateStatus) fetchAndSaveArticles(context);
+			UpdateStatus status					= fetchAndSaveArticles(context);
 
 			return status;
 		}
@@ -619,7 +619,7 @@ public class ContentUpdateManager {
 
 		@Override
 		protected UpdateStatus doInBackground(Void... params) {
-			UpdateStatus status					= (UpdateStatus) fetchAndSaveAnnouncements(context);
+			UpdateStatus status					= fetchAndSaveAnnouncements(context);
 
 			return status;
 		}
@@ -639,7 +639,7 @@ public class ContentUpdateManager {
 
 		@Override
 		protected UpdateStatus doInBackground(Void... params) {
-			UpdateStatus status					= (UpdateStatus) fetchAndSaveHistoryEvents(context);
+			UpdateStatus status					= fetchAndSaveHistoryEvents(context);
 
 			return status;
 		}

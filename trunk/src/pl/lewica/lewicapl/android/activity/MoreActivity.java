@@ -37,6 +37,7 @@ public class MoreActivity extends Activity {
 	private static Typeface categoryTypeface;
 
 
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.list_more);

@@ -54,6 +54,7 @@ public class HistoryListActivity extends Activity {
 	private 	int day;
 
 
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.list_history);	// This comes from this file's name /res/list_history.xml
@@ -89,6 +90,7 @@ public class HistoryListActivity extends Activity {
 		) {
 			// Disables the onClick event attached to the rows (and also the default, orange background colour).
 			// In order to get rid of lines dividing the rows, you might want to implement areAllItemsEnabled() as well.
+			@Override
 			public boolean isEnabled(int position) { 
 				return false; 
 			} 
