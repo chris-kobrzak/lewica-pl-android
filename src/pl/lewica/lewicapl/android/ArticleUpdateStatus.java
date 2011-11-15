@@ -31,9 +31,11 @@ public class ArticleUpdateStatus extends UpdateStatus {
 	private Set<Map<String, String>> images;
 	
 	
+	@Override
 	public int getTotalUpdated() {
 		return totalUpdated;
 	}
+	@Override
 	public void setTotalUpdated(int totalUpdated) {
 		this.totalUpdated = totalUpdated;
 	}

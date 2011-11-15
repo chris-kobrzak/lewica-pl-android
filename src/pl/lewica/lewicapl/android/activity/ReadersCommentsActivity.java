@@ -32,6 +32,7 @@ public class ReadersCommentsActivity extends Activity {
 	private long articleID;
 
 
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
