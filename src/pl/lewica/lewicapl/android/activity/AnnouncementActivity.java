@@ -70,12 +70,21 @@ public class AnnouncementActivity extends Activity {
 		// Custom font used by the category headings
 		categoryTypeface	= Typeface.createFromAsset(getAssets(), "Impact.ttf");
 
-		annID				= filterIDFromUri(getIntent() );
-
 		// Access data
 		annDAO				= new AnnouncementDAO(this);
 		annDAO.open();
-		
+
+		// When user changes the orientation, Android restarts the activity.  Say, users navigated through articles using
+		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
+		// article that was loaded through the intent.  In other words, changing the orientation would change the article displayed...
+		// The logic below fixes this issue and it's using the ID set by onRetainNonConfigurationInstance (see docs for details).
+		final Long ID	= (Long) getLastNonConfigurationInstance();
+		if (ID == null) {
+			annID			= filterIDFromUri(getIntent() );
+		} else {
+			annID			= ID;
+		}
+
 		// Fill views with data
 		loadContent(annID, this);
 
@@ -165,6 +174,17 @@ public class AnnouncementActivity extends Activity {
 			default :
 				return super.onOptionsItemSelected(item);
 		}
+	}
+
+
+	/**
+	 * Caches the current article ID.  Called when device orientation changes.
+	 * @see android.app.Activity#onRetainNonConfigurationInstance()
+	 */
+	@Override
+	public Object onRetainNonConfigurationInstance() {
+	    final Long ID = annID;
+		return ID;
 	}
 
 
