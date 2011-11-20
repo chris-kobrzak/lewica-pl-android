@@ -17,6 +17,7 @@ package pl.lewica.lewicapl.android.activity;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.SoftReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -56,8 +57,9 @@ public class ArticleActivity extends Activity {
 	public static final String URI_BASE_COMMENTS	= "content://lewicapl/articles/article/comments/";
 
 	private static Typeface categoryTypeface;
-	private static Map<Long,Bitmap> images	= new HashMap<Long,Bitmap>();
+	private static Map<Long, SoftReference<Bitmap>> images	= new HashMap<Long,SoftReference<Bitmap>>();
 
+	private ImageCache imageCache;
 	private long articleID;
 	private int categoryID;
 	private String articleURL;
@@ -88,6 +90,9 @@ public class ArticleActivity extends Activity {
 		
 		// Custom font used by the category headings
 		categoryTypeface	= Typeface.createFromAsset(getAssets(), "Impact.ttf");
+
+		// Image caching service
+		imageCache			= new ImageCache();
 
 		// Access data
 		articleDAO				= new ArticleDAO(this);
@@ -321,9 +326,17 @@ public class ArticleActivity extends Activity {
 		ImageView iv			= (ImageView) findViewById(R.id.article_image);
 		iv.setImageBitmap(null);
 		if (cursor.getInt(colIndex_HasThumb) == 1) {
-			if (images.containsKey(articleID) ) {
-				loadImage(images.get(articleID) );
-			} else {
+			boolean downloadImage		= true;
+			// Checking if this image is available in our local cache.
+			if (imageCache.isCached(articleID) ) {
+				Bitmap bitmap	= imageCache.get(articleID);
+				if (bitmap != null) {
+					loadImage(bitmap);
+					downloadImage		= false;
+				}
+			}
+			// Image needs to downloaded from the server
+			if (downloadImage) {
 				String imageUrl		= ArticleURL.buildURLImage(ID, cursor.getString(colIndex_ThumbExt) );
 	
 				// Images need to be downloaded in a separate thread as we cannot block the UI thread.
@@ -380,6 +393,35 @@ public class ArticleActivity extends Activity {
 	}
 
 
+	
+	/**
+	 * Inner class that abstracts out the publication image attachment caching.
+	 * Images are cached in a parent class member called images.
+	 * Other methods should use this class rather than directly reference the images object methods.
+	 * @author Krzysztof Kobrzak
+	 */
+	private class ImageCache {
+
+		public boolean isCached(Long articleID) {
+			return images.containsKey(articleID);
+		}
+
+
+		public Bitmap get(Long articleID) {
+			SoftReference<Bitmap> sf		= images.get(articleID);
+			if (sf != null) {
+				return sf.get();
+			}
+			return null;
+		}
+
+
+		public void put(Long articleID, Bitmap bitmap) {
+			images.put(articleID, new SoftReference<Bitmap>(bitmap) );
+		}
+	}
+
+
 	private class ImageLoadTask extends AsyncTask<String, Void, Bitmap> {
 		@Override
 		protected Bitmap doInBackground(String... imageURLs) {
@@ -419,7 +461,7 @@ public class ArticleActivity extends Activity {
 			// Even though relying on articleID might seem risky, loading a wrong image shouldn't ever be the case.
 			// This is because we cancel image loading operations every time loadArticle is called, ie. when users 
 			// navigate between articles using the previous-next facility.
-			images.put(articleID, bitmap);
+			imageCache.put(articleID, bitmap);
 		}
 	}
 }
