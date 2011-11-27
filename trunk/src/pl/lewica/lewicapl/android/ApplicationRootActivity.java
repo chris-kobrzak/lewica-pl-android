@@ -16,6 +16,7 @@
 package pl.lewica.lewicapl.android;
 
 import java.io.File;
+import java.io.IOException;
 
 import android.app.TabActivity;
 import android.content.BroadcastReceiver;
@@ -76,6 +77,16 @@ public class ApplicationRootActivity extends TabActivity {
 		File sdDir		= Environment.getExternalStorageDirectory();
 		storageDir		= new File(sdDir + res.getString(R.string.path_images) );
 		storageDir.mkdirs();
+		// Add a special, hidden file to the cache directory to prevent images from being indexed by Android Gallery.
+		File hideGallery	= new File(storageDir + "/.nomedia");
+		if (! hideGallery.exists() ) {
+			// It's not a big deal if this operation fails so let's just try-catch it.
+			try {
+				hideGallery.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
 		// Create an Intent to launch an Activity for the tab (to be reused)
 		intent	= new Intent(this, NewsListActivity.class);
