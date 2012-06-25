@@ -50,8 +50,32 @@ public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		int i, prevVersion;
+
+		// Version 1
+		initDatabase(db, DATABASE_VERSION);
+
+		// Versions 2+
+		for (i = 2; i <= DATABASE_VERSION; i++) {
+			prevVersion	= i - 1;
+			upgradeDatabase(db, prevVersion, i);
+		}
+	}
+
+
+	/**
+	 *  Method is called during the upgrade of the database, e.g. if you increase the database version.  Not in use yet.
+	 */
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		upgradeDatabase(db, oldVersion, newVersion);
+	}
+
+
+	private void initDatabase(SQLiteDatabase db, int version) {
 		List<String> queries;
 
+		Log.i(TAG, "Creating DB version 1");
 		try {
 			queries = Schema.getDatabaseInitSQL(context, DATABASE_VERSION);
 
@@ -63,20 +87,17 @@ public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
 		} catch (IOException e) {
 			// This is unlikely to happen but if it does, there's not much you can do as the application
 			// cannot run without the database.  So let's at least make sure this event is logged.
-			Log.e(TAG, "Failed to create database version " + DATABASE_VERSION);
+			Log.e(TAG, "Failed to create DB version " + DATABASE_VERSION);
 		} finally {
 			db.endTransaction();
 		}
 	}
 
 
-	/**
-	 *  Method is called during the upgrade of the database, e.g. if you increase the database version.  Not in use yet.
-	 */
-	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+	private void upgradeDatabase(SQLiteDatabase db, int oldVersion, int newVersion) {
 		List<String> queries;
 
+		Log.i(TAG, "Upgrading DB from version " + oldVersion + " to " + newVersion);
 		try {
 			queries = Schema.getDatabaseUpgradeSQL(context, oldVersion, newVersion);
 
@@ -88,7 +109,7 @@ public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
 		} catch (IOException e) {
 			// This is unlikely to happen but if it does, there's not much you can do as the application
 			// cannot run without the database.  So let's at least make sure this event is logged.
-			Log.e(TAG, "Failed to upgrade database version from " + oldVersion + " to " + newVersion);
+			Log.e(TAG, "Failed to upgrade DB from version " + oldVersion + " to " + newVersion);
 		} finally {
 			db.endTransaction();
 		}
