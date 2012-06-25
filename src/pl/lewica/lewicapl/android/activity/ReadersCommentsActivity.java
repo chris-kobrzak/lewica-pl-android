@@ -40,8 +40,8 @@ public class ReadersCommentsActivity extends Activity {
 
 		articleID					= filterIDFromUri(getIntent() );
 		
-		WebView tv			= (WebView) findViewById(R.id.web_comments);
-		tv.loadUrl(URLDictionary.BASE_READERS_COMMENTS + articleID);
+		WebView wv			= (WebView) findViewById(R.id.web_comments);
+		wv.loadUrl(URLDictionary.BASE_READERS_COMMENTS + articleID);
 	}
 
 	/**
