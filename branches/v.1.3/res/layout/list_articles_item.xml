@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	style="@style/ListItemContainer"
+>
+	<ImageView
+		android:src="@android:drawable/ic_menu_report_image"
+		android:id="@+id/article_item_icon"
+		android:layout_width="60dp"
+		android:layout_height="60dp"
+	/>
+	<TextView
+		android:text="Title"
+		android:id="@+id/article_item_title"
+		android:layout_above="@+id/article_item_date"
+		android:layout_alignTop="@+id/article_item_icon"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="70dp"
+		android:gravity="center_vertical|left"
+		android:ellipsize="end"
+		style="@style/ListItemLabel"
+	/>
+	<TextView
+		android:text="Date"
+		android:id="@+id/article_item_date"
+		android:layout_alignBottom="@+id/article_item_icon"
+		android:layout_alignLeft="@+id/article_item_title"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		style="@style/ListItemDetailText"
+	/>
+	<ImageView
+		android:src="@drawable/ic_pencil"
+		android:id="@+id/ico_pencil"
+		android:layout_alignBottom="@+id/article_item_date"
+		android:layout_alignParentRight="true"
+		android:layout_width="16.3dp"
+		android:layout_height="20dp"
+		android:layout_marginRight="5dp"
+	/>
+</RelativeLayout>
