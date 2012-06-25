@@ -21,13 +21,16 @@ import java.util.List;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
 
 /**
  * Standard Android SQLite database management class responsible for creating and updating the schema.
  * @author Krzysztof Kobrzak
  */
 public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
-
+	private static final String TAG	= "LewicaPLSQLiteOpenHelper";
+	
 	private static final String DATABASE_NAME		= "LewicaPL.db";
 	private static final int DATABASE_VERSION		= 1;
 	
@@ -52,13 +55,17 @@ public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
 		try {
 			queries = Schema.getDatabaseInitSQL(context, DATABASE_VERSION);
 
+			db.beginTransaction();
 			for (String query: queries) {
 				db.execSQL(query);
 			}
+			db.setTransactionSuccessful();
 		} catch (IOException e) {
 			// This is unlikely to happen but if it does, there's not much you can do as the application
 			// cannot run without the database.  So let's at least make sure this event is logged.
-			e.printStackTrace();
+			Log.e(TAG, "Failed to create database version " + DATABASE_VERSION);
+		} finally {
+			db.endTransaction();
 		}
 	}
 
@@ -67,6 +74,23 @@ public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
 	 *  Method is called during the upgrade of the database, e.g. if you increase the database version.  Not in use yet.
 	 */
 	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		List<String> queries;
 
+		try {
+			queries = Schema.getDatabaseUpgradeSQL(context, oldVersion, newVersion);
+
+			db.beginTransaction();
+			for (String query: queries) {
+				db.execSQL(query);
+			}
+			db.setTransactionSuccessful();
+		} catch (IOException e) {
+			// This is unlikely to happen but if it does, there's not much you can do as the application
+			// cannot run without the database.  So let's at least make sure this event is logged.
+			Log.e(TAG, "Failed to upgrade database version from " + oldVersion + " to " + newVersion);
+		} finally {
+			db.endTransaction();
+		}
+	}
 }
