@@ -56,19 +56,35 @@ public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
 		initDatabase(db, DATABASE_VERSION);
 
 		// Versions 2+
-		for (i = 2; i <= DATABASE_VERSION; i++) {
+		i	= 2;
+		for ( ; i <= DATABASE_VERSION; i++) {
 			prevVersion	= i - 1;
 			upgradeDatabase(db, prevVersion, i);
 		}
 	}
 
 
+
 	/**
-	 *  Method is called during the upgrade of the database, e.g. if you increase the database version.  Not in use yet.
+	 * Method is called during the upgrade of the database, e.g. if you increase the database version.
+	 * 
+	 * What it does is it calls updateDatabase as many times as the difference between newVersion and oldVersion is.
+	 * This is because we want to run incremental upgrades so if e.g. you upgrade from version 1 to 3,
+	 * we run a version 1 to version 2 upgrade script and then version 2 to 3. 
+	 *  
+	 * Not in use yet.
+	 *  
+	 * @param db
+	 * @param oldVersion
+	 * @param newVersion
 	 */
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		upgradeDatabase(db, oldVersion, newVersion);
+		int i	= oldVersion;
+
+		for ( ; i <= newVersion - oldVersion; i++) {
+			upgradeDatabase(db, i, i + 1);
+		}
 	}
 
 
@@ -95,6 +111,11 @@ public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
 
 
 	private void upgradeDatabase(SQLiteDatabase db, int oldVersion, int newVersion) {
+		// Preliminary checks
+		if (newVersion <= oldVersion) {
+			Log.w(TAG, "Impossible to upgrade DB from new version " + oldVersion + " to older " + newVersion);
+			return;
+		}
 		List<String> queries;
 
 		Log.i(TAG, "Upgrading DB from version " + oldVersion + " to " + newVersion);
