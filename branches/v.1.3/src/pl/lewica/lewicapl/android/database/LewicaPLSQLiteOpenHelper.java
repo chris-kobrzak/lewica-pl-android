@@ -66,7 +66,7 @@ public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
 
 
 	/**
-	 * Method is called during the upgrade of the database, e.g. if you increase the database version.
+	 * This method is called during the upgrade of the database, e.g. if you increase the database version.
 	 * 
 	 * What it does is it calls updateDatabase as many times as the difference between newVersion and oldVersion is.
 	 * This is because we want to run incremental upgrades so if e.g. you upgrade from version 1 to 3,
@@ -88,7 +88,8 @@ public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
 	}
 
 
-	private void initDatabase(SQLiteDatabase db, int version) {
+	private boolean initDatabase(SQLiteDatabase db, int version) {
+		boolean result	= true;
 		List<String> queries;
 
 		Log.i(TAG, "Creating DB version 1");
@@ -101,21 +102,24 @@ public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
 			}
 			db.setTransactionSuccessful();
 		} catch (IOException e) {
-			// This is unlikely to happen but if it does, there's not much you can do as the application
-			// cannot run without the database.  So let's at least make sure this event is logged.
-			Log.e(TAG, "Failed to create DB version " + DATABASE_VERSION);
+			result	= false;
 		} finally {
 			db.endTransaction();
 		}
+
+		if (result) {
+			return true;
+		}
+
+		// This is unlikely to happen but if it does, there's not much you can do as the application
+		// cannot run without the database.  So let's at least make sure this event is logged.
+		Log.e(TAG, "Failed to create DB version " + DATABASE_VERSION);
+		return false;
 	}
 
 
-	private void upgradeDatabase(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// Preliminary checks
-		if (newVersion <= oldVersion) {
-			Log.w(TAG, "Impossible to upgrade DB from new version " + oldVersion + " to older " + newVersion);
-			return;
-		}
+	private boolean upgradeDatabase(SQLiteDatabase db, int oldVersion, int newVersion) {
+		boolean result	= true;
 		List<String> queries;
 
 		Log.i(TAG, "Upgrading DB from version " + oldVersion + " to " + newVersion);
@@ -128,11 +132,18 @@ public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
 			}
 			db.setTransactionSuccessful();
 		} catch (IOException e) {
-			// This is unlikely to happen but if it does, there's not much you can do as the application
-			// cannot run without the database.  So let's at least make sure this event is logged.
-			Log.e(TAG, "Failed to upgrade DB from version " + oldVersion + " to " + newVersion);
+			result	= false;
 		} finally {
 			db.endTransaction();
 		}
+
+		if (result) {
+			return true;
+		}
+		
+		// This is unlikely to happen but if it does, there's not much you can do as the application
+		// cannot run without the database.  So let's at least make sure this event is logged.
+		Log.e(TAG, "Failed to upgrade DB from version " + oldVersion + " to " + newVersion);
+		return false;
 	}
 }
