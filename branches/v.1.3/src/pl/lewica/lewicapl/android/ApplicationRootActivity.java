@@ -32,10 +32,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewParent;
 import android.view.Window;
+import android.widget.LinearLayout;
 import android.widget.TabHost;
 
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.activity.AnnouncementListActivity;
+import pl.lewica.lewicapl.android.activity.BlogPostListActivity;
 import pl.lewica.lewicapl.android.activity.HistoryListActivity;
 import pl.lewica.lewicapl.android.activity.MoreActivity;
 import pl.lewica.lewicapl.android.activity.NewsListActivity;
@@ -66,6 +68,8 @@ public class ApplicationRootActivity extends TabActivity {
 		// This allows to show and hide the progress indicator in the top bar.
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
+		setUpStorageEnvironment();
+
 		setContentView(R.layout.tab_layout);
 
 		// Tabs layout based on http://developer.android.com/resources/tutorials/views/hello-tabwidget.html
@@ -73,21 +77,7 @@ public class ApplicationRootActivity extends TabActivity {
 		TabHost tabHost	= getTabHost();  // The activity TabHost
 		TabHost.TabSpec spec;  // Resusable TabSpec for each tab
 		Intent intent;  // Reusable Intent for each tab
-
-		File sdDir		= Environment.getExternalStorageDirectory();
-		storageDir		= new File(sdDir + res.getString(R.string.path_images) );
-		storageDir.mkdirs();
-		// Add a special, hidden file to the cache directory to prevent images from being indexed by Android Gallery.
-		File hideGallery	= new File(storageDir + "/.nomedia");
-		if (! hideGallery.exists() ) {
-			// It's not a big deal if this operation fails so let's just try-catch it.
-			try {
-				hideGallery.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
+		
 		// Create an Intent to launch an Activity for the tab (to be reused)
 		intent	= new Intent(this, NewsListActivity.class);
 		// Initialize a TabSpec for each tab and add it to the TabHost
@@ -97,6 +87,10 @@ public class ApplicationRootActivity extends TabActivity {
 		// Do the same for the other tabs
 		intent	= new Intent(this, PublicationListActivity.class);
 		spec		= tabHost.newTabSpec("texts").setIndicator(res.getString(R.string.tab_texts), res.getDrawable(R.drawable.ic_tab_book) ).setContent(intent);
+		tabHost.addTab(spec);
+		
+		intent	= new Intent(this, BlogPostListActivity.class);
+		spec		= tabHost.newTabSpec("blog").setIndicator(res.getString(R.string.tab_blog), res.getDrawable(R.drawable.ic_tab_person) ).setContent(intent);
 		tabHost.addTab(spec);
 
 		intent	= new Intent(this, AnnouncementListActivity.class);
@@ -239,6 +233,26 @@ public class ApplicationRootActivity extends TabActivity {
 
 				default :
 					return super.onOptionsItemSelected(item);
+		}
+	}
+
+
+	public void setUpStorageEnvironment() {
+		File sdDir		= Environment.getExternalStorageDirectory();
+		storageDir		= new File(sdDir + getResources().getString(R.string.path_images) );
+		if (! storageDir.exists() ) {
+			storageDir.mkdirs();
+		}
+		// Add a special, hidden file to the cache directory to prevent images from being indexed by Android Gallery.
+		File hideGallery	= new File(storageDir + "/.nomedia");
+		if (hideGallery.exists() ) {
+			return;
+		}
+		// It's not a big deal if this operation fails so let's just try-catch it.
+		try {
+			hideGallery.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
