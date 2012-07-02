@@ -39,6 +39,9 @@ public class SAXParserHandlerFactory {
 			case ARTICLE:
 				return new ArticleSAXHandler();
 
+			case BLOG_POST:
+				return new BlogPostSAXHandler();
+
 			case ANNOUNCEMENT:
 				return new AnnouncementSAXHandler();
 
