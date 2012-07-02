@@ -25,7 +25,7 @@ package pl.lewica.api.url;
  */
 public class BlogPostURL implements WebServiceURL {
 
-	public static final String WEB_SERVICE					= "http://lewica.pl/api/blog.php";
+	public static final String WEB_SERVICE					= "http://lewica.pl/api/blog-posty.php";
 	// The maximum number of entries that can be downloaded is limited to 10 by the server anyway.
 	public static final int LIMIT								= 15;
 
