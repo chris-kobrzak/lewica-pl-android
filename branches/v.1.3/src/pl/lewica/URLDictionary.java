@@ -32,4 +32,14 @@ public class URLDictionary {
 
 	public static final String BASE_READERS_COMMENTS	= "http://lewica.pl/forum/index.php?format=minimal&fuse=messages.";
 
+
+	public static String buildURL_BlogPost(int blogID, Long ID) {
+		StringBuilder sb	= new StringBuilder(BLOGS);
+		sb.append("?blog=");
+		sb.append(Integer.toString(blogID) );
+		sb.append("&id=");
+		sb.append(Long.toString(ID) );
+
+		return sb.toString();
+	}
 }
