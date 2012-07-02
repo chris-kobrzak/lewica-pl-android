@@ -262,8 +262,8 @@ public class ContentUpdateManager {
 		File image;
 		URL url;
 
-		BufferedInputStream bis;
-		FileOutputStream fos;
+		BufferedInputStream bis	= null;
+		FileOutputStream fos		= null;
 		ByteArrayBuffer bab;
 		int current;
 		// See http://stackoverflow.com/questions/3498643/dalvik-message-default-buffer-size-used-in-bufferedinputstream-constructor-it/7516554#7516554
@@ -301,6 +301,21 @@ public class ContentUpdateManager {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
+			} finally {
+				if (fos != null) {
+					try {
+						fos.close();
+					} catch (IOException ioe) {
+						System.err.println("Unable to close output stream for " + imageURL);
+					}
+				}
+				if (bis != null) {
+					try {
+						bis.close();
+					} catch (IOException ioe) {
+						System.err.println("Unable to buffer input stream for " + imageURL);
+					}
+				}
 			}
 		}
 
