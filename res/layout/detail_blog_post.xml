@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/blog_post_scroll_view"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+>
+	<RelativeLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:paddingBottom="10dp"
+	>
+		<LinearLayout
+			android:id="@+id/info_bar_blog_post"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:background="@color/orange"
+		>
+			<TextView
+				android:text="category"
+				android:id="@+id/blog_post_category"
+				android:layout_width="wrap_content"
+				android:ellipsize="end"
+				style="@style/InfoBarCategory"
+			/>
+			<TextView
+				android:text="date"
+				android:id="@+id/blog_post_date"
+				android:layout_width="fill_parent"
+				style="@style/InfoBarDate"
+			/>
+		</LinearLayout>
+		<TextView
+			android:text="title"
+			android:id="@+id/blog_post_title"
+			android:layout_below="@+id/info_bar_blog_post"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			style="@style/StandardHeading"
+		/>
+
+		<TextView
+			android:text="content"
+			android:id="@+id/blog_post_content"
+			android:layout_below="@+id/blog_post_title"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="10dp"
+			style="@style/StandardText"
+		/>
+		<TextView
+			android:text="published by"
+			android:id="@+id/blog_post_author"
+			android:layout_below="@+id/blog_post_content"
+			android:layout_alignRight="@+id/blog_post_content"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="7dp"
+		/>	
+	</RelativeLayout>
+</ScrollView>
