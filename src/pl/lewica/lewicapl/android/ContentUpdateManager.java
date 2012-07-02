@@ -38,11 +38,13 @@ import android.os.AsyncTask;
 import pl.lewica.api.FeedDownloadManager;
 import pl.lewica.api.model.Announcement;
 import pl.lewica.api.model.Article;
+import pl.lewica.api.model.BlogEntry;
 import pl.lewica.api.model.History;
 import pl.lewica.api.model.DataModel;
 import pl.lewica.api.model.DataModelType;
 import pl.lewica.api.url.AnnouncementURL;
 import pl.lewica.api.url.ArticleURL;
+import pl.lewica.api.url.BlogEntryURL;
 import pl.lewica.api.url.HistoryURL;
 import pl.lewica.lewicapl.android.activity.AnnouncementListActivity;
 import pl.lewica.lewicapl.android.activity.HistoryListActivity;
@@ -50,6 +52,7 @@ import pl.lewica.lewicapl.android.activity.NewsListActivity;
 import pl.lewica.lewicapl.android.activity.PublicationListActivity;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
+import pl.lewica.lewicapl.android.database.BlogEntryDAO;
 import pl.lewica.lewicapl.android.database.HistoryDAO;
 import pl.lewica.util.DateUtil;
 
@@ -80,7 +83,9 @@ public class ContentUpdateManager {
 		NEW_ANNOUNCEMENTS,
 		NO_ANNOUNCEMENTS,
 		NEW_HISTORY,
-		NO_HISTORY
+		NO_HISTORY,
+		NEW_BLOG_ENTRIES,
+		NO_BLOG_ENTRIES
 	}
 
 
@@ -304,6 +309,47 @@ public class ContentUpdateManager {
 
 
 	/**
+	 * Coordinates the process of downloading the blog entries feed and inserting data to the database.
+	 * @param context
+	 * @return UpdateStatus
+	 */
+	private UpdateStatus fetchAndSaveBlogEntries(Context context) {
+		UpdateStatus status						= new UpdateStatus();
+		FeedDownloadManager fdm			= new FeedDownloadManager();
+		BlogEntryURL blogEntryURL				= new BlogEntryURL();
+		BlogEntryDAO blogEntryDAO			= new BlogEntryDAO(context);
+
+		blogEntryDAO.open();
+		int lastBlogEntryID					= blogEntryDAO.fetchLastID();
+
+		blogEntryURL.setNewerThan(lastBlogEntryID);
+		blogEntryURL.setLimit(15);
+
+		List<DataModel> blogEntries	= fdm.fetchAndParse(DataModelType.BLOG_ENTRY, blogEntryURL.buildURL() );
+		int totalBlogEntries					= blogEntries.size();
+
+		if (totalBlogEntries == 0) {
+			blogEntryDAO.close();
+			status.setTotalUpdated(0);
+
+			return status;
+		}
+
+		BlogEntry blogEntry;
+		// Loop through downloaded blog entries and insert them to the database
+		for (DataModel element: blogEntries) {
+			blogEntry	= (BlogEntry) element;
+			blogEntryDAO.insert(blogEntry);
+		}
+
+		blogEntryDAO.close();
+		status.setTotalUpdated(totalBlogEntries);
+
+		return status;
+	}
+
+
+	/**
 	 * Coordinates the process of downloading the announcements feed and inserting data to the database.
 	 * @param context
 	 * @return UpdateStatus
@@ -313,33 +359,33 @@ public class ContentUpdateManager {
 		FeedDownloadManager fdm			= new FeedDownloadManager();
 		AnnouncementURL annURL				= new AnnouncementURL();
 		AnnouncementDAO annDAO			= new AnnouncementDAO(context);
-
+		
 		annDAO.open();
 		int lastAnnID					= annDAO.fetchLastID();
-
+		
 		annURL.setNewerThan(lastAnnID);
 		annURL.setLimit(10);
-
+		
 		List<DataModel> anns	= fdm.fetchAndParse(DataModelType.ANNOUNCEMENT, annURL.buildURL() );
 		int totalAnns					= anns.size();
-
+		
 		if (totalAnns == 0) {
 			annDAO.close();
 			status.setTotalUpdated(0);
-
+			
 			return status;
 		}
-
+		
 		Announcement ann;
 		// Loop through downloaded articles and insert them to the database
 		for (DataModel element: anns) {
 			ann	= (Announcement) element;
 			annDAO.insert(ann);
 		}
-
+		
 		annDAO.close();
 		status.setTotalUpdated(totalAnns);
-
+		
 		return status;
 	}
 
@@ -430,8 +476,16 @@ public class ContentUpdateManager {
 		intent.setAction(PublicationListActivity.RELOAD_VIEW);
 		context.sendBroadcast(intent);
 	}
-	
-	
+
+
+	public void broadcastDataReload_BlogEntries() {
+		Intent intent	= new Intent();
+//		TODO Uncomment it when blog entries activity is ready
+//		intent.setAction(BlogEntriesListActivity.RELOAD_VIEW);
+		context.sendBroadcast(intent);
+	}
+
+
 	public void broadcastDataReload_Announcements() {
 		Intent intent	= new Intent();
 		intent.setAction(AnnouncementListActivity.RELOAD_VIEW);
@@ -513,9 +567,9 @@ public class ContentUpdateManager {
 				// No break statement here, just let it jump to the next NO_PUBLICATIONS case that will take care of deciding what to do next.
 
 			case NO_PUBLICATIONS:
-				// After publications come the announcements
+				// After publications come the blog stuff
 				if (chainReaction) {
-					new UpdateAnnouncementsTask().execute();
+					new UpdateBlogEntriesTask().execute();
 				} else {
 					broadcastNetworkActivity_Off();
 					setRunning(false);
@@ -530,6 +584,21 @@ public class ContentUpdateManager {
 				broadcastDataReload_Publications();
 
 				// We "know" the image update is actually triggered by UpdateArticlesTask so no actions required here.
+				break;
+
+			case NEW_BLOG_ENTRIES:
+				broadcastDataReload_BlogEntries();
+
+				// No break statement here, just let it jump to the next NO_BLOG_ENTRIES case that will take care of deciding what to do next.
+
+			case NO_BLOG_ENTRIES:
+				// After blog come the announcements
+				if (chainReaction) {
+					new UpdateAnnouncementsTask().execute();
+				} else {
+					broadcastNetworkActivity_Off();
+					setRunning(false);
+				}
 				break;
 
 			case NEW_ANNOUNCEMENTS:
@@ -611,6 +680,26 @@ public class ContentUpdateManager {
 			}
 			// Images task is branched out by the articles task so we want to be strict and set the chainReaction argument to false.
 			manageAndBroadcastUpdates(CommandType.NEW_PUBLICATION_IMAGES, false);
+		}
+	}
+	
+	
+	private class UpdateBlogEntriesTask extends AsyncTask<Void, Integer, UpdateStatus> {
+		
+		@Override
+		protected UpdateStatus doInBackground(Void... params) {
+			UpdateStatus status					= fetchAndSaveBlogEntries(context);
+			
+			return status;
+		}
+		
+		@Override
+		protected void onPostExecute(UpdateStatus status) {
+			if (status.getTotalUpdated() == 0) {
+				manageAndBroadcastUpdates(CommandType.NO_BLOG_ENTRIES, true);
+				return;
+			}
+			manageAndBroadcastUpdates(CommandType.NEW_BLOG_ENTRIES, true);
 		}
 	}
 
