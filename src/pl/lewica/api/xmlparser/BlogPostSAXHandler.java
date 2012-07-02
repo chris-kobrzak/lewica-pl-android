@@ -44,7 +44,7 @@ public class BlogPostSAXHandler extends DefaultHandler implements SAXParserDeleg
 	static final  String BLOG_POST_BLOG_TITLE	= "blog";
 	static final  String BLOG_POST_AUTHOR		= "autor";
 	static final  String BLOG_POST_TITLE		= "tytul";
-	static final  String BLOG_POST_TEXT		= "text";
+	static final  String BLOG_POST_TEXT		= "tekst";
 
 	// In case any parsing problems the date falls back to this value:
 	public String defaultDate	= "2000-01-01";
