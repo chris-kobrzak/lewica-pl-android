@@ -24,7 +24,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import pl.lewica.api.model.BlogPost;
-import pl.lewica.util.DateUtil;
 
 
 /**
@@ -81,7 +80,7 @@ public class BlogPostDAO {
 		cv.put(FIELD_BLOG_ID,				blogPost.getBlogID() );
 		cv.put(FIELD_AUTHOR_ID,			blogPost.getAuthorID() );
 		cv.put(FIELD_WAS_READ,				0);	// It's a new blogPost so it couldn't be read yet
-		cv.put(FIELD_DATE_PUBLISHED,	DateUtil.convertDateToString(blogPost.getDatePublished(), DateUtil.DATE_MASK_SQL) );
+		cv.put(FIELD_DATE_PUBLISHED,	blogPost.getDatePublished().getTime() );
 		cv.put(FIELD_BLOG_TITLE,			blogPost.getBlogTitle() );
 		cv.put(FIELD_AUTHOR,				blogPost.getAuthor() );
 		cv.put(FIELD_TITLE,						blogPost.getTitle() );
@@ -136,7 +135,7 @@ public class BlogPostDAO {
 
 	public Cursor selectOne(long blogPostID) throws SQLException {
 		Cursor cursor = database.query(true, DATABASE_TABLE, new String[] {
-				FIELD_ID, FIELD_DATE_PUBLISHED, FIELD_BLOG_TITLE,  FIELD_AUTHOR, FIELD_TITLE, FIELD_TEXT },
+				FIELD_ID, FIELD_DATE_PUBLISHED, FIELD_BLOG_ID, FIELD_BLOG_TITLE,  FIELD_AUTHOR, FIELD_TITLE, FIELD_TEXT },
 				FIELD_ID + "=" + blogPostID, null, null, null, null, "1");
 		if (cursor != null) {
 			cursor.moveToFirst();
