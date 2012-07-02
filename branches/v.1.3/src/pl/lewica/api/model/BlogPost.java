@@ -18,10 +18,10 @@ package pl.lewica.api.model;
 import java.util.Date;
 
 /**
- * Represents the data structure of the blog entry feed available through the lewica.pl REST-like Web Service.
+ * Represents the data structure of the blog post feed available through the lewica.pl REST-like Web Service.
  * @author Krzysztof Kobrzak
  */
-public class BlogEntry implements DataModel {
+public class BlogPost implements DataModel {
 	public int ID;
 	public int blogID;
 	public int authorID;

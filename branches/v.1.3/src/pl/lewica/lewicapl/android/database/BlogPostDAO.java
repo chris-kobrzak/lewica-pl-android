@@ -23,19 +23,19 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import pl.lewica.api.model.BlogEntry;
+import pl.lewica.api.model.BlogPost;
 import pl.lewica.util.DateUtil;
 
 
 /**
- * Collection of Data Access method for interacting with the blogEntry entity.
+ * Collection of Data Access method for interacting with the blogPost entity.
  * @author Krzysztof Kobrzak
  */
-public class BlogEntryDAO {
+public class BlogPostDAO {
 
 	public static final int LIMIT_LATEST_ENTRIES			= 15;
 
-	private static final String DATABASE_TABLE				= "ZBlogEntry";
+	private static final String DATABASE_TABLE				= "ZBlogPost";
 	// Database fields
 	public static final String FIELD_ID							= "_id";
 	public static final String FIELD_BLOG_ID					= "ZIdBlog";
@@ -55,12 +55,12 @@ public class BlogEntryDAO {
 	private LewicaPLSQLiteOpenHelper dbHelper;
 
 
-	public BlogEntryDAO(Context context) {
+	public BlogPostDAO(Context context) {
 		this.context	= context;
 	}
 
 
-	public BlogEntryDAO open() 
+	public BlogPostDAO open() 
 			throws SQLException {
 		dbHelper	= new LewicaPLSQLiteOpenHelper(context);
 		database	= dbHelper.getWritableDatabase();
@@ -74,18 +74,18 @@ public class BlogEntryDAO {
 	}
 
 	// String wasRead,
-	public long insert(BlogEntry blogEntry) {
+	public long insert(BlogPost blogPost) {
 		ContentValues cv	= new ContentValues();
 		
-		cv.put(FIELD_ID,							blogEntry.getID() );
-		cv.put(FIELD_BLOG_ID,				blogEntry.getBlogID() );
-		cv.put(FIELD_AUTHOR_ID,			blogEntry.getAuthorID() );
-		cv.put(FIELD_WAS_READ,				0);	// It's a new blogEntry so it couldn't be read yet
-		cv.put(FIELD_DATE_PUBLISHED,	DateUtil.convertDateToString(blogEntry.getDatePublished(), DateUtil.DATE_MASK_SQL) );
-		cv.put(FIELD_BLOG_TITLE,			blogEntry.getBlogTitle() );
-		cv.put(FIELD_AUTHOR,				blogEntry.getAuthor() );
-		cv.put(FIELD_TITLE,						blogEntry.getTitle() );
-		cv.put(FIELD_TEXT,						blogEntry.getText() );
+		cv.put(FIELD_ID,							blogPost.getID() );
+		cv.put(FIELD_BLOG_ID,				blogPost.getBlogID() );
+		cv.put(FIELD_AUTHOR_ID,			blogPost.getAuthorID() );
+		cv.put(FIELD_WAS_READ,				0);	// It's a new blogPost so it couldn't be read yet
+		cv.put(FIELD_DATE_PUBLISHED,	DateUtil.convertDateToString(blogPost.getDatePublished(), DateUtil.DATE_MASK_SQL) );
+		cv.put(FIELD_BLOG_TITLE,			blogPost.getBlogTitle() );
+		cv.put(FIELD_AUTHOR,				blogPost.getAuthor() );
+		cv.put(FIELD_TITLE,						blogPost.getTitle() );
+		cv.put(FIELD_TEXT,						blogPost.getText() );
 
 		return database.insert(DATABASE_TABLE, null, cv);
 	}
@@ -134,10 +134,10 @@ public class BlogEntryDAO {
 	}
 
 
-	public Cursor selectOne(long blogEntryID) throws SQLException {
+	public Cursor selectOne(long blogPostID) throws SQLException {
 		Cursor cursor = database.query(true, DATABASE_TABLE, new String[] {
 				FIELD_ID, FIELD_DATE_PUBLISHED, FIELD_BLOG_TITLE,  FIELD_AUTHOR, FIELD_TITLE, FIELD_TEXT },
-				FIELD_ID + "=" + blogEntryID, null, null, null, null, "1");
+				FIELD_ID + "=" + blogPostID, null, null, null, null, "1");
 		if (cursor != null) {
 			cursor.moveToFirst();
 		}
@@ -162,7 +162,7 @@ public class BlogEntryDAO {
 	}
 
 	/**
-	 * Returns the latest blogEntry ID from the database.
+	 * Returns the latest blogPost ID from the database.
 	 * @return
 	 */
 	public int fetchLastID() {
@@ -189,7 +189,7 @@ public class BlogEntryDAO {
 		StringBuilder sb				= new StringBuilder();
 		
 		// Building SQL query consisting of two "unioned" parts like this one:
-		// SELECT COALESCE(MAX(_id), 0)AS id, 'Previous' AS type FROM ZBlogEntry WHERE _id < 1365
+		// SELECT COALESCE(MAX(_id), 0)AS id, 'Previous' AS type FROM ZBlogPost WHERE _id < 1365
 		sb.append("SELECT COALESCE(MAX(");
 		sb.append(FIELD_ID);
 		sb.append("), 0) AS id, '");

@@ -26,31 +26,31 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import pl.lewica.api.model.BlogEntry;
+import pl.lewica.api.model.BlogPost;
 import pl.lewica.api.model.DataModel;
 import pl.lewica.util.DateUtil;
 
 /**
- * BlogEntrys feed XML parser using the SAX engine.
+ * Blog posts feed XML parser using the SAX engine.
  * @author Krzysztof Kobrzak
  */
-public class BlogEntrySAXHandler extends DefaultHandler implements SAXParserDelegate {
+public class BlogPostSAXHandler extends DefaultHandler implements SAXParserDelegate {
 	// XML nodes, see documentation under http://lewica.pl/api/
-	static final  String BLOG_ENTRY				= "publikacja";
-	static final  String BLOG_ENTRY_ID			= "id";
-	static final  String BLOG_ENTRY_BLOG_ID		= "id_blog";
-	static final  String BLOG_ENTRY_AUTHOR_ID	= "id_autor";
-	static final  String BLOG_ENTRY_PUB_DATE	= "data";
-	static final  String BLOG_ENTRY_BLOG_TITLE	= "blog";
-	static final  String BLOG_ENTRY_AUTHOR		= "autor";
-	static final  String BLOG_ENTRY_TITLE		= "tytul";
-	static final  String BLOG_ENTRY_TEXT		= "text";
+	static final  String BLOG_POST				= "publikacja";
+	static final  String BLOG_POST_ID			= "id";
+	static final  String BLOG_POST_BLOG_ID		= "id_blog";
+	static final  String BLOG_POST_AUTHOR_ID	= "id_autor";
+	static final  String BLOG_POST_PUB_DATE	= "data";
+	static final  String BLOG_POST_BLOG_TITLE	= "blog";
+	static final  String BLOG_POST_AUTHOR		= "autor";
+	static final  String BLOG_POST_TITLE		= "tytul";
+	static final  String BLOG_POST_TEXT		= "text";
 
 	// In case any parsing problems the date falls back to this value:
 	public String defaultDate	= "2000-01-01";
 
-	private List<DataModel> blogEntries;
-	private BlogEntry currentBlogEntry;
+	private List<DataModel> blogPosts;
+	private BlogPost currentBlogPost;
 	private StringBuilder builder;
 
 
@@ -59,7 +59,7 @@ public class BlogEntrySAXHandler extends DefaultHandler implements SAXParserDele
 	 * @see pl.lewica.api.xmlparser.SAXParserDelegate#getElements()
 	 */
 	public List<DataModel> getElements() {
-		return this.blogEntries;
+		return this.blogPosts;
 	}
 
 
@@ -67,7 +67,7 @@ public class BlogEntrySAXHandler extends DefaultHandler implements SAXParserDele
 	public void startDocument()
 			throws SAXException {
 		super.startDocument();
-		blogEntries	= new ArrayList<DataModel>();
+		blogPosts	= new ArrayList<DataModel>();
 		builder				= new StringBuilder();
 	}
 
@@ -76,8 +76,8 @@ public class BlogEntrySAXHandler extends DefaultHandler implements SAXParserDele
 	public void startElement(String uri, String localName, String name, Attributes attributes)
 			throws SAXException {
 		super.startElement(uri, localName, name, attributes);
-		if (name.equalsIgnoreCase(BLOG_ENTRY) ) {
-			this.currentBlogEntry	= new BlogEntry();
+		if (name.equalsIgnoreCase(BLOG_POST) ) {
+			this.currentBlogPost	= new BlogPost();
 		}
 	}
 
@@ -95,24 +95,24 @@ public class BlogEntrySAXHandler extends DefaultHandler implements SAXParserDele
 			throws SAXException {
 		super.endElement(uri, localName, name);
 
-		if (this.currentBlogEntry == null) {
+		if (this.currentBlogPost == null) {
 			builder.setLength(0);
 			return;
 		}
 
-		if (name.equalsIgnoreCase(BLOG_ENTRY_ID) ) {
+		if (name.equalsIgnoreCase(BLOG_POST_ID) ) {
 			int ID	= Integer.parseInt(builder.toString() );
-			currentBlogEntry.setID(ID);
+			currentBlogPost.setID(ID);
 		}
-		else if (name.equalsIgnoreCase(BLOG_ENTRY_BLOG_ID) ) {
+		else if (name.equalsIgnoreCase(BLOG_POST_BLOG_ID) ) {
 			int blogID	= Integer.parseInt(builder.toString() );
-			currentBlogEntry.setBlogID(blogID);
+			currentBlogPost.setBlogID(blogID);
 		}
-		else if (name.equalsIgnoreCase(BLOG_ENTRY_AUTHOR_ID) ) {
+		else if (name.equalsIgnoreCase(BLOG_POST_AUTHOR_ID) ) {
 			int authorID	= Integer.parseInt(builder.toString() );
-			currentBlogEntry.setAuthorID(authorID);
+			currentBlogPost.setAuthorID(authorID);
 		}
-		else if (name.equalsIgnoreCase(BLOG_ENTRY_PUB_DATE) ) {
+		else if (name.equalsIgnoreCase(BLOG_POST_PUB_DATE) ) {
 			DateFormat df	= new SimpleDateFormat(DateUtil.DATE_MASK_SQL);
 			Date pubDate	;
 			
@@ -122,24 +122,24 @@ public class BlogEntrySAXHandler extends DefaultHandler implements SAXParserDele
 				// We don't want to let an invalid date crash the application so let's just use any date
 				pubDate	= java.sql.Date.valueOf(defaultDate);
 			}
-			currentBlogEntry.setDatePublished(pubDate);
+			currentBlogPost.setDatePublished(pubDate);
 		}
-		else if (name.equalsIgnoreCase(BLOG_ENTRY_BLOG_TITLE) ) {
-			currentBlogEntry.setBlogTitle(builder.toString() );
+		else if (name.equalsIgnoreCase(BLOG_POST_BLOG_TITLE) ) {
+			currentBlogPost.setBlogTitle(builder.toString() );
 		}
-		else if (name.equalsIgnoreCase(BLOG_ENTRY_AUTHOR) ) {
-			currentBlogEntry.setAuthor(builder.toString() );
+		else if (name.equalsIgnoreCase(BLOG_POST_AUTHOR) ) {
+			currentBlogPost.setAuthor(builder.toString() );
 		}
-		else if (name.equalsIgnoreCase(BLOG_ENTRY_TITLE) ) {
-			currentBlogEntry.setTitle(builder.toString() );
+		else if (name.equalsIgnoreCase(BLOG_POST_TITLE) ) {
+			currentBlogPost.setTitle(builder.toString() );
 		}
-		else if (name.equalsIgnoreCase(BLOG_ENTRY_TEXT) ) {
-			currentBlogEntry.setText(builder.toString() );
+		else if (name.equalsIgnoreCase(BLOG_POST_TEXT) ) {
+			currentBlogPost.setText(builder.toString() );
 		}
-		else if (name.equalsIgnoreCase(BLOG_ENTRY) ) {
-			currentBlogEntry.setWasRead(false);
+		else if (name.equalsIgnoreCase(BLOG_POST) ) {
+			currentBlogPost.setWasRead(false);
 
-			blogEntries.add(currentBlogEntry);
+			blogPosts.add(currentBlogPost);
 		}
 		builder.setLength(0);
 	}

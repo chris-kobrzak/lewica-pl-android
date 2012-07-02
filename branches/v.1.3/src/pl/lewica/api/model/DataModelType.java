@@ -23,6 +23,6 @@ package pl.lewica.api.model;
 public enum DataModelType {
 	ARTICLE,
 	ANNOUNCEMENT,
-	BLOG_ENTRY,
+	BLOG_POST,
 	HISTORY
 }
