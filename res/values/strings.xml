@@ -2,7 +2,6 @@
 <resources>
 	<string name="app_name">LewicaPL</string>
 	<color name="white">#fff</color>
-	<color name="black">#000</color>
 	<color name="red">#fa1000</color>
 	<color name="orange">#ffb31a</color>
 	<color name="grey_light">#eee</color>
