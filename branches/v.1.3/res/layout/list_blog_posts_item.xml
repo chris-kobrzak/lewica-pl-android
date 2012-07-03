@@ -11,7 +11,7 @@
 		android:id="@+id/blog_post_item_details"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		style="@style/ListItemDetailText"
+		style="@style/ListItemHeadingSmall"
 	/>
 
 	<TextView
