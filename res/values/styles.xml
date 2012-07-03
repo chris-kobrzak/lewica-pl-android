@@ -12,9 +12,7 @@
 		<item name="android:textColor">@color/red</item>
 	</style>
 	<style name="ListItemHeadingSmall">
-		<item name="android:textSize">12sp</item>
-		<item name="android:typeface">sans</item>
-		<item name="android:textStyle">bold</item>
+		<item name="android:textSize">13sp</item>
 	</style>
 	<style name="ListItemLabel">
 		<item name="android:textSize">14sp</item>
