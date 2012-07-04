@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -49,6 +50,8 @@ import pl.lewica.lewicapl.android.database.BlogPostDAO;
 public class BlogPostListActivity extends Activity {
 
 	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.blogpostlistactivity.RELOAD";
+
+	private static Typeface categoryTypeface;
 
 	// When users select a new post, navigate back to the list and start scrolling up and down, the cursor won't know this article should be marked as read.
 	// That results in articles still being marked as unread (titles in red rather than blue).
@@ -185,34 +188,18 @@ public class BlogPostListActivity extends Activity {
 				colour	= res.getColor(R.color.read);
 			}
 			tv.setTextColor(colour);
-			tv.setText(cursor.getString(colIndex_Title) );
+			tv.setText(cursor.getString(colIndex_Author) + ": " + cursor.getString(colIndex_Title) );
 			// Datetime
 			dtv	= (TextView) view.findViewById(R.id.blog_post_item_date);
 			long unixTime	= cursor.getLong(colIndex_DatePub);	// Dates are stored as Unix timestamps
 			Date d				= new Date(unixTime);
 			dtv.setText(dateFormat.format(d) );
 
-			// Author and blog title
-			tv	= (TextView) view.findViewById(R.id.blog_post_item_details);
-			String author		= cursor.getString(colIndex_Author);
+			// Blog title
+			tv	= (TextView) view.findViewById(R.id.blog_post_item_blog_title);
 			String blogTitle	= cursor.getString(colIndex_Blog);
-
 			tv.setVisibility(View.VISIBLE);
 
-			if (author.length() > 0 && blogTitle.length() > 0) {
-				StringBuilder sb	= new StringBuilder();
-				sb.append(author);
-				sb.append(" | ");
-				sb.append(blogTitle);
-
-				tv.setText(sb.toString() );
-				return;
-			}
-
-			if (author.length() > 0) {
-				tv.setText(author);
-				return;
-			}
 			if (blogTitle.length() > 0) {
 				tv.setText(blogTitle);
 				return;
