@@ -39,6 +39,7 @@
 	<string name="heading_homepage">lewica.pl</string>
 	<string name="heading_facebook">facebook</string>
 	<string name="heading_blogs">blogi</string>
+	<string name="heading_blog">blog</string>
 	<string name="heading_links">katalog</string>
 	<string name="heading_search">wyszukiwarka</string>
 	<string name="heading_team">redakcja</string>

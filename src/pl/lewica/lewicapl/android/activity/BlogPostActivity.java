@@ -238,8 +238,16 @@ public class BlogPostActivity extends Activity {
 		tv.setText(cursor.getString(colIndex_Title) );
 
 		tv							= (TextView) findViewById(R.id.blog_post_category);
+		StringBuilder sb	= new StringBuilder(context.getString(R.string.heading_blog) );
+		sb.append(": ");
+		// By default we want to show blog title but if it's empty, blogger's name will do
+		if (cursor.getString(colIndex_Blog).length() > 0) {
+			sb.append(cursor.getString(colIndex_Blog) );
+		} else if (cursor.getString(colIndex_PublishedBy).length() > 0) {
+			sb.append(cursor.getString(colIndex_PublishedBy) );
+		}
 		tv.setTypeface(categoryTypeface);
-		tv.setText(context.getString(R.string.heading_blogs) + ": " + cursor.getString(colIndex_Blog).toLowerCase() );
+		tv.setText(sb.toString() );
 
 		tv							= (TextView) findViewById(R.id.blog_post_date);
 		long unixTime		= cursor.getLong(colIndex_DatePub);	// Dates are stored as Unix timestamps
