@@ -17,21 +17,21 @@
 			android:background="@color/orange"
 		>
 			<TextView
-				android:text="category"
+				android:text="@string/placeholder_category"
 				android:id="@+id/blog_post_category"
 				android:layout_width="wrap_content"
 				android:ellipsize="end"
 				style="@style/InfoBarCategory"
 			/>
 			<TextView
-				android:text="date"
+				android:text="@string/placeholder_date"
 				android:id="@+id/blog_post_date"
 				android:layout_width="fill_parent"
 				style="@style/InfoBarDate"
 			/>
 		</LinearLayout>
 		<TextView
-			android:text="title"
+			android:text="@string/placeholder_title"
 			android:id="@+id/blog_post_title"
 			android:layout_below="@+id/info_bar_blog_post"
 			android:layout_width="fill_parent"
@@ -40,7 +40,7 @@
 		/>
 
 		<TextView
-			android:text="content"
+			android:text="@string/placeholder_content"
 			android:id="@+id/blog_post_content"
 			android:layout_below="@+id/blog_post_title"
 			android:layout_width="fill_parent"
@@ -49,7 +49,7 @@
 			style="@style/StandardText"
 		/>
 		<TextView
-			android:text="published by"
+			android:text="@string/placeholder_published_by"
 			android:id="@+id/blog_post_author"
 			android:layout_below="@+id/blog_post_content"
 			android:layout_alignRight="@+id/blog_post_content"

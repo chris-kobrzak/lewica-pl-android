@@ -7,9 +7,8 @@
 	style="@style/ListItemContainer"
 >
 	<TextView
-		android:text="Title"
+		android:text="@string/placeholder_title"
 		android:id="@+id/announcement_item_title"
-		android:layout_above="@+id/announcement_item_details"
 		android:layout_width="fill_parent"
 		android:layout_height="45dp"
 		android:gravity="center_vertical|left"
@@ -17,7 +16,7 @@
 		style="@style/ListItemLabel"
 	/>
 	<TextView
-		android:text="Where and when"
+		android:text="@string/placeholder_where"
 		android:id="@+id/announcement_item_details"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
