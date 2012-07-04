@@ -7,7 +7,7 @@
 	style="@style/ListItemContainer"
 >
 	<TextView
-		android:text="Blog title and author"
+		android:text="@string/placeholder_published_by"
 		android:id="@+id/blog_post_item_details"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
@@ -15,7 +15,7 @@
 	/>
 
 	<TextView
-		android:text="Title" 
+		android:text="@string/placeholder_title" 
 		android:id="@+id/blog_post_item_title"
 		android:layout_width="fill_parent"
 		android:layout_height="45dp"
@@ -26,7 +26,7 @@
 	/>
 
 	<TextView
-		android:text="Date"
+		android:text="@string/placeholder_date"
 		android:id="@+id/blog_post_item_date"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"

@@ -8,14 +8,14 @@
 	android:paddingBottom="5dp"
 >
 	<TextView
-		android:text="year"
+		android:text="@string/placeholder_year"
 		android:id="@+id/history_year"
 		android:layout_width="50dp"
 		android:layout_height="wrap_content" 
 		style="@style/InfoLabel"
 	/>
 	<TextView
-		android:text="event"
+		android:text="@string/placeholder_content"
 		android:id="@+id/history_event"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
