@@ -242,9 +242,9 @@ public class BlogPostActivity extends Activity {
 		sb.append(": ");
 		// By default we want to show blog title but if it's empty, blogger's name will do
 		if (cursor.getString(colIndex_Blog).length() > 0) {
-			sb.append(cursor.getString(colIndex_Blog) );
+			sb.append(cursor.getString(colIndex_Blog).toLowerCase() );
 		} else if (cursor.getString(colIndex_PublishedBy).length() > 0) {
-			sb.append(cursor.getString(colIndex_PublishedBy) );
+			sb.append(cursor.getString(colIndex_PublishedBy).toLowerCase() );
 		}
 		tv.setTypeface(categoryTypeface);
 		tv.setText(sb.toString() );

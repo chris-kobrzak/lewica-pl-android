@@ -7,14 +7,6 @@
 	style="@style/ListItemContainer"
 >
 	<TextView
-		android:text="@string/placeholder_published_by"
-		android:id="@+id/blog_post_item_details"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		style="@style/ListItemHeadingSmall"
-	/>
-
-	<TextView
 		android:text="@string/placeholder_title" 
 		android:id="@+id/blog_post_item_title"
 		android:layout_width="fill_parent"
@@ -24,12 +16,28 @@
 		android:ellipsize="end"
 		style="@style/ListItemLabel"
 	/>
-
-	<TextView
-		android:text="@string/placeholder_date"
-		android:id="@+id/blog_post_item_date"
+	<LinearLayout
+		android:id="@+id/info_bar_blog_post"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		style="@style/ListItemDetailText"
-	/>
+	>
+		<TextView
+			android:text="@string/placeholder_date"
+			android:id="@+id/blog_post_item_date"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			style="@style/ListItemDetailText"
+		/>
+
+		<TextView
+			android:text="@string/placeholder_category"
+			android:id="@+id/blog_post_item_blog_title"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="right"
+			android:textStyle="italic"
+			style="@style/ListItemDetailText"
+		/>
+
+	</LinearLayout>
 </LinearLayout>
