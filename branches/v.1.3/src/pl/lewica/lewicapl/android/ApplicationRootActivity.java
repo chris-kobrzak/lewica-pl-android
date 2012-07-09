@@ -32,7 +32,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewParent;
 import android.view.Window;
-import android.widget.LinearLayout;
 import android.widget.TabHost;
 
 import pl.lewica.lewicapl.R;
@@ -44,6 +43,7 @@ import pl.lewica.lewicapl.android.activity.NewsListActivity;
 import pl.lewica.lewicapl.android.activity.PublicationListActivity;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
+import pl.lewica.lewicapl.android.database.BlogPostDAO;
 
 /**
  * @author Krzysztof Kobrzak
@@ -52,6 +52,12 @@ public class ApplicationRootActivity extends TabActivity {
 
 	public static final String START_INDETERMINATE_PROGRESS		= "pl.lewica.lewicapl.android.applicationrootactivity.RELOADON";
 	public static final String STOP_INDETERMINATE_PROGRESS		= "pl.lewica.lewicapl.android.applicationrootactivity.RELOADOFF";
+
+	public static final int TAB_NEWS			= 0;
+	public static final int TAB_ARTICLES		= 1;
+	public static final int TAB_BLOGS			= 2;
+	public static final int TAB_ANNOUNCEMENTS	= 3;
+	public static final int TAB_HISTORY			= 4;
 
 	private static File storageDir;
 	private IntentFilter filter;
@@ -156,7 +162,7 @@ public class ApplicationRootActivity extends TabActivity {
 
 		MenuInflater inflater	= getMenuInflater();
 		int tab	= getTabHost().getCurrentTab();
-		if (tab != 3) {
+		if (tab != TAB_HISTORY) {
 			inflater.inflate(R.menu.menu_common, menu); 
 		} else {
 			inflater.inflate(R.menu.menu_history, menu);
@@ -168,6 +174,8 @@ public class ApplicationRootActivity extends TabActivity {
 
 	@Override
 	public boolean onPrepareOptionsMenu (Menu menu) {
+		super.onPrepareOptionsMenu(menu);
+
 		// Don't let them run the refresh if it's already running.
 		menu.getItem(0).setEnabled(true);
 
@@ -181,6 +189,8 @@ public class ApplicationRootActivity extends TabActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		super.onOptionsItemSelected(item);
+
 		switch (item.getItemId() ) {
 			case R.id.menu_more:
 				Intent intent	= new Intent(this, MoreActivity.class);
@@ -202,7 +212,7 @@ public class ApplicationRootActivity extends TabActivity {
 				ArticleDAO articleDAO;
 
 				switch (tab) {
-					case 0:
+					case TAB_NEWS:
 						articleDAO		= new ArticleDAO(this);
 						articleDAO.open();
 						articleDAO.updateMarkNewsAsRead();
@@ -211,7 +221,7 @@ public class ApplicationRootActivity extends TabActivity {
 						updateManager.broadcastDataReload_News();
 						break;
 
-					case 1:
+					case TAB_ARTICLES:
 						articleDAO		= new ArticleDAO(this);
 						articleDAO.open();
 						articleDAO.updateMarkTextsAsRead();
@@ -219,8 +229,17 @@ public class ApplicationRootActivity extends TabActivity {
 
 						updateManager.broadcastDataReload_Publications();
 						break;
+						
+					case TAB_BLOGS:
+						BlogPostDAO blogDAO		= new BlogPostDAO(this);
+						blogDAO.open();
+						blogDAO.updateMarkAllAsRead();
+						blogDAO.close();
+						
+						updateManager.broadcastDataReload_BlogPosts();
+						break;
 
-					case 2:
+					case TAB_ANNOUNCEMENTS:
 						AnnouncementDAO annDAO	= new AnnouncementDAO(this);
 						annDAO.open();
 						annDAO.updateMarkAllAsRead();
