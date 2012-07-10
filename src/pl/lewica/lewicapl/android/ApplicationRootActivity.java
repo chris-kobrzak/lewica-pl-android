@@ -53,12 +53,13 @@ public class ApplicationRootActivity extends TabActivity {
 	public static final String START_INDETERMINATE_PROGRESS		= "pl.lewica.lewicapl.android.applicationrootactivity.RELOADON";
 	public static final String STOP_INDETERMINATE_PROGRESS		= "pl.lewica.lewicapl.android.applicationrootactivity.RELOADOFF";
 
-	public static final int TAB_NEWS			= 0;
-	public static final int TAB_ARTICLES		= 1;
-	public static final int TAB_BLOGS			= 2;
-	public static final int TAB_ANNOUNCEMENTS	= 3;
-	public static final int TAB_HISTORY			= 4;
-
+	// Order of tabs
+	public static enum Tab {
+		NEWS, ARTICLES, BLOGS, ANNOUNCEMENTS, HISTORY
+	}
+	// This is to be able switch by enum ordinal
+	public static final Tab[] tabs	= Tab.values();
+	
 	private static File storageDir;
 	private IntentFilter filter;
 	private ApplicationBroadcastReceiver receiver;
@@ -81,30 +82,36 @@ public class ApplicationRootActivity extends TabActivity {
 		// Tabs layout based on http://developer.android.com/resources/tutorials/views/hello-tabwidget.html
 		Resources res			= getResources(); // Resource object to get Drawables
 		TabHost tabHost	= getTabHost();  // The activity TabHost
-		TabHost.TabSpec spec;  // Resusable TabSpec for each tab
+		TabHost.TabSpec spec;  // Reusable TabSpec for each tab
 		Intent intent;  // Reusable Intent for each tab
-		
+		String tag;
+
 		// Create an Intent to launch an Activity for the tab (to be reused)
 		intent	= new Intent(this, NewsListActivity.class);
-		// Initialize a TabSpec for each tab and add it to the TabHost
-		spec		= tabHost.newTabSpec("news").setIndicator(res.getString(R.string.tab_news), res.getDrawable(R.drawable.ic_tab_tv) ).setContent(intent);
+		tag		= Tab.NEWS.name();
+		// Initialise a TabSpec for each tab and add it to the TabHost
+		spec		= tabHost.newTabSpec(tag).setIndicator(res.getString(R.string.tab_news), res.getDrawable(R.drawable.ic_tab_tv) ).setContent(intent);
 		tabHost.addTab(spec);
 
 		// Do the same for the other tabs
 		intent	= new Intent(this, PublicationListActivity.class);
-		spec		= tabHost.newTabSpec("texts").setIndicator(res.getString(R.string.tab_texts), res.getDrawable(R.drawable.ic_tab_book) ).setContent(intent);
+		tag		= Tab.ARTICLES.name();
+		spec		= tabHost.newTabSpec(tag).setIndicator(res.getString(R.string.tab_texts), res.getDrawable(R.drawable.ic_tab_book) ).setContent(intent);
 		tabHost.addTab(spec);
 		
 		intent	= new Intent(this, BlogPostListActivity.class);
-		spec		= tabHost.newTabSpec("blog").setIndicator(res.getString(R.string.tab_blog), res.getDrawable(R.drawable.ic_tab_person) ).setContent(intent);
+		tag		= Tab.BLOGS.name();
+		spec		= tabHost.newTabSpec(tag).setIndicator(res.getString(R.string.tab_blog), res.getDrawable(R.drawable.ic_tab_person) ).setContent(intent);
 		tabHost.addTab(spec);
 
 		intent	= new Intent(this, AnnouncementListActivity.class);
-		spec		= tabHost.newTabSpec("announcements").setIndicator(res.getString(R.string.tab_announcements), res.getDrawable(R.drawable.ic_tab_bullhorn) ).setContent(intent);
+		tag		= Tab.ANNOUNCEMENTS.name();
+		spec		= tabHost.newTabSpec(tag).setIndicator(res.getString(R.string.tab_announcements), res.getDrawable(R.drawable.ic_tab_bullhorn) ).setContent(intent);
 		tabHost.addTab(spec);
 
 		intent	= new Intent(this, HistoryListActivity.class);
-		spec		= tabHost.newTabSpec("history").setIndicator(res.getString(R.string.tab_history), res.getDrawable(R.drawable.ic_tab_calendar) ).setContent(intent);
+		tag		= Tab.HISTORY.name();
+		spec		= tabHost.newTabSpec(tag).setIndicator(res.getString(R.string.tab_history), res.getDrawable(R.drawable.ic_tab_calendar) ).setContent(intent);
 		tabHost.addTab(spec);
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
@@ -162,7 +169,7 @@ public class ApplicationRootActivity extends TabActivity {
 
 		MenuInflater inflater	= getMenuInflater();
 		int tab	= getTabHost().getCurrentTab();
-		if (tab != TAB_HISTORY) {
+		if (tab != Tab.HISTORY.ordinal() ) {
 			inflater.inflate(R.menu.menu_common, menu); 
 		} else {
 			inflater.inflate(R.menu.menu_history, menu);
@@ -209,10 +216,12 @@ public class ApplicationRootActivity extends TabActivity {
 
 			case R.id.menu_mark_as_read:
 				int tab	= getTabHost().getCurrentTab();
+				
 				ArticleDAO articleDAO;
 
-				switch (tab) {
-					case TAB_NEWS:
+				// Switching over an integer representing the ordinal of the current tab
+				switch (tabs[tab]) {
+					case NEWS:
 						articleDAO		= new ArticleDAO(this);
 						articleDAO.open();
 						articleDAO.updateMarkNewsAsRead();
@@ -221,7 +230,7 @@ public class ApplicationRootActivity extends TabActivity {
 						updateManager.broadcastDataReload_News();
 						break;
 
-					case TAB_ARTICLES:
+					case ARTICLES:
 						articleDAO		= new ArticleDAO(this);
 						articleDAO.open();
 						articleDAO.updateMarkTextsAsRead();
@@ -230,7 +239,7 @@ public class ApplicationRootActivity extends TabActivity {
 						updateManager.broadcastDataReload_Publications();
 						break;
 						
-					case TAB_BLOGS:
+					case BLOGS:
 						BlogPostDAO blogDAO		= new BlogPostDAO(this);
 						blogDAO.open();
 						blogDAO.updateMarkAllAsRead();
@@ -239,7 +248,7 @@ public class ApplicationRootActivity extends TabActivity {
 						updateManager.broadcastDataReload_BlogPosts();
 						break;
 
-					case TAB_ANNOUNCEMENTS:
+					case ANNOUNCEMENTS:
 						AnnouncementDAO annDAO	= new AnnouncementDAO(this);
 						annDAO.open();
 						annDAO.updateMarkAllAsRead();
