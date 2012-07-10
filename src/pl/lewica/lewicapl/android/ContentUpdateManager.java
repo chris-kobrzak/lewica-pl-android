@@ -47,6 +47,7 @@ import pl.lewica.api.url.ArticleURL;
 import pl.lewica.api.url.BlogPostURL;
 import pl.lewica.api.url.HistoryURL;
 import pl.lewica.lewicapl.android.activity.AnnouncementListActivity;
+import pl.lewica.lewicapl.android.activity.BlogPostListActivity;
 import pl.lewica.lewicapl.android.activity.HistoryListActivity;
 import pl.lewica.lewicapl.android.activity.NewsListActivity;
 import pl.lewica.lewicapl.android.activity.PublicationListActivity;
@@ -495,8 +496,7 @@ public class ContentUpdateManager {
 
 	public void broadcastDataReload_BlogPosts() {
 		Intent intent	= new Intent();
-//		TODO Uncomment it when blog entries activity is ready
-//		intent.setAction(BlogPostsListActivity.RELOAD_VIEW);
+		intent.setAction(BlogPostListActivity.RELOAD_VIEW);
 		context.sendBroadcast(intent);
 	}
 
