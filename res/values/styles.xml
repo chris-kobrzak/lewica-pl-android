@@ -22,6 +22,9 @@
 	<style name="ListItemDetailText">
 		<item name="android:textSize">12sp</item>
 	</style>
+	<style name="InfoBar">
+		<item name="android:background">@color/orange</item>
+	</style>
 	<style name="InfoBarDate">
 		<item name="android:gravity">right</item>
 		<item name="android:layout_height">22sp</item>
