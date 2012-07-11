@@ -16,7 +16,6 @@
 package pl.lewica.lewicapl.android;
 
 import java.io.File;
-import java.io.IOException;
 
 import android.app.TabActivity;
 import android.content.BroadcastReceiver;
@@ -26,7 +25,6 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -61,8 +59,6 @@ public class ApplicationRootActivity extends TabActivity {
 	// This is to be able switch by enum ordinal
 	public static final Tab[] tabs	= Tab.values();
 
-	private static final String TAG	= "ApplicationRootActivity";	
-	private static File storageDir;
 	private IntentFilter filter;
 	private BroadcastReceiver receiver;
 	private BroadcastSender broadcastSender;
@@ -71,14 +67,34 @@ public class ApplicationRootActivity extends TabActivity {
 	private int updateInterval	= 5 * 60;
 
 
+	public void init() {
+		// This allows to show and hide the progress indicator in the top bar and needs to be done before content view set-up
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+
+		File sdDir		= Environment.getExternalStorageDirectory();
+		File storageDir		= new File(sdDir + getResources().getString(R.string.path_images) );
+		if (! storageDir.exists() ) {
+			storageDir.mkdirs();
+		}
+		AndroidUtil.setUpResourcesHiddenFromAndroidGallery(storageDir);
+
+		filter		= new IntentFilter();
+		filter.addAction(START_INDETERMINATE_PROGRESS);
+		filter.addAction(STOP_INDETERMINATE_PROGRESS);
+		receiver	= new ApplicationBroadcastReceiver();
+		registerReceiver(receiver, filter);
+
+		// Required by the content update module
+		updateManager		= ContentUpdateManager.getInstance(getApplicationContext(), storageDir);
+		broadcastSender	= BroadcastSender.getInstance(this);
+	}
+
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// This allows to show and hide the progress indicator in the top bar.
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-
-		setUpStorageEnvironment();
+		init();
 
 		setContentView(R.layout.tab_layout);
 
@@ -127,18 +143,7 @@ public class ApplicationRootActivity extends TabActivity {
 			}
 		}
 
-		// By default, the first tab is selected
-		tabHost.setCurrentTab(0);
-
-		filter		= new IntentFilter();
-		filter.addAction(START_INDETERMINATE_PROGRESS);
-		filter.addAction(STOP_INDETERMINATE_PROGRESS);
-		receiver	= new ApplicationBroadcastReceiver();
-		registerReceiver(receiver, filter);
-
-		// Required by the content update module
-		updateManager	= ContentUpdateManager.getInstance(getApplicationContext(), storageDir);
-		broadcastSender	= BroadcastSender.getInstance(this);
+		tabHost.setCurrentTab(Tab.NEWS.ordinal() );
 	}
 
 
@@ -242,13 +247,13 @@ public class ApplicationRootActivity extends TabActivity {
 
 						broadcastSender.reloadTab(Tab.ARTICLES);
 						break;
-						
+
 					case BLOGS:
 						BlogPostDAO blogDAO		= new BlogPostDAO(this);
 						blogDAO.open();
 						blogDAO.updateMarkAllAsRead();
 						blogDAO.close();
-						
+
 						broadcastSender.reloadTab(Tab.BLOGS);
 						break;
 
@@ -265,26 +270,6 @@ public class ApplicationRootActivity extends TabActivity {
 
 				default :
 					return super.onOptionsItemSelected(item);
-		}
-	}
-
-
-	private void setUpStorageEnvironment() {
-		File sdDir		= Environment.getExternalStorageDirectory();
-		storageDir		= new File(sdDir + getResources().getString(R.string.path_images) );
-		if (! storageDir.exists() ) {
-			storageDir.mkdirs();
-		}
-		// Add a special, hidden file to the cache directory to prevent images from being indexed by Android Gallery.
-		File hideGallery	= new File(storageDir + "/.nomedia");
-		if (hideGallery.exists() ) {
-			return;
-		}
-		// It's not a big deal if this operation fails so let's just try-catch it.
-		try {
-			hideGallery.createNewFile();
-		} catch (IOException e) {
-			Log.w(TAG, "Failed to create .nomedia file");
 		}
 	}
 
