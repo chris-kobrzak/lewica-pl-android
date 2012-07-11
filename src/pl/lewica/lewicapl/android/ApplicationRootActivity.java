@@ -26,6 +26,7 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -59,7 +60,8 @@ public class ApplicationRootActivity extends TabActivity {
 	}
 	// This is to be able switch by enum ordinal
 	public static final Tab[] tabs	= Tab.values();
-	
+
+	private static final String TAG	= "ApplicationRootActivity";	
 	private static File storageDir;
 	private IntentFilter filter;
 	private BroadcastReceiver receiver;
@@ -267,7 +269,7 @@ public class ApplicationRootActivity extends TabActivity {
 	}
 
 
-	public void setUpStorageEnvironment() {
+	private void setUpStorageEnvironment() {
 		File sdDir		= Environment.getExternalStorageDirectory();
 		storageDir		= new File(sdDir + getResources().getString(R.string.path_images) );
 		if (! storageDir.exists() ) {
@@ -282,7 +284,7 @@ public class ApplicationRootActivity extends TabActivity {
 		try {
 			hideGallery.createNewFile();
 		} catch (IOException e) {
-			e.printStackTrace();
+			Log.w(TAG, "Failed to create .nomedia file");
 		}
 	}
 
