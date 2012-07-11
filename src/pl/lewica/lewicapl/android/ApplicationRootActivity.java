@@ -62,7 +62,8 @@ public class ApplicationRootActivity extends TabActivity {
 	
 	private static File storageDir;
 	private IntentFilter filter;
-	private ApplicationBroadcastReceiver receiver;
+	private BroadcastReceiver receiver;
+	private BroadcastSender broadcastSender;
 	private ContentUpdateManager updateManager;
 	// Number of seconds after which the application will attempt to run an update. 
 	private int updateInterval	= 5 * 60;
@@ -135,6 +136,7 @@ public class ApplicationRootActivity extends TabActivity {
 
 		// Required by the content update module
 		updateManager	= ContentUpdateManager.getInstance(getApplicationContext(), storageDir);
+		broadcastSender	= BroadcastSender.getInstance(this);
 	}
 
 
@@ -227,7 +229,7 @@ public class ApplicationRootActivity extends TabActivity {
 						articleDAO.updateMarkNewsAsRead();
 						articleDAO.close();
 
-						updateManager.broadcastDataReload_News();
+						broadcastSender.reloadTab(Tab.NEWS);
 						break;
 
 					case ARTICLES:
@@ -236,7 +238,7 @@ public class ApplicationRootActivity extends TabActivity {
 						articleDAO.updateMarkTextsAsRead();
 						articleDAO.close();
 
-						updateManager.broadcastDataReload_Publications();
+						broadcastSender.reloadTab(Tab.ARTICLES);
 						break;
 						
 					case BLOGS:
@@ -245,7 +247,7 @@ public class ApplicationRootActivity extends TabActivity {
 						blogDAO.updateMarkAllAsRead();
 						blogDAO.close();
 						
-						updateManager.broadcastDataReload_BlogPosts();
+						broadcastSender.reloadTab(Tab.BLOGS);
 						break;
 
 					case ANNOUNCEMENTS:
@@ -254,7 +256,7 @@ public class ApplicationRootActivity extends TabActivity {
 						annDAO.updateMarkAllAsRead();
 						annDAO.close();
 
-						updateManager.broadcastDataReload_Announcements();
+						broadcastSender.reloadTab(Tab.HISTORY);
 						break;
 				}
 				return true;

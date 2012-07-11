@@ -36,15 +36,20 @@ public class BroadcastSender {
 	}
 
 
-	public void setDeviceNetworkActivityIndicator(boolean show) {
-		Intent intent	= new Intent();
+	/**
+	 * Attempts to switch the top bar network activity indicator on or off by notifying the application activity.  
+	 */
+	public void indicateDeviceNetworkActivity(boolean show) {
+		String action;
 
 		if (show) {
-			intent.setAction(ApplicationRootActivity.START_INDETERMINATE_PROGRESS);
+			action 	= ApplicationRootActivity.START_INDETERMINATE_PROGRESS;
 		} else {
-			intent.setAction(ApplicationRootActivity.STOP_INDETERMINATE_PROGRESS);
+			action	= ApplicationRootActivity.STOP_INDETERMINATE_PROGRESS;
 		}
 
+		Intent intent	= new Intent();
+		intent.setAction(action);
 		context.sendBroadcast(intent);
 	}
 
@@ -54,7 +59,7 @@ public class BroadcastSender {
 	 * This might be triggered by the user.
 	 * @param tab
 	 */
-	public void sendBroadcastReloadTab(ApplicationRootActivity.Tab tab) {
+	public void reloadTab(ApplicationRootActivity.Tab tab) {
 		String action;
 
 		switch (tab) {
@@ -91,12 +96,12 @@ public class BroadcastSender {
 	/**
 	 * Broadcasts RELOAD_VIEW messages to all activities that display content from the database.
 	 */
-	public void sendBroadcastReloadAllTabs() {
-		sendBroadcastReloadTab(Tab.NEWS);
-		sendBroadcastReloadTab(Tab.ARTICLES);
-		sendBroadcastReloadTab(Tab.BLOGS);
-		sendBroadcastReloadTab(Tab.ANNOUNCEMENTS);
-		sendBroadcastReloadTab(Tab.HISTORY);
+	public void reloadAllTabs() {
+		reloadTab(Tab.NEWS);
+		reloadTab(Tab.ARTICLES);
+		reloadTab(Tab.BLOGS);
+		reloadTab(Tab.ANNOUNCEMENTS);
+		reloadTab(Tab.HISTORY);
 	}
 
 
@@ -104,23 +109,23 @@ public class BroadcastSender {
 	 * This should be used when you know what has been updated in the database.
 	 * @param dataType
 	 */
-	public void sendBroadcastDataUpdated(DataModelType dataType) {
+	public void reloadTabsOnDataUpdate(DataModelType dataType) {
 		switch (dataType) {
 			case ARTICLE:
-				sendBroadcastReloadTab(Tab.NEWS);
-				sendBroadcastReloadTab(Tab.ARTICLES);
+				reloadTab(Tab.NEWS);
+				reloadTab(Tab.ARTICLES);
 				break;
 				
 			case BLOG_POST:
-				sendBroadcastReloadTab(Tab.BLOGS);
+				reloadTab(Tab.BLOGS);
 				break;
 				
 			case ANNOUNCEMENT:
-				sendBroadcastReloadTab(Tab.ANNOUNCEMENTS);
+				reloadTab(Tab.ANNOUNCEMENTS);
 				break;
 				
 			case HISTORY:
-				sendBroadcastReloadTab(Tab.HISTORY);
+				reloadTab(Tab.HISTORY);
 				break;
 				
 			default:
