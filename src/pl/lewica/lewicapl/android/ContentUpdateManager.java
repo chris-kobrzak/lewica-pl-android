@@ -33,6 +33,7 @@ import org.apache.http.util.ByteArrayBuffer;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import pl.lewica.api.FeedDownloadManager;
 import pl.lewica.api.model.Announcement;
@@ -59,6 +60,7 @@ import pl.lewica.util.DateUtil;
  * @author Krzysztof Kobrzak
  */
 public class ContentUpdateManager {
+	private static final String TAG	= "ContentUpdateManager";
 
 	private static ContentUpdateManager _instance;
 	
@@ -295,22 +297,24 @@ public class ContentUpdateManager {
 				fos.write(bab.toByteArray() );
 				fos.close();
 			} catch (MalformedURLException e) {
-				e.printStackTrace();
+				Log.w(TAG, "MalformedURLException: " + e.getMessage() );
+				return false;
 			} catch (IOException e) {
-				e.printStackTrace();
+				Log.w(TAG, "IOException: " + e.getMessage() );
+				return false;
 			} finally {
 				if (fos != null) {
 					try {
 						fos.close();
 					} catch (IOException ioe) {
-						System.err.println("Unable to close output stream for " + imageURL);
+						Log.w(TAG, "Unable to close file output stream for " + imageURL);
 					}
 				}
 				if (bis != null) {
 					try {
 						bis.close();
 					} catch (IOException ioe) {
-						System.err.println("Unable to buffer input stream for " + imageURL);
+						Log.w(TAG, "Unable to close buffered input stream for " + imageURL);
 					}
 				}
 			}
