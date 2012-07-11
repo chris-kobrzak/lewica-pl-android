@@ -26,8 +26,11 @@ public class AndroidUtil {
 	private static final String TAG	= "AndroidUtil";
 
 
+	/**
+	 * Adds a special, hidden file to the cache directory to prevent images from being indexed by Android Gallery
+	 * @param storageDir
+	 */
 	public static void setUpResourcesHiddenFromAndroidGallery(File storageDir) {
-		// Add a special, hidden file to the cache directory to prevent images from being indexed by Android Gallery.
 		File hideGallery	= new File(storageDir + "/.nomedia");
 		if (hideGallery.exists() ) {
 			return;
