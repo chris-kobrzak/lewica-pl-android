@@ -435,9 +435,9 @@ public class ArticleActivity extends Activity {
 
 				bitmap 	= BitmapFactory.decodeStream(is);
 			} catch (MalformedURLException e) {
-				e.printStackTrace();
+				// Ignore it
 			} catch (IOException e) {
-				e.printStackTrace();
+				// Ignore it
 			}
 			// The parent process might have requested this thread to be stopped.
 			if (isCancelled() ) {
