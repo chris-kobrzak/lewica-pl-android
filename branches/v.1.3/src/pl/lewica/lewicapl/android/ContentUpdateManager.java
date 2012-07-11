@@ -32,7 +32,6 @@ import java.util.Set;
 import org.apache.http.util.ByteArrayBuffer;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 
 import pl.lewica.api.FeedDownloadManager;
@@ -46,11 +45,6 @@ import pl.lewica.api.url.AnnouncementURL;
 import pl.lewica.api.url.ArticleURL;
 import pl.lewica.api.url.BlogPostURL;
 import pl.lewica.api.url.HistoryURL;
-import pl.lewica.lewicapl.android.activity.AnnouncementListActivity;
-import pl.lewica.lewicapl.android.activity.BlogPostListActivity;
-import pl.lewica.lewicapl.android.activity.HistoryListActivity;
-import pl.lewica.lewicapl.android.activity.NewsListActivity;
-import pl.lewica.lewicapl.android.activity.PublicationListActivity;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
@@ -70,8 +64,9 @@ public class ContentUpdateManager {
 	
 	private File storageDir;
 	private Context context;
+	private BroadcastSender broadcastSender;
 	private boolean isRunning;
-	private int lastUpdated	= 1;		// This actually stores a timestamp the action was triggered, not completed at.
+	private int lastUpdated	= 1;		// This actually stores a time stamp the action was triggered on, not completed at.
 	private int timeout			= 20;	// Seconds
 
 	public static enum CommandType {
@@ -98,6 +93,7 @@ public class ContentUpdateManager {
 	private ContentUpdateManager(Context context, File storageDir) {
 		this.context		= context;
 		this.storageDir	= storageDir;
+		this.broadcastSender	= BroadcastSender.getInstance(context);
 	}
 
 
@@ -126,7 +122,7 @@ public class ContentUpdateManager {
 	public boolean isRunning() {
 		int sinceLastUpdate	= DateUtil.currentUnixTime() % lastUpdated; 
 		if (isRunning && sinceLastUpdate > timeout) {
-			broadcastNetworkActivity_Off();
+			broadcastSender.indicateDeviceNetworkActivity(false);
 			this.lastUpdated		= 1;
 			this.isRunning		= false;
 		}
@@ -160,7 +156,7 @@ public class ContentUpdateManager {
 
 	/**
 	 * Standard setter for lastUpdated.
-	 * @param lastUpdated
+	 * @param lastUpdated Unix time stamp
 	 */
 	public void setLastUpdated(int lastUpdated) {
 		this.lastUpdated = lastUpdated;
@@ -456,84 +452,7 @@ public class ContentUpdateManager {
 
 		return status;
 	}
-
-
-	/**
-	 * Broadcasts RELOAD_VIEW messages to all activities that display content from the database.
-	 */
-	public void broadcastDataReload() {
-		Intent intent	= new Intent();
-
-		// Notify the news listing screen
-		intent.setAction(NewsListActivity.RELOAD_VIEW);
-		context.sendBroadcast(intent);
-
-		// Notify the publications listing screen
-		intent.setAction(PublicationListActivity.RELOAD_VIEW);
-		context.sendBroadcast(intent);
-
-		intent.setAction(AnnouncementListActivity.RELOAD_VIEW);
-		context.sendBroadcast(intent);
-
-		intent.setAction(HistoryListActivity.RELOAD_VIEW);
-		context.sendBroadcast(intent);
-	}
-
-
-	public void broadcastDataReload_News() {
-		Intent intent	= new Intent();
-		intent.setAction(NewsListActivity.RELOAD_VIEW);
-		context.sendBroadcast(intent);
-	}
 	
-	
-	public void broadcastDataReload_Publications() {
-		Intent intent	= new Intent();
-		intent.setAction(PublicationListActivity.RELOAD_VIEW);
-		context.sendBroadcast(intent);
-	}
-
-
-	public void broadcastDataReload_BlogPosts() {
-		Intent intent	= new Intent();
-		intent.setAction(BlogPostListActivity.RELOAD_VIEW);
-		context.sendBroadcast(intent);
-	}
-
-
-	public void broadcastDataReload_Announcements() {
-		Intent intent	= new Intent();
-		intent.setAction(AnnouncementListActivity.RELOAD_VIEW);
-		context.sendBroadcast(intent);
-	}
-	
-	
-	public void broadcastDataReload_History() {
-		Intent intent	= new Intent();
-		intent.setAction(HistoryListActivity.RELOAD_VIEW);
-		context.sendBroadcast(intent);
-	}
-
-
-	/**
-	 * Attempts to switch the top bar network activity indicator on by notifying the application activity.  
-	 */
-	public void broadcastNetworkActivity_On() {
-		Intent intent	= new Intent();
-		intent.setAction(ApplicationRootActivity.START_INDETERMINATE_PROGRESS);
-		context.sendBroadcast(intent);
-	}
-	
-	
-	/**
-	 * Attempts to switch the top bar network activity indicator off by notifying the application activity. 
-	 */
-	public void broadcastNetworkActivity_Off() {
-		Intent intent	= new Intent();
-		intent.setAction(ApplicationRootActivity.STOP_INDETERMINATE_PROGRESS);
-		context.sendBroadcast(intent);
-	}
-
 
 	/**
 	 * Convenience method that can be used to trigger the update process.
@@ -562,23 +481,20 @@ public class ContentUpdateManager {
 		// Please note, the order of the case statements matters!
 		switch (command) {
 			case INIT:
-				broadcastNetworkActivity_On();
+				broadcastSender.indicateDeviceNetworkActivity(true);
 				// Fetch news and opinions updates from the server.
 				new UpdateArticlesTask().execute();
 				break;
 
 			case INIT_HISTORY:
-				broadcastNetworkActivity_On();
+				broadcastSender.indicateDeviceNetworkActivity(true);
 				new UpdateHistoryTask().execute();
 				break;
 
 			case NEW_PUBLICATIONS:
-				// Notify the news listing screen
-				broadcastDataReload_News();
+				// Notify the news and publication listing screens
+				broadcastSender.reloadTabsOnDataUpdate(DataModelType.ARTICLE);
 
-				// Notify the publications listing screen
-				broadcastDataReload_Publications();
-				
 				// No break statement here, just let it jump to the next NO_PUBLICATIONS case that will take care of deciding what to do next.
 
 			case NO_PUBLICATIONS:
@@ -586,23 +502,20 @@ public class ContentUpdateManager {
 				if (chainReaction) {
 					new UpdateBlogPostsTask().execute();
 				} else {
-					broadcastNetworkActivity_Off();
+					broadcastSender.indicateDeviceNetworkActivity(false);
 					setRunning(false);
 				}
 				break;
 
 			case NEW_PUBLICATION_IMAGES:
-				// Notify the news listing screen
-				broadcastDataReload_News();
-
-				// Notify the publications listing screen
-				broadcastDataReload_Publications();
+				// Notify the news and articles listing screens
+				broadcastSender.reloadTabsOnDataUpdate(DataModelType.ARTICLE);
 
 				// We "know" the image update is actually triggered by UpdateArticlesTask so no actions required here.
 				break;
 
 			case NEW_BLOG_POSTS:
-				broadcastDataReload_BlogPosts();
+				broadcastSender.reloadTabsOnDataUpdate(DataModelType.BLOG_POST);
 
 				// No break statement here, just let it jump to the next NO_BLOG_ENTRIES case that will take care of deciding what to do next.
 
@@ -611,13 +524,13 @@ public class ContentUpdateManager {
 				if (chainReaction) {
 					new UpdateAnnouncementsTask().execute();
 				} else {
-					broadcastNetworkActivity_Off();
+					broadcastSender.indicateDeviceNetworkActivity(false);
 					setRunning(false);
 				}
 				break;
 
 			case NEW_ANNOUNCEMENTS:
-				broadcastDataReload_Announcements();
+				broadcastSender.reloadTabsOnDataUpdate(DataModelType.ANNOUNCEMENT);
 
 				// No break statement here, just let it jump to the next NO_ANNOUNCEMENTS case that will take care of deciding what to do next.
 
@@ -626,18 +539,18 @@ public class ContentUpdateManager {
 				if (chainReaction) {
 					new UpdateHistoryTask().execute();
 				} else {
-					broadcastNetworkActivity_Off();
+					broadcastSender.indicateDeviceNetworkActivity(false);
 					setRunning(false);
 				}
 				break;
 
 			case NEW_HISTORY:
-				broadcastDataReload_History();
+				broadcastSender.reloadTabsOnDataUpdate(DataModelType.HISTORY);
 
 				// No break statement here, just let it jump to the next NO_HISTORY case that will take care of deciding what to do next.
 
 			case NO_HISTORY:
-				broadcastNetworkActivity_Off();
+				broadcastSender.indicateDeviceNetworkActivity(false);
 				setRunning(false);
 				break;
 		}
