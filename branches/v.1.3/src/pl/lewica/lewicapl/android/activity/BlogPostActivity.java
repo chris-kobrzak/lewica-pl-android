@@ -159,6 +159,7 @@ public class BlogPostActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		long id;
+		Intent intent;
 
 		switch (item.getItemId()) {
 			case R.id.menu_previous:
@@ -178,10 +179,16 @@ public class BlogPostActivity extends Activity {
 				return true;
 
 			case R.id.menu_share:
-				Intent intent	= new Intent(Intent.ACTION_SEND);
+				intent	= new Intent(Intent.ACTION_SEND);
 				intent.setType("text/plain");
 				intent.putExtra(Intent.EXTRA_TEXT, blogPostURL);
 				startActivity(Intent.createChooser(intent, getString(R.string.label_share_link) ) );
+				return true;
+
+			case R.id.menu_open_browser:
+				Uri uri			= Uri.parse(blogPostURL);
+				intent	= new Intent(Intent.ACTION_VIEW, uri);
+				startActivity(intent);
 				return true;
 
 			default :
