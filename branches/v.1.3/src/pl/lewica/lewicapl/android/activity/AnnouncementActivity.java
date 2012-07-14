@@ -37,6 +37,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.ApplicationRootActivity;
+import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 
 
@@ -297,9 +299,11 @@ public class AnnouncementActivity extends Activity {
 		// Mark this announcement as read without blocking the UI thread
 		// Java threads require variables to be declared as final
 		final long announcementIDThread	= ID;
+		final Context contextThread			= context;
 		new Thread(new Runnable() {
 			public void run() {
 				annDAO.updateMarkAsRead(announcementIDThread);
+				BroadcastSender.getInstance(contextThread).reloadTab(ApplicationRootActivity.Tab.ANNOUNCEMENTS);
 			}
 		}).start();
 	}

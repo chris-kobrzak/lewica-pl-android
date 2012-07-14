@@ -48,6 +48,8 @@ import android.widget.TextView;
 import pl.lewica.api.model.Article;
 import pl.lewica.api.url.ArticleURL;
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.ApplicationRootActivity;
+import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 
 
@@ -285,6 +287,7 @@ public class ArticleActivity extends Activity {
 				tv.setText(context.getString(R.string.heading_world) );
 				break;
 
+			// TODO Confirm we need the case statements below
 			case Article.SECTION_OPINIONS:
 				tv.setText(context.getString(R.string.heading_texts) );
 				break;
@@ -357,10 +360,23 @@ public class ArticleActivity extends Activity {
 
 		// Mark this article as read without blocking the UI thread
 		// Java threads require variables to be declared as final
-		final long articleIDThread	= ID;
+		final long articleIDThread		= ID;
+		final int categoryIDThread		= categoryID;
+		final Context contextThread	= context;
 		new Thread(new Runnable() {
 			public void run() {
 				articleDAO.updateMarkAsRead(articleIDThread);
+				switch (categoryIDThread) {
+					case Article.SECTION_POLAND:
+					case Article.SECTION_WORLD:
+						BroadcastSender.getInstance(contextThread).reloadTab(ApplicationRootActivity.Tab.NEWS);
+					break;
+					case Article.SECTION_OPINIONS:
+					case Article.SECTION_REVIEWS:
+					case Article.SECTION_CULTURE:
+						BroadcastSender.getInstance(contextThread).reloadTab(ApplicationRootActivity.Tab.ARTICLES);
+					break;
+				}
 			}
 		}).start();
 	}
