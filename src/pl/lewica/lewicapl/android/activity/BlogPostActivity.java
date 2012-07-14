@@ -38,6 +38,8 @@ import android.widget.TextView;
 
 import pl.lewica.URLDictionary;
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.ApplicationRootActivity;
+import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
 
 
@@ -286,9 +288,11 @@ public class BlogPostActivity extends Activity {
 		// Mark this blog_post as read without blocking the UI thread
 		// Java threads require variables to be declared as final
 		final long blogPostIDThread	= ID;
+		final Context contextThread	= context;
 		new Thread(new Runnable() {
 			public void run() {
 				blogPostDAO.updateMarkAsRead(blogPostIDThread);
+				BroadcastSender.getInstance(contextThread).reloadTab(ApplicationRootActivity.Tab.BLOGS);
 			}
 		}).start();
 	}
