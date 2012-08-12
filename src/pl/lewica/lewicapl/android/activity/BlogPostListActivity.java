@@ -50,6 +50,11 @@ public class BlogPostListActivity extends Activity {
 
 	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.blogpostlistactivity.RELOAD";
 
+	// Currently it's only possible to filter the list by blog ID.
+	public static enum dataFilters {
+		BLOG_ID
+	}
+
 	// When users select a new post, navigate back to the list and start scrolling up and down, the cursor won't know this article should be marked as read.
 	// That results in articles still being marked as unread (titles in red rather than blue).
 	// That's why we need to cache the list of clicked articles.  Please note, it is down to BlogPostActivity to flag articles as read in the database.
@@ -58,7 +63,7 @@ public class BlogPostListActivity extends Activity {
 	private BlogPostDAO blogPostDAO;
 	private ListAdapter listAdapter;
 	private ListView listView;
-	private BlogPostsUpdateBroadcastReceiver receiver;
+	private BroadcastReceiver receiver;
 
 
 
@@ -114,10 +119,18 @@ public class BlogPostListActivity extends Activity {
 	}
 
 
-	public void reloadRows() {
+	private void reloadRows() {
 		CursorAdapter ca	= (CursorAdapter) listAdapter;
 		// Reload rows
 		Cursor newCursor	= blogPostDAO.selectLatest();
+		ca.changeCursor(newCursor);
+	}
+
+
+	private void reloadRowsFilterByBlogID(int blogID) {
+		CursorAdapter ca	= (CursorAdapter) listAdapter;
+		// Reload rows
+		Cursor newCursor	= blogPostDAO.selectLatestByBlogID(blogID);
 		ca.changeCursor(newCursor);
 	}
 
@@ -126,7 +139,12 @@ public class BlogPostListActivity extends Activity {
 	private class BlogPostsUpdateBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			reloadRows();
+			if (! intent.hasExtra(BlogPostListActivity.dataFilters.BLOG_ID.name() ) ) {
+				reloadRows();
+			} else {
+				int blogID		= intent.getIntExtra(BlogPostListActivity.dataFilters.BLOG_ID.name(), 0);
+				reloadRowsFilterByBlogID(blogID);
+			}
 		}
 	}
 

@@ -133,4 +133,13 @@ public class BroadcastSender {
 		}
 	}
 
+
+	public void reloadTab_BlogPostListFilteredByBlogID(int blogID) {
+		String action	= BlogPostListActivity.RELOAD_VIEW;
+
+		Intent intent	= new Intent();
+		intent.setAction(action);
+		intent.putExtra(BlogPostListActivity.dataFilters.BLOG_ID.name(), blogID);
+		context.sendBroadcast(intent);
+	}
 }
