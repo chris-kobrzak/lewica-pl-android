@@ -64,7 +64,7 @@ public class NewsListActivity extends Activity {
 	private ArticleDAO articleDAO;
 	private ListAdapter listAdapter;
 	private ListView listView;
-	private NewsUpdateBroadcastReceiver receiver;
+	private BroadcastReceiver receiver;
 	// When users select a new article, navigate back to the list and start scrolling up and down, the cursor won't know this article should be marked as read.
 	// That results in articles still being marked as unread (titles in red rather than blue).
 	// That's why we need to cache the list of clicked articles.  Please note, it is down to ArcticleActivity to flag articles as read in the database.

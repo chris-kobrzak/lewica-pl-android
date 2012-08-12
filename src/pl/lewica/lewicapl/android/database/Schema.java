@@ -47,4 +47,34 @@ public class Schema {
 
 		return FileUtil.importSQL(is);
 	}
+
+
+	/**
+	 * Returns SQL scripts required to initialise the database.
+	 * Since SQLiteDatabse.execSQL() can only run individual queries, this method returns a list queries that can be looped through.
+	 * @param context
+	 * @param oldVersion
+	 * @param newVersion
+	 * @return
+	 * @throws IOException
+	 */
+	public static List<String> getDatabaseUpgradeSQL(Context context, int oldVersion, int newVersion) 
+			throws IOException {
+		AssetManager am	= context.getAssets();
+		InputStream is		= am.open(getUpgradeFileName(oldVersion, newVersion) );
+
+		return FileUtil.importSQL(is);
+	}
+
+
+	/**
+	 * Returns SQL upgrade script file name. 
+	 * A sample file name could be LewicaPLUpgrade1To2.sql for a file upgrading from version 1 to 2.
+	 * @param oldVersion
+	 * @param newVersion
+	 * @return
+	 */
+	private static String getUpgradeFileName(int oldVersion, int newVersion) {
+		return "LewicaPLUpgrade" + oldVersion + "To" + newVersion + ".sql";
+	}
 }

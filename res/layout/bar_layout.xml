@@ -4,16 +4,16 @@
 	android:id="@+id/info_bar"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
-	android:background="@color/orange"
+	style="@style/InfoBar"
 >
 	<TextView
-		android:text="category"
+		android:text="@string/placeholder_category"
 		android:id="@+id/bar_category"
 		android:layout_width="wrap_content"
 		style="@style/InfoBarCategory"
 	/>
 	<TextView
-		android:text="date"
+		android:text="@string/placeholder_date"
 		android:id="@+id/bar_date"
 		android:layout_width="fill_parent"
 		style="@style/InfoBarDate"

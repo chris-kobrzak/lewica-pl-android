@@ -34,36 +34,30 @@ import pl.lewica.api.model.Article;
  * Collection of Data Access method for interacting with the Article entity.
  * @author Krzysztof Kobrzak
  */
-public class ArticleDAO {
-	// Changing this value would have database ramifications as the views have hard-coded limits set to 5.
-	public static final int LIMIT_LATEST_ENTRIES					= 5;
-	
-	public static final String DATABASE_TABLE						= "ZArticle";
+public class ArticleDAO extends BaseTextDAO {
+
 	// A view using UNION statements pulling data from other views.  See LewicaPL.sql for details.
 	public static final String DATABASE_VIEW_NEWS				= "VLatestNews";
 	public static final String DATABASE_VIEW_PUBLICATIONS	= "VLatestPublications";
 
 	// Database fields
-	public static final String FIELD_ID									= "_id";
 	public static final String FIELD_CATEGORY_ID					= "ZIDArticleCategory";
 	public static final String FIELD_RELATED_IDS					= "ZRelatedIDs";
 	public static final String FIELD_DATE_PUBLISHED				= "ZDatePublished";
-	public static final String FIELD_WAS_READ						= "ZWasRead";
 	public static final String FIELD_HAS_IMAGE						= "ZHasThumbnail";
 	public static final String FIELD_IMAGE_EXTENSION			= "ZImageExtension";
-	public static final String FIELD_URL									= "ZURL";
+	public static final String FIELD_URL								= "ZURL";
 	public static final String FIELD_TITLE								= "ZTitle";
 	public static final String FIELD_TEXT								= "ZText";
 	public static final String FIELD_EDITOR_COMMENT			= "ZEditorComment";
 	public static final String FIELD_HAS_EDITOR_COMMENT	= "ZHasEditorComment";
-//	public static final String FIELD_TOTAL_COMMENTS			= "ZTotalComments";
 
-	public static final String MAP_KEY_PREVIOUS					= "Previous";
-	public static final String MAP_KEY_NEXT							= "Next";
+	protected static String[] fieldsForSingleRecord				= new String[] {FIELD_ID, FIELD_CATEGORY_ID, FIELD_DATE_PUBLISHED, FIELD_WAS_READ, FIELD_HAS_IMAGE, FIELD_IMAGE_EXTENSION, FIELD_URL, FIELD_TITLE, FIELD_TEXT, FIELD_EDITOR_COMMENT, FIELD_HAS_EDITOR_COMMENT };
 
-	private Context context;
-	private SQLiteDatabase database;
-	private LewicaPLSQLiteOpenHelper dbHelper;
+	private static String databaseTable									= "ZArticle";
+
+	// Changing this value would have database ramifications as the views have hard-coded limits set to 5!
+	protected int limitLatestRecords										= 5;
 
 
 	public ArticleDAO(Context context) {
@@ -77,11 +71,6 @@ public class ArticleDAO {
 		database	= dbHelper.getReadableDatabase();
 
 		return this;
-	}
-
-
-	public void close() {
-		dbHelper.close();
 	}
 
 
@@ -134,31 +123,7 @@ public class ArticleDAO {
 		cv.put(FIELD_EDITOR_COMMENT,	article.getEditorComment() );
 
 		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
-		return databaseWritable.insert(DATABASE_TABLE, null, cv);
-	}
-
-
-	/**
-	 * Meant to be called in a separate thread to avoid blocking UI.
-	 * @param articleID
-	 * @return
-	 */
-	public int updateMarkAsRead(long articleID) {
-		ContentValues cv	= new ContentValues();
-
-		cv.put(FIELD_WAS_READ, 1);
-
-		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
-
-		int totalUpdates	= databaseWritable.update(
-			DATABASE_TABLE, 
-			cv, 
-			FIELD_ID + "=" + articleID, 
-			null
-		);
-		databaseWritable.close();
-
-		return totalUpdates;
+		return databaseWritable.insert(databaseTable, null, cv);
 	}
 
 
@@ -182,11 +147,11 @@ public class ArticleDAO {
 		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
 
 		int totalUpdates	= databaseWritable.update(
-				DATABASE_TABLE, 
-				cv, 
-				sb.toString(), 
-				null
-				);
+			getDatabaseTable(), 
+			cv, 
+			sb.toString(), 
+			null
+		);
 		databaseWritable.close();
 
 		return totalUpdates;
@@ -215,50 +180,14 @@ public class ArticleDAO {
 		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
 
 		int totalUpdates	= databaseWritable.update(
-				DATABASE_TABLE, 
-				cv, 
-				sb.toString(), 
-				null
-				);
+			getDatabaseTable(), 
+			cv, 
+			sb.toString(), 
+			null
+		);
 		databaseWritable.close();
 
 		return totalUpdates;
-	}
-
-
-	public int updateMarkAllAsRead() {
-		ContentValues cv	= new ContentValues();
-
-		cv.put(FIELD_WAS_READ, 1);
-
-		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
-
-		int totalUpdates	= databaseWritable.update(
-				DATABASE_TABLE, 
-				cv, 
-				FIELD_WAS_READ + "= 0", 
-				null
-				);
-		databaseWritable.close();
-
-		return totalUpdates;
-	}
-
-
-	/**
-	 * A wrapper method that fetches one article record from the database.
-	 * @param articleID
-	 * @return
-	 * @throws SQLException
-	 */
-	public Cursor selectOne(long articleID) throws SQLException {
-		Cursor cursor = database.query(true, DATABASE_TABLE, new String[] {
-				FIELD_ID, FIELD_CATEGORY_ID, FIELD_DATE_PUBLISHED, FIELD_WAS_READ, FIELD_HAS_IMAGE, FIELD_IMAGE_EXTENSION, FIELD_URL, FIELD_TITLE, FIELD_TEXT, FIELD_EDITOR_COMMENT, FIELD_HAS_EDITOR_COMMENT },
-				FIELD_ID + "=" + articleID, null, null, null, null, "1");
-		if (cursor != null) {
-			cursor.moveToFirst();
-		}
-		return cursor;
 	}
 
 
@@ -276,7 +205,7 @@ public class ArticleDAO {
 				Integer.toString(Article.SECTION_POLAND),
 				Integer.toString(Article.SECTION_WORLD)
 			},
-			LIMIT_LATEST_ENTRIES * 2);
+			limitLatestRecords * 2);
 	}
 
 
@@ -295,7 +224,7 @@ public class ArticleDAO {
 				Integer.toString(Article.SECTION_REVIEWS),
 				Integer.toString(Article.SECTION_CULTURE)
 			},
-			LIMIT_LATEST_ENTRIES * 3);
+			limitLatestRecords * 3);
 	}
 
 
@@ -344,30 +273,7 @@ public class ArticleDAO {
 	}
 
 
-	/**
-	 * Returns the latest article ID from the database.
-	 * @return
-	 */
-	public int fetchLastID() {
-		Cursor cursor = database.query(
-			DATABASE_TABLE,
-			new String[] { "MAX(" + FIELD_ID + ")" },
-			null, null, null, null, null, null
-		);
-
-		if (cursor == null) {
-			return 0;
-		}
-
-		cursor.moveToFirst();
-
-		int result	= cursor.getInt(0);
-		cursor.close();
-		return result;
-	}
-
-
-	public Map<String,Long> fetchPreviousNextID(long ID, int categoryID) {
+	public Map<String,Long> fetchPreviousNextID(long recordID, int categoryID) {
 		Map<String,Long> map	= new HashMap<String,Long>();
 		StringBuilder sb				= new StringBuilder();
 
@@ -378,7 +284,7 @@ public class ArticleDAO {
 		sb.append("), 0) AS id, '");
 		sb.append(MAP_KEY_PREVIOUS);
 		sb.append("' AS type FROM ");
-		sb.append(DATABASE_TABLE);
+		sb.append(getDatabaseTable());
 		sb.append(" WHERE ");
 		sb.append(FIELD_ID);
 		sb.append(" < ? AND ");
@@ -389,14 +295,14 @@ public class ArticleDAO {
 		sb.append("), 0) AS id, '");
 		sb.append(MAP_KEY_NEXT);
 		sb.append("' AS type FROM ");
-		sb.append(DATABASE_TABLE);
+		sb.append(getDatabaseTable());
 		sb.append(" WHERE ");
 		sb.append(FIELD_ID);
 		sb.append(" > ? AND ");
 		sb.append(FIELD_CATEGORY_ID);
 		sb.append(" = ?");
 
-		String idString			= Long.toString(ID); 
+		String idString			= Long.toString(recordID); 
 		String idCategString	= Integer.toString(categoryID);
 
 		if (! database.isOpen() ) {
@@ -415,28 +321,40 @@ public class ArticleDAO {
 		cursor.moveToFirst();
 		int colIndID		= cursor.getColumnIndex("id");
 		int colIndType	= cursor.getColumnIndex("type");
-		
+
 		map.put(cursor.getString(colIndType), cursor.getLong(colIndID) );
-		
+
 		// Second row = next article ID, see the UNION query above
 		cursor.moveToLast();
-		
+
 		map.put(cursor.getString(colIndType), cursor.getLong(colIndID) );
-		
+
 		cursor.close();
 
 		return map;
 	}
 
 
-	/**
-	 * Not in use yet.  Convert this method to public when the delete functionality is implemented.
-	 * @param articleID
-	 * @return
-	 */
-	@SuppressWarnings("unused")
-	private boolean delete(long articleID) {
-		return database.delete(DATABASE_TABLE, FIELD_ID + "=" + articleID, null) > 0;
+	@Override
+	protected String getDatabaseTable() {
+		return databaseTable;
 	}
 
+
+	@Override
+	protected String[] getFieldsForSingleRecord() {
+		return fieldsForSingleRecord;
+	}
+
+
+	@Override
+	protected String[] getFieldsForRecordSet() {
+		return fieldsForRecordSet;
+	}
+
+
+	@Override
+	protected int getLimitLatestRecords() {
+		return limitLatestRecords;
+	}
 }

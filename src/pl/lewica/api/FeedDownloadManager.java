@@ -83,7 +83,6 @@ public class FeedDownloadManager {
 			return elements;
 		} catch (Exception e) {
 			// Typically, it's just URL connection time-out so let's just ignore it and return an empty list (see the statements below).
-			e.printStackTrace();
 		}
 
 		// We are still here and that means there's been a problem in the try block.  Just return a empty list.

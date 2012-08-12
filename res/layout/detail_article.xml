@@ -17,20 +17,20 @@
 			android:background="@color/orange"
 		>
 			<TextView
-				android:text="category"
+				android:text="@string/placeholder_category"
 				android:id="@+id/article_category"
 				android:layout_width="wrap_content"
 				style="@style/InfoBarCategory"
 			/>
 			<TextView
-				android:text="date"
+				android:text="@string/placeholder_date"
 				android:id="@+id/article_date"
 				android:layout_width="fill_parent"
 				style="@style/InfoBarDate"
 			/>
 		</LinearLayout>
 		<TextView
-			android:text="title"
+			android:text="@string/placeholder_title"
 			android:id="@+id/article_title"
 			android:layout_below="@+id/info_bar_article"
 			android:layout_width="fill_parent"
@@ -45,9 +45,10 @@
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="7dp"
 			android:layout_marginRight="7dp"
+			android:contentDescription="@string/description_article_image"
 		/>
 		<TextView
-			android:text="content"
+			android:text="@string/placeholder_content"
 			android:id="@+id/article_content"
 			android:layout_below="@+id/article_image"
 			android:layout_width="fill_parent"
@@ -65,7 +66,7 @@
 			android:background="@color/grey_dark"
 		/>
 		<TextView
-			android:text="editor's comment"
+			android:text="@string/placeholder_editors_comment"
 			android:id="@+id/article_editor_comment"
 			android:layout_below="@+id/article_editor_comment_top"
 			android:layout_width="fill_parent"

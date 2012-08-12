@@ -11,14 +11,14 @@
 		android:orientation="vertical"
 	>
 		<TextView
-			android:text="TextView"
+			android:text="@string/placeholder_category"
 			android:id="@+id/more_introduction"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:padding="7dp"
 		/>
 		<TextView
-			android:text="TextView"
+			android:text="@string/placeholder_category"
 			android:id="@+id/more_homepage"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
@@ -26,7 +26,7 @@
 			style="@style/ListItemHeading"
 		/>
 		<TextView
-			android:text="TextView"
+			android:text="@string/placeholder_category"
 			android:id="@+id/more_facebook"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
 			style="@style/ListItemHeading"
 		/>
 		<TextView
-			android:text="TextView"
+			android:text="@string/placeholder_category"
 			android:id="@+id/more_blogs"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
 			style="@style/ListItemHeading"
 		/>
 		<TextView
-			android:text="TextView"
+			android:text="@string/placeholder_category"
 			android:id="@+id/more_links"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
 			style="@style/ListItemHeading"
 		/>
 		<TextView
-			android:text="TextView"
+			android:text="@string/placeholder_category"
 			android:id="@+id/more_search"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
@@ -59,7 +59,7 @@
 			style="@style/ListItemHeading"
 		/>
 		<TextView
-			android:text="TextView"
+			android:text="@string/placeholder_category"
 			android:id="@+id/more_team"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
