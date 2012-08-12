@@ -428,15 +428,4 @@ public class ArticleDAO {
 		return map;
 	}
 
-
-	/**
-	 * Not in use yet.  Convert this method to public when the delete functionality is implemented.
-	 * @param articleID
-	 * @return
-	 */
-	@SuppressWarnings("unused")
-	private boolean delete(long articleID) {
-		return database.delete(DATABASE_TABLE, FIELD_ID + "=" + articleID, null) > 0;
-	}
-
 }
