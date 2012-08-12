@@ -16,6 +16,7 @@
 package pl.lewica.lewicapl.android;
 
 import java.io.File;
+import java.io.IOException;
 
 import android.app.TabActivity;
 import android.content.BroadcastReceiver;
@@ -76,7 +77,10 @@ public class ApplicationRootActivity extends TabActivity {
 		if (! storageDir.exists() ) {
 			storageDir.mkdirs();
 		}
-		AndroidUtil.setUpResourcesHiddenFromAndroidGallery(storageDir);
+		// it's not a big deal if this operation fails so let's just try-catch it.
+		try {
+			AndroidUtil.setUpResourcesHiddenFromAndroidGallery(storageDir);
+		} catch (IOException err) {}
 
 		filter		= new IntentFilter();
 		filter.addAction(START_INDETERMINATE_PROGRESS);
@@ -264,6 +268,9 @@ public class ApplicationRootActivity extends TabActivity {
 						annDAO.close();
 
 						broadcastSender.reloadTab(Tab.HISTORY);
+						break;
+
+					case HISTORY:
 						break;
 				}
 				return true;
