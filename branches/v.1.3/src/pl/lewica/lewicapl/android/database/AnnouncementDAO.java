@@ -15,14 +15,10 @@
 */
 package pl.lewica.lewicapl.android.database;
 
-import java.util.HashMap;
-import java.util.Map;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import pl.lewica.api.model.Announcement;
 import pl.lewica.util.DateUtil;
 
@@ -31,28 +27,20 @@ import pl.lewica.util.DateUtil;
  * Collection of Data Access method for interacting with the announcement entity.
  * @author Krzysztof Kobrzak
  */
-public class AnnouncementDAO {
+public class AnnouncementDAO extends BaseTextDAO {
 
-	public static final int LIMIT_LATEST_ENTRIES			= 10;
-
-	private static final String DATABASE_TABLE				= "ZAnnouncement";
-	// Database fields
-	public static final String FIELD_ID							= "_id";
-	public static final String FIELD_WAS_READ				= "ZWasRead";
 	public static final String FIELD_DATE_EXPIRY			= "ZDateExpiry";
 	public static final String FIELD_WHAT						= "ZWhat";
 	public static final String FIELD_WHERE					= "ZWhere";
 	public static final String FIELD_WHEN						= "ZWhen";
 	public static final String FIELD_PUBLISHED_BY			= "ZPublishedBy";
-	public static final String FIELD_PUBLISHED_EMAIL		= "ZPublishedByEmail";
+	public static final String FIELD_PUBLISHED_EMAIL	= "ZPublishedByEmail";
 	public static final String FIELD_TEXT						= "ZText";
 
-	public static final String MAP_KEY_PREVIOUS			= "Previous";
-	public static final String MAP_KEY_NEXT					= "Next";
+	protected static String[] fieldsForSingleRecord		= new String[] {FIELD_ID, FIELD_DATE_EXPIRY, FIELD_WHAT, FIELD_WHERE,  FIELD_WHEN, FIELD_PUBLISHED_BY, FIELD_PUBLISHED_EMAIL, FIELD_TEXT };
+	protected static String[] fieldsForRecordSet				= new String[] {FIELD_ID, FIELD_DATE_EXPIRY, FIELD_WHAT, FIELD_WHERE, FIELD_WHEN, FIELD_WAS_READ };
 
-	private Context context;
-	private SQLiteDatabase database;
-	private LewicaPLSQLiteOpenHelper dbHelper;
+	private static String databaseTable							= "ZAnnouncement";
 
 
 	public AnnouncementDAO(Context context) {
@@ -60,23 +48,18 @@ public class AnnouncementDAO {
 	}
 
 
-	public AnnouncementDAO open() 
-			throws SQLException {
+	public AnnouncementDAO open() throws SQLException {
 		dbHelper	= new LewicaPLSQLiteOpenHelper(context);
 		database	= dbHelper.getWritableDatabase();
-		
+
 		return this;
 	}
 
 
-	public void close() {
-		dbHelper.close();
-	}
-
 	// String wasRead,
 	public long insert(Announcement announcement) {
 		ContentValues cv	= new ContentValues();
-		
+
 		cv.put(FIELD_ID,							announcement.getID() );
 		cv.put(FIELD_WAS_READ,				0);	// It's a new announcement so it couldn't be read yet
 		cv.put(FIELD_DATE_EXPIRY,			DateUtil.convertDateToString(announcement.getDateExpiry(), DateUtil.DATE_MASK_SQL) );
@@ -87,158 +70,30 @@ public class AnnouncementDAO {
 		cv.put(FIELD_PUBLISHED_EMAIL,	announcement.getPublishedByEmail() );
 		cv.put(FIELD_TEXT,						announcement.getContent() );
 
-		return database.insert(DATABASE_TABLE, null, cv);
+		return database.insert(getDatabaseTable(), null, cv);
 	}
 
 
-	/**
-	 * Meant to be called in a separate thread to avoid blocking UI.
-	 * @param articleID
-	 * @return
-	 */
-	public int updateMarkAsRead(long articleID) {
-		ContentValues cv	= new ContentValues();
-
-		cv.put(FIELD_WAS_READ, 1);
-
-		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
-
-		int totalUpdates	= databaseWritable.update(
-			DATABASE_TABLE, 
-			cv, 
-			FIELD_ID + "=" + articleID, 
-			null
-		);
-		databaseWritable.close();
-		
-		return totalUpdates;
+	@Override
+	protected String getDatabaseTable() {
+		return databaseTable;
 	}
 
 
-	public int updateMarkAllAsRead() {
-		ContentValues cv	= new ContentValues();
-		
-		cv.put(FIELD_WAS_READ, 1);
-		
-		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
-		
-		int totalUpdates	= databaseWritable.update(
-				DATABASE_TABLE, 
-				cv, 
-				FIELD_WAS_READ + "=" + 0, 
-				null
-				);
-		databaseWritable.close();
-		
-		return totalUpdates;
+	@Override
+	protected String[] getFieldsForSingleRecord() {
+		return fieldsForSingleRecord;
 	}
 
 
-	public Cursor selectOne(long announcementID) throws SQLException {
-		Cursor cursor = database.query(true, DATABASE_TABLE, new String[] {
-				FIELD_ID, FIELD_DATE_EXPIRY, FIELD_WHAT, FIELD_WHERE,  FIELD_WHEN, FIELD_PUBLISHED_BY, FIELD_PUBLISHED_EMAIL, FIELD_TEXT },
-				FIELD_ID + "=" + announcementID, null, null, null, null, "1");
-		if (cursor != null) {
-			cursor.moveToFirst();
-		}
-		return cursor;
+	@Override
+	protected String[] getFieldsForRecordSet() {
+		return fieldsForRecordSet;
 	}
 
 
-	public Cursor selectLatest()
-			 throws SQLException {
-		Cursor cursor = database.query(
-			true, 
-			DATABASE_TABLE, 
-			new String[] {	FIELD_ID, FIELD_WAS_READ, FIELD_DATE_EXPIRY, FIELD_WHAT, FIELD_WHERE, FIELD_WHEN },
-			null, null, null, null, 
-			FIELD_ID + " DESC", 
-			Integer.toString(LIMIT_LATEST_ENTRIES)
-		);
-		if (cursor != null) {
-			cursor.moveToFirst();
-		}
-		return cursor;
+	@Override
+	protected int getLimitLatestRecords() {
+		return limitLatestRecords;
 	}
-
-	/**
-	 * Returns the latest announcement ID from the database.
-	 * @return
-	 */
-	public int fetchLastID() {
-		Cursor cursor = database.query(
-			DATABASE_TABLE,
-			new String[] { "MAX(" + FIELD_ID + ")" },
-			null, null, null, null, null, null
-		);
-
-		if (cursor == null) {
-			return 0;
-		}
-
-		cursor.moveToFirst();
-
-		int result	= cursor.getInt(0);
-		cursor.close();
-		return result;
-	}
-
-
-	public Map<String,Long> fetchPreviousNextID(long ID) {
-		Map<String,Long> map	= new HashMap<String,Long>();
-		StringBuilder sb				= new StringBuilder();
-		
-		// Building SQL query consisting of two "unioned" parts like this one:
-		// SELECT COALESCE(MAX(_id), 0)AS id, 'Previous' AS type FROM ZAnnouncement WHERE _id < 1365
-		sb.append("SELECT COALESCE(MAX(");
-		sb.append(FIELD_ID);
-		sb.append("), 0) AS id, '");
-		sb.append(MAP_KEY_PREVIOUS);
-		sb.append("' AS type FROM ");
-		sb.append(DATABASE_TABLE);
-		sb.append(" WHERE ");
-		sb.append(FIELD_ID);
-		sb.append(" < ? ");
-		sb.append(" UNION ");
-		sb.append("SELECT COALESCE(MIN(");
-		sb.append(FIELD_ID);
-		sb.append("), 0) AS id, '");
-		sb.append(MAP_KEY_NEXT);
-		sb.append("' AS type FROM ");
-		sb.append(DATABASE_TABLE);
-		sb.append(" WHERE ");
-		sb.append(FIELD_ID);
-		sb.append(" > ? ");
-
-		String idString			= Long.toString(ID); 
-
-		if (! database.isOpen() ) {
-			database				= dbHelper.getReadableDatabase();
-		}
-		Cursor cursor	= database.rawQuery(
-			sb.toString(),
-			new String[] { idString, idString }
-		);
-
-		if (cursor == null) {
-			return map;
-		}
-
-		// First row = previous article ID, see the UNION query above
-		cursor.moveToFirst();
-		int colIndID		= cursor.getColumnIndex("id");
-		int colIndType	= cursor.getColumnIndex("type");
-		
-		map.put(cursor.getString(colIndType), cursor.getLong(colIndID) );
-		
-		// Second row = next article ID, see the UNION query above
-		cursor.moveToLast();
-		
-		map.put(cursor.getString(colIndType), cursor.getLong(colIndID) );
-		
-		cursor.close();
-
-		return map;
-	}
-
 }
