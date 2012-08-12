@@ -39,6 +39,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
+import pl.lewica.lewicapl.android.database.BaseTextDAO;
 
 
 /**
@@ -53,7 +54,7 @@ public class AnnouncementListActivity extends Activity {
 	// That's why we need to cache the list of clicked articles.  Please note, it is down to ArcticleActivity to flag articles as read in the database.
 	private static Set<Long> clicked	= new HashSet<Long>();
 
-	private AnnouncementDAO annDAO;
+	private BaseTextDAO annDAO;
 	private ListAdapter listAdapter;
 	private ListView listView;
 	private AnnouncementsUpdateBroadcastReceiver receiver;

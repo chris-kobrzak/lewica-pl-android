@@ -43,6 +43,7 @@ import pl.lewica.lewicapl.android.activity.NewsListActivity;
 import pl.lewica.lewicapl.android.activity.PublicationListActivity;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
+import pl.lewica.lewicapl.android.database.BaseTextDAO;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
 
 /**
@@ -262,7 +263,7 @@ public class ApplicationRootActivity extends TabActivity {
 						break;
 
 					case ANNOUNCEMENTS:
-						AnnouncementDAO annDAO	= new AnnouncementDAO(this);
+						BaseTextDAO annDAO	= new AnnouncementDAO(this);
 						annDAO.open();
 						annDAO.updateMarkAllAsRead();
 						annDAO.close();
