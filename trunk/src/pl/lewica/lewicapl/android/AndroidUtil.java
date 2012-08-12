@@ -1,5 +1,5 @@
 /*
- Copyright 2011 lewica.pl
+ Copyright 2012 lewica.pl
 
  Licensed under the Apache Licence, Version 2.0 (the "Licence");
  you may not use this file except in compliance with the Licence.
@@ -13,16 +13,25 @@
  See the Licence for the specific language governing permissions and
  limitations under the Licence. 
 */
-package pl.lewica.api.model;
+package pl.lewica.lewicapl.android;
 
-/**
- * Lists all available data entities.  The list might be extended to support the blogs in the future.
- * Naming convention for enum types: FooType
- * @author Krzysztof Kobrzak
- */
-public enum DataModelType {
-	ARTICLE,
-	ANNOUNCEMENT,
-	BLOG_POST,
-	HISTORY
+import java.io.File;
+import java.io.IOException;
+
+
+public class AndroidUtil {
+
+
+	/**
+	 * Adds a special, hidden file to the cache directory to prevent images from being indexed by Android Gallery
+	 * @param storageDir
+	 */
+	public static void setUpResourcesHiddenFromAndroidGallery(File storageDir)
+			throws IOException {
+		File hideGallery	= new File(storageDir + "/.nomedia");
+		if (hideGallery.exists() ) {
+			return;
+		}
+		hideGallery.createNewFile();
+	}
 }

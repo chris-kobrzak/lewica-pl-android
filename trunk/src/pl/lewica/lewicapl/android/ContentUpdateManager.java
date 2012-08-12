@@ -32,24 +32,23 @@ import java.util.Set;
 import org.apache.http.util.ByteArrayBuffer;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import pl.lewica.api.FeedDownloadManager;
 import pl.lewica.api.model.Announcement;
 import pl.lewica.api.model.Article;
+import pl.lewica.api.model.BlogPost;
 import pl.lewica.api.model.History;
 import pl.lewica.api.model.DataModel;
 import pl.lewica.api.model.DataModelType;
 import pl.lewica.api.url.AnnouncementURL;
 import pl.lewica.api.url.ArticleURL;
+import pl.lewica.api.url.BlogPostURL;
 import pl.lewica.api.url.HistoryURL;
-import pl.lewica.lewicapl.android.activity.AnnouncementListActivity;
-import pl.lewica.lewicapl.android.activity.HistoryListActivity;
-import pl.lewica.lewicapl.android.activity.NewsListActivity;
-import pl.lewica.lewicapl.android.activity.PublicationListActivity;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
+import pl.lewica.lewicapl.android.database.BlogPostDAO;
 import pl.lewica.lewicapl.android.database.HistoryDAO;
 import pl.lewica.util.DateUtil;
 
@@ -61,13 +60,15 @@ import pl.lewica.util.DateUtil;
  * @author Krzysztof Kobrzak
  */
 public class ContentUpdateManager {
+	private static final String TAG	= "ContentUpdateManager";
 
 	private static ContentUpdateManager _instance;
 	
 	private File storageDir;
 	private Context context;
+	private BroadcastSender broadcastSender;
 	private boolean isRunning;
-	private int lastUpdated	= 1;		// This actually stores a timestamp the action was triggered, not completed at.
+	private int lastUpdated	= 1;		// This actually stores a time stamp the action was triggered on, not completed at.
 	private int timeout			= 20;	// Seconds
 
 	public static enum CommandType {
@@ -76,11 +77,12 @@ public class ContentUpdateManager {
 		NEW_PUBLICATIONS,
 		NO_PUBLICATIONS,
 		NEW_PUBLICATION_IMAGES,
-		NO_PUBLICATION_IMAGES,
 		NEW_ANNOUNCEMENTS,
 		NO_ANNOUNCEMENTS,
 		NEW_HISTORY,
-		NO_HISTORY
+		NO_HISTORY,
+		NEW_BLOG_POSTS,
+		NO_BLOG_POSTS
 	}
 
 
@@ -92,6 +94,7 @@ public class ContentUpdateManager {
 	private ContentUpdateManager(Context context, File storageDir) {
 		this.context		= context;
 		this.storageDir	= storageDir;
+		this.broadcastSender	= BroadcastSender.getInstance(context);
 	}
 
 
@@ -120,7 +123,7 @@ public class ContentUpdateManager {
 	public boolean isRunning() {
 		int sinceLastUpdate	= DateUtil.currentUnixTime() % lastUpdated; 
 		if (isRunning && sinceLastUpdate > timeout) {
-			broadcastNetworkActivity_Off();
+			broadcastSender.indicateDeviceNetworkActivity(false);
 			this.lastUpdated		= 1;
 			this.isRunning		= false;
 		}
@@ -154,7 +157,7 @@ public class ContentUpdateManager {
 
 	/**
 	 * Standard setter for lastUpdated.
-	 * @param lastUpdated
+	 * @param lastUpdated Unix time stamp
 	 */
 	public void setLastUpdated(int lastUpdated) {
 		this.lastUpdated = lastUpdated;
@@ -257,8 +260,8 @@ public class ContentUpdateManager {
 		File image;
 		URL url;
 
-		BufferedInputStream bis;
-		FileOutputStream fos;
+		BufferedInputStream bis	= null;
+		FileOutputStream fos		= null;
 		ByteArrayBuffer bab;
 		int current;
 		// See http://stackoverflow.com/questions/3498643/dalvik-message-default-buffer-size-used-in-bufferedinputstream-constructor-it/7516554#7516554
@@ -293,13 +296,71 @@ public class ContentUpdateManager {
 				fos.write(bab.toByteArray() );
 				fos.close();
 			} catch (MalformedURLException e) {
-				e.printStackTrace();
+				Log.w(TAG, "MalformedURLException: " + e.getMessage() );
+				return false;
 			} catch (IOException e) {
-				e.printStackTrace();
+				Log.w(TAG, "IOException: " + e.getMessage() );
+				return false;
+			} finally {
+				if (fos != null) {
+					try {
+						fos.close();
+					} catch (IOException ioe) {
+						Log.w(TAG, "Unable to close file output stream for " + imageURL);
+					}
+				}
+				if (bis != null) {
+					try {
+						bis.close();
+					} catch (IOException ioe) {
+						Log.w(TAG, "Unable to close buffered input stream for " + imageURL);
+					}
+				}
 			}
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Coordinates the process of downloading the blog entries feed and inserting data to the database.
+	 * @param context
+	 * @return UpdateStatus
+	 */
+	private UpdateStatus fetchAndSaveBlogPosts(Context context) {
+		UpdateStatus status						= new UpdateStatus();
+		FeedDownloadManager fdm			= new FeedDownloadManager();
+		BlogPostURL blogPostURL				= new BlogPostURL();
+		BlogPostDAO blogPostDAO			= new BlogPostDAO(context);
+
+		blogPostDAO.open();
+		int lastBlogPostID					= blogPostDAO.fetchLastID();
+
+		blogPostURL.setNewerThan(lastBlogPostID);
+		blogPostURL.setLimit(15);
+
+		List<DataModel> blogPosts	= fdm.fetchAndParse(DataModelType.BLOG_POST, blogPostURL.buildURL() );
+		int totalBlogPosts					= blogPosts.size();
+
+		if (totalBlogPosts == 0) {
+			blogPostDAO.close();
+			status.setTotalUpdated(0);
+
+			return status;
+		}
+
+		BlogPost blogPost;
+		// Loop through downloaded blog entries and insert them to the database
+		for (DataModel element: blogPosts) {
+			blogPost	= (BlogPost) element;
+			blogPostDAO.insert(blogPost);
+		}
+
+		blogPostDAO.close();
+		status.setTotalUpdated(totalBlogPosts);
+
+		return status;
 	}
 
 
@@ -313,33 +374,33 @@ public class ContentUpdateManager {
 		FeedDownloadManager fdm			= new FeedDownloadManager();
 		AnnouncementURL annURL				= new AnnouncementURL();
 		AnnouncementDAO annDAO			= new AnnouncementDAO(context);
-
+		
 		annDAO.open();
 		int lastAnnID					= annDAO.fetchLastID();
-
+		
 		annURL.setNewerThan(lastAnnID);
 		annURL.setLimit(10);
-
+		
 		List<DataModel> anns	= fdm.fetchAndParse(DataModelType.ANNOUNCEMENT, annURL.buildURL() );
 		int totalAnns					= anns.size();
-
+		
 		if (totalAnns == 0) {
 			annDAO.close();
 			status.setTotalUpdated(0);
-
+			
 			return status;
 		}
-
+		
 		Announcement ann;
 		// Loop through downloaded articles and insert them to the database
 		for (DataModel element: anns) {
 			ann	= (Announcement) element;
 			annDAO.insert(ann);
 		}
-
+		
 		annDAO.close();
 		status.setTotalUpdated(totalAnns);
-
+		
 		return status;
 	}
 
@@ -394,77 +455,7 @@ public class ContentUpdateManager {
 
 		return status;
 	}
-
-
-	/**
-	 * Broadcasts RELOAD_VIEW messages to all activities that display content from the database.
-	 */
-	public void broadcastDataReload() {
-		Intent intent	= new Intent();
-
-		// Notify the news listing screen
-		intent.setAction(NewsListActivity.RELOAD_VIEW);
-		context.sendBroadcast(intent);
-
-		// Notify the publications listing screen
-		intent.setAction(PublicationListActivity.RELOAD_VIEW);
-		context.sendBroadcast(intent);
-
-		intent.setAction(AnnouncementListActivity.RELOAD_VIEW);
-		context.sendBroadcast(intent);
-
-		intent.setAction(HistoryListActivity.RELOAD_VIEW);
-		context.sendBroadcast(intent);
-	}
-
-
-	public void broadcastDataReload_News() {
-		Intent intent	= new Intent();
-		intent.setAction(NewsListActivity.RELOAD_VIEW);
-		context.sendBroadcast(intent);
-	}
 	
-	
-	public void broadcastDataReload_Publications() {
-		Intent intent	= new Intent();
-		intent.setAction(PublicationListActivity.RELOAD_VIEW);
-		context.sendBroadcast(intent);
-	}
-	
-	
-	public void broadcastDataReload_Announcements() {
-		Intent intent	= new Intent();
-		intent.setAction(AnnouncementListActivity.RELOAD_VIEW);
-		context.sendBroadcast(intent);
-	}
-	
-	
-	public void broadcastDataReload_History() {
-		Intent intent	= new Intent();
-		intent.setAction(HistoryListActivity.RELOAD_VIEW);
-		context.sendBroadcast(intent);
-	}
-
-
-	/**
-	 * Attempts to switch the top bar network activity indicator on by notifying the application activity.  
-	 */
-	public void broadcastNetworkActivity_On() {
-		Intent intent	= new Intent();
-		intent.setAction(ApplicationRootActivity.START_INDETERMINATE_PROGRESS);
-		context.sendBroadcast(intent);
-	}
-	
-	
-	/**
-	 * Attempts to switch the top bar network activity indicator off by notifying the application activity. 
-	 */
-	public void broadcastNetworkActivity_Off() {
-		Intent intent	= new Intent();
-		intent.setAction(ApplicationRootActivity.STOP_INDETERMINATE_PROGRESS);
-		context.sendBroadcast(intent);
-	}
-
 
 	/**
 	 * Convenience method that can be used to trigger the update process.
@@ -493,47 +484,56 @@ public class ContentUpdateManager {
 		// Please note, the order of the case statements matters!
 		switch (command) {
 			case INIT:
-				broadcastNetworkActivity_On();
+				broadcastSender.indicateDeviceNetworkActivity(true);
 				// Fetch news and opinions updates from the server.
 				new UpdateArticlesTask().execute();
 				break;
 
 			case INIT_HISTORY:
-				broadcastNetworkActivity_On();
+				broadcastSender.indicateDeviceNetworkActivity(true);
 				new UpdateHistoryTask().execute();
 				break;
 
 			case NEW_PUBLICATIONS:
-				// Notify the news listing screen
-				broadcastDataReload_News();
+				// Notify the news and publication listing screens
+				broadcastSender.reloadTabsOnDataUpdate(DataModelType.ARTICLE);
 
-				// Notify the publications listing screen
-				broadcastDataReload_Publications();
-				
 				// No break statement here, just let it jump to the next NO_PUBLICATIONS case that will take care of deciding what to do next.
 
 			case NO_PUBLICATIONS:
-				// After publications come the announcements
+				// After publications come the blog stuff
 				if (chainReaction) {
-					new UpdateAnnouncementsTask().execute();
+					new UpdateBlogPostsTask().execute();
 				} else {
-					broadcastNetworkActivity_Off();
+					broadcastSender.indicateDeviceNetworkActivity(false);
 					setRunning(false);
 				}
 				break;
 
 			case NEW_PUBLICATION_IMAGES:
-				// Notify the news listing screen
-				broadcastDataReload_News();
-
-				// Notify the publications listing screen
-				broadcastDataReload_Publications();
+				// Notify the news and articles listing screens
+				broadcastSender.reloadTabsOnDataUpdate(DataModelType.ARTICLE);
 
 				// We "know" the image update is actually triggered by UpdateArticlesTask so no actions required here.
 				break;
 
+			case NEW_BLOG_POSTS:
+				broadcastSender.reloadTabsOnDataUpdate(DataModelType.BLOG_POST);
+
+				// No break statement here, just let it jump to the next NO_BLOG_ENTRIES case that will take care of deciding what to do next.
+
+			case NO_BLOG_POSTS:
+				// After blog come the announcements
+				if (chainReaction) {
+					new UpdateAnnouncementsTask().execute();
+				} else {
+					broadcastSender.indicateDeviceNetworkActivity(false);
+					setRunning(false);
+				}
+				break;
+
 			case NEW_ANNOUNCEMENTS:
-				broadcastDataReload_Announcements();
+				broadcastSender.reloadTabsOnDataUpdate(DataModelType.ANNOUNCEMENT);
 
 				// No break statement here, just let it jump to the next NO_ANNOUNCEMENTS case that will take care of deciding what to do next.
 
@@ -542,18 +542,18 @@ public class ContentUpdateManager {
 				if (chainReaction) {
 					new UpdateHistoryTask().execute();
 				} else {
-					broadcastNetworkActivity_Off();
+					broadcastSender.indicateDeviceNetworkActivity(false);
 					setRunning(false);
 				}
 				break;
 
 			case NEW_HISTORY:
-				broadcastDataReload_History();
+				broadcastSender.reloadTabsOnDataUpdate(DataModelType.HISTORY);
 
 				// No break statement here, just let it jump to the next NO_HISTORY case that will take care of deciding what to do next.
 
 			case NO_HISTORY:
-				broadcastNetworkActivity_Off();
+				broadcastSender.indicateDeviceNetworkActivity(false);
 				setRunning(false);
 				break;
 		}
@@ -611,6 +611,26 @@ public class ContentUpdateManager {
 			}
 			// Images task is branched out by the articles task so we want to be strict and set the chainReaction argument to false.
 			manageAndBroadcastUpdates(CommandType.NEW_PUBLICATION_IMAGES, false);
+		}
+	}
+	
+	
+	private class UpdateBlogPostsTask extends AsyncTask<Void, Integer, UpdateStatus> {
+		
+		@Override
+		protected UpdateStatus doInBackground(Void... params) {
+			UpdateStatus status					= fetchAndSaveBlogPosts(context);
+			
+			return status;
+		}
+		
+		@Override
+		protected void onPostExecute(UpdateStatus status) {
+			if (status.getTotalUpdated() == 0) {
+				manageAndBroadcastUpdates(CommandType.NO_BLOG_POSTS, true);
+				return;
+			}
+			manageAndBroadcastUpdates(CommandType.NEW_BLOG_POSTS, true);
 		}
 	}
 
