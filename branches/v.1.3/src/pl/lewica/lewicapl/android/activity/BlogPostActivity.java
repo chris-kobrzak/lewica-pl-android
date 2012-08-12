@@ -50,6 +50,7 @@ public class BlogPostActivity extends Activity {
 	private static Typeface categoryTypeface;
 
 	private long blogPostID;
+	private int blogID;
 	private BlogPostDAO blogPostDAO;
 	private Map<String,Long> nextPrevID;
 	private String blogPostURL;
@@ -187,10 +188,10 @@ public class BlogPostActivity extends Activity {
 				startActivity(Intent.createChooser(intent, getString(R.string.label_share_link) ) );
 				return true;
 
-			case R.id.menu_open_browser:
-				Uri uri			= Uri.parse(blogPostURL);
-				intent	= new Intent(Intent.ACTION_VIEW, uri);
-				startActivity(intent);
+			case R.id.menu_other_posts:
+				BroadcastSender broadcastSender	= BroadcastSender.getInstance(this);
+				broadcastSender.reloadTab_BlogPostListFilteredByBlogID(blogID);
+				finish();
 				return true;
 
 			default :
@@ -205,7 +206,7 @@ public class BlogPostActivity extends Activity {
 	 */
 	@Override
 	public Object onRetainNonConfigurationInstance() {
-	    final Long ID = blogPostID;
+		final Long ID = blogPostID;
 		return ID;
 	}
 
@@ -239,6 +240,7 @@ public class BlogPostActivity extends Activity {
 		sv.fullScroll(View.FOCUS_UP);
 		sv.setSmoothScrollingEnabled(true);
 
+		blogID					= cursor.getInt(colIndex_BlogID);
 		blogPostURL			= URLDictionary.buildURL_BlogPost(cursor.getInt(colIndex_BlogID), ID);
 
 		// Now start populating all views with data

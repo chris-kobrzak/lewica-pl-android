@@ -160,6 +160,24 @@ public class BlogPostDAO {
 		return cursor;
 	}
 
+
+	public Cursor selectLatestByBlogID(int blogID)
+			throws SQLException {
+		Cursor cursor = database.query(
+				true, 
+				DATABASE_TABLE, 
+				new String[] {	FIELD_ID, FIELD_WAS_READ, FIELD_DATE_PUBLISHED, FIELD_BLOG_TITLE, FIELD_AUTHOR, FIELD_TITLE },
+				FIELD_BLOG_ID + "=" + blogID,
+				null, null, null, 
+				FIELD_ID + " DESC", 
+				Integer.toString(LIMIT_LATEST_ENTRIES * 2)
+				);
+		if (cursor != null) {
+			cursor.moveToFirst();
+		}
+		return cursor;
+	}
+
 	/**
 	 * Returns the latest blogPost ID from the database.
 	 * @return
@@ -232,22 +250,12 @@ public class BlogPostDAO {
 		
 		// Second row = next article ID, see the UNION query above
 		cursor.moveToLast();
-		
+
 		map.put(cursor.getString(colIndType), cursor.getLong(colIndID) );
-		
+
 		cursor.close();
 
 		return map;
 	}
 
-
-	/**
-	 * Not in use yet.  Convert this method to public when the delete functionality is implemented.
-	 * @param articleID
-	 * @return
-	 */
-	@SuppressWarnings("unused")
-	private boolean delete(long articleID) {
-		return database.delete(DATABASE_TABLE, FIELD_ID + "=" + articleID, null) > 0;
-	}
 }
