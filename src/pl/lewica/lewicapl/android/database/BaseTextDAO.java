@@ -38,7 +38,16 @@ public abstract class BaseTextDAO {
 	protected LewicaPLSQLiteOpenHelper dbHelper;
 
 
-	public abstract BaseTextDAO open() throws SQLException;
+	public BaseTextDAO(Context context) {
+		this.context	= context;
+	}
+
+
+	public void open()
+			throws SQLException {
+		dbHelper	= new LewicaPLSQLiteOpenHelper(context);
+		database	= dbHelper.getReadableDatabase();
+	}
 
 
 	public void close() {

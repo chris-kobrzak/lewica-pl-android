@@ -46,16 +46,7 @@ public class BlogPostDAO extends BaseTextDAO {
 
 
 	public BlogPostDAO(Context context) {
-		this.context	= context;
-	}
-
-
-	public BlogPostDAO open() 
-			throws SQLException {
-		dbHelper	= new LewicaPLSQLiteOpenHelper(context);
-		database	= dbHelper.getWritableDatabase();
-		
-		return this;
+		super(context);
 	}
 
 

@@ -18,7 +18,6 @@ package pl.lewica.lewicapl.android.database;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.SQLException;
 import pl.lewica.api.model.Announcement;
 import pl.lewica.util.DateUtil;
 
@@ -44,15 +43,7 @@ public class AnnouncementDAO extends BaseTextDAO {
 
 
 	public AnnouncementDAO(Context context) {
-		this.context	= context;
-	}
-
-
-	public AnnouncementDAO open() throws SQLException {
-		dbHelper	= new LewicaPLSQLiteOpenHelper(context);
-		database	= dbHelper.getWritableDatabase();
-
-		return this;
+		super(context);
 	}
 
 

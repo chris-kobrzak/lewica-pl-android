@@ -61,16 +61,7 @@ public class ArticleDAO extends BaseTextDAO {
 
 
 	public ArticleDAO(Context context) {
-		this.context	= context;
-	}
-
-
-	public ArticleDAO open()
-			throws SQLException {
-		dbHelper	= new LewicaPLSQLiteOpenHelper(context);
-		database	= dbHelper.getReadableDatabase();
-
-		return this;
+		super(context);
 	}
 
 
