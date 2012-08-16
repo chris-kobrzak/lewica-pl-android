@@ -19,7 +19,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 
 import pl.lewica.api.model.History;
 
@@ -28,37 +27,25 @@ import pl.lewica.api.model.History;
  * Collection of Data Access method for interacting with the calendar/history entity.
  * @author Krzysztof Kobrzak
  */
-public class HistoryDAO {
-	private static final String DATABASE_TABLE		= "ZCalendar";
+public class HistoryDAO extends LewicaPLDAO {
+
+	private static final String DATABASE_TABLE	= "ZCalendar";
 	// Database fields
 	public static final String FIELD_ID					= "_id";
 	public static final String FIELD_YEAR				= "ZYear";
 	public static final String FIELD_MONTH			= "ZMonth";
 	public static final String FIELD_DAY				= "ZDay";
-	public static final String FIELD_EVENT				= "ZEvent";
+	public static final String FIELD_EVENT			= "ZEvent";
 
-	private Context context;
-	private SQLiteDatabase database;
-	private LewicaPLSQLiteOpenHelper dbHelper;
+	private static String[] fieldsForSingleRecord	= new String[] {FIELD_ID, FIELD_YEAR, FIELD_EVENT };
+
+	public static final int LIMIT_ROWS					= 100;
 
 
 	public HistoryDAO(Context context) {
-		this.context	= context;
+		super(context);
 	}
 
-
-	public HistoryDAO open()
-			throws SQLException {
-		dbHelper	= new LewicaPLSQLiteOpenHelper(context);
-		database	= dbHelper.getWritableDatabase();
-		
-		return this;
-	}
-
-
-	public void close() {
-		dbHelper.close();
-	}
 
 	// String wasRead,
 	public long insert(History history) {
@@ -73,7 +60,7 @@ public class HistoryDAO {
 	}
 
 
-	public Cursor select(int month, int day) 
+	public Cursor select(int month, int day, int limit) 
 			throws SQLException {
 		StringBuilder sb	= new StringBuilder();
 		sb.append(FIELD_MONTH);
@@ -83,14 +70,14 @@ public class HistoryDAO {
 		
 		Cursor cursor = database.query(
 				true, 
-				DATABASE_TABLE, 										// FROM
-				new String[] { FIELD_ID, FIELD_YEAR, FIELD_EVENT },	// SELECT
-				sb.toString(),												// WHERE 
+				DATABASE_TABLE, 						// FROM
+				fieldsForSingleRecord,				// SELECT
+				sb.toString(),								// WHERE 
 				new String[] { Integer.toString(month), Integer.toString(day) }, 
-				null, 															// GROUP BY
-				null, 															// HAVING
-				FIELD_YEAR + " ASC", 									// ORDER BY
-				"100");														// LIMIT
+				null, 											// GROUP BY
+				null, 											// HAVING
+				FIELD_YEAR + " ASC", 				// ORDER BY
+				Integer.toString(limit) );				// LIMIT
 
 		if (cursor != null) {
 			cursor.moveToFirst();
@@ -99,7 +86,7 @@ public class HistoryDAO {
 	}
 
 
-	public boolean hasEntries(int month, int day) 
+	public boolean hasEntriesForDate(int month, int day) 
 			throws SQLException {
 		StringBuilder sb	= new StringBuilder();
 		sb.append(FIELD_MONTH);
@@ -111,7 +98,7 @@ public class HistoryDAO {
 		Cursor cursor = database.query(
 				true, 
 				DATABASE_TABLE, 				// FROM
-				new String[] { FIELD_ID },		// SELECT
+				new String[] { FIELD_ID },	// SELECT
 				sb.toString(),						// WHERE 
 				new String[] { Integer.toString(month), Integer.toString(day) }, 
 				null, 									// GROUP BY

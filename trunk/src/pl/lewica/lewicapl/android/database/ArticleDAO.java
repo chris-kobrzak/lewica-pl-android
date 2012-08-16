@@ -40,6 +40,8 @@ public class ArticleDAO extends BaseTextDAO {
 	public static final String DATABASE_VIEW_NEWS				= "VLatestNews";
 	public static final String DATABASE_VIEW_PUBLICATIONS	= "VLatestPublications";
 
+	public static final String DATABASE_TABLE						= "ZArticle";
+
 	// Database fields
 	public static final String FIELD_CATEGORY_ID					= "ZIDArticleCategory";
 	public static final String FIELD_RELATED_IDS					= "ZRelatedIDs";
@@ -52,16 +54,15 @@ public class ArticleDAO extends BaseTextDAO {
 	public static final String FIELD_EDITOR_COMMENT			= "ZEditorComment";
 	public static final String FIELD_HAS_EDITOR_COMMENT	= "ZHasEditorComment";
 
-	protected static String[] fieldsForSingleRecord				= new String[] {FIELD_ID, FIELD_CATEGORY_ID, FIELD_DATE_PUBLISHED, FIELD_WAS_READ, FIELD_HAS_IMAGE, FIELD_IMAGE_EXTENSION, FIELD_URL, FIELD_TITLE, FIELD_TEXT, FIELD_EDITOR_COMMENT, FIELD_HAS_EDITOR_COMMENT };
-
-	private static String databaseTable									= "ZArticle";
-
 	// Changing this value would have database ramifications as the views have hard-coded limits set to 5!
-	protected int limitLatestRecords										= 5;
+	// Due to the fact this limit is hard-coded in database views, we cannot let calling code pass this var to getLatest[...] methods as we do in other DAOs.
+	public static final int LIMIT_RECORDS_IN_SECTION			= 5;
+
+	private static String[] fieldsForSingleRecord					= new String[] {FIELD_ID, FIELD_CATEGORY_ID, FIELD_DATE_PUBLISHED, FIELD_WAS_READ, FIELD_HAS_IMAGE, FIELD_IMAGE_EXTENSION, FIELD_URL, FIELD_TITLE, FIELD_TEXT, FIELD_EDITOR_COMMENT, FIELD_HAS_EDITOR_COMMENT };
 
 
 	public ArticleDAO(Context context) {
-		super(context);
+		super(context, DATABASE_TABLE);
 	}
 
 
@@ -114,7 +115,7 @@ public class ArticleDAO extends BaseTextDAO {
 		cv.put(FIELD_EDITOR_COMMENT,	article.getEditorComment() );
 
 		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
-		return databaseWritable.insert(databaseTable, null, cv);
+		return databaseWritable.insert(DATABASE_TABLE, null, cv);
 	}
 
 
@@ -138,7 +139,7 @@ public class ArticleDAO extends BaseTextDAO {
 		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
 
 		int totalUpdates	= databaseWritable.update(
-			getDatabaseTable(), 
+			DATABASE_TABLE, 
 			cv, 
 			sb.toString(), 
 			null
@@ -171,7 +172,7 @@ public class ArticleDAO extends BaseTextDAO {
 		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
 
 		int totalUpdates	= databaseWritable.update(
-			getDatabaseTable(), 
+			DATABASE_TABLE, 
 			cv, 
 			sb.toString(), 
 			null
@@ -187,7 +188,8 @@ public class ArticleDAO extends BaseTextDAO {
 	 * @return
 	 * @throws SQLException
 	 */
-	public Cursor selectLatestNews() throws SQLException {
+	public Cursor selectLatestNews()
+			throws SQLException {
 		// Requesting LIMIT_LATEST_ENTRIES entries per section.  Total news sections is 2.
 		return selectLatest(
 			DATABASE_VIEW_NEWS,
@@ -196,7 +198,7 @@ public class ArticleDAO extends BaseTextDAO {
 				Integer.toString(Article.SECTION_POLAND),
 				Integer.toString(Article.SECTION_WORLD)
 			},
-			limitLatestRecords * 2);
+			LIMIT_RECORDS_IN_SECTION * 2);
 	}
 
 
@@ -205,7 +207,8 @@ public class ArticleDAO extends BaseTextDAO {
 	 * @return
 	 * @throws SQLException
 	 */
-	public Cursor selectLatestTexts() throws SQLException {
+	public Cursor selectLatestTexts()
+			throws SQLException {
 		// Requesting LIMIT_LATEST_ENTRIES entries per section.  Total publications sections is 3.
 		return selectLatest(
 			DATABASE_VIEW_PUBLICATIONS,
@@ -215,7 +218,7 @@ public class ArticleDAO extends BaseTextDAO {
 				Integer.toString(Article.SECTION_REVIEWS),
 				Integer.toString(Article.SECTION_CULTURE)
 			},
-			limitLatestRecords * 3);
+			LIMIT_RECORDS_IN_SECTION * 3);
 	}
 
 
@@ -275,7 +278,7 @@ public class ArticleDAO extends BaseTextDAO {
 		sb.append("), 0) AS id, '");
 		sb.append(MAP_KEY_PREVIOUS);
 		sb.append("' AS type FROM ");
-		sb.append(getDatabaseTable());
+		sb.append(DATABASE_TABLE);
 		sb.append(" WHERE ");
 		sb.append(FIELD_ID);
 		sb.append(" < ? AND ");
@@ -286,7 +289,7 @@ public class ArticleDAO extends BaseTextDAO {
 		sb.append("), 0) AS id, '");
 		sb.append(MAP_KEY_NEXT);
 		sb.append("' AS type FROM ");
-		sb.append(getDatabaseTable());
+		sb.append(DATABASE_TABLE);
 		sb.append(" WHERE ");
 		sb.append(FIELD_ID);
 		sb.append(" > ? AND ");
@@ -326,26 +329,12 @@ public class ArticleDAO extends BaseTextDAO {
 	}
 
 
-	@Override
-	protected String getDatabaseTable() {
-		return databaseTable;
-	}
-
-
+	/**
+	 * Fields are not inherited in Java hence the need for a getter that will be called by parent methods,
+	 * making sure they will use this class's field, not its own one.
+	 */
 	@Override
 	protected String[] getFieldsForSingleRecord() {
 		return fieldsForSingleRecord;
-	}
-
-
-	@Override
-	protected String[] getFieldsForRecordSet() {
-		return fieldsForRecordSet;
-	}
-
-
-	@Override
-	protected int getLimitLatestRecords() {
-		return limitLatestRecords;
 	}
 }

@@ -28,6 +28,8 @@ import pl.lewica.util.DateUtil;
  */
 public class AnnouncementDAO extends BaseTextDAO {
 
+	private static final String DATABASE_TABLE			= "ZAnnouncement";
+
 	public static final String FIELD_DATE_EXPIRY			= "ZDateExpiry";
 	public static final String FIELD_WHAT						= "ZWhat";
 	public static final String FIELD_WHERE					= "ZWhere";
@@ -39,11 +41,9 @@ public class AnnouncementDAO extends BaseTextDAO {
 	protected static String[] fieldsForSingleRecord		= new String[] {FIELD_ID, FIELD_DATE_EXPIRY, FIELD_WHAT, FIELD_WHERE,  FIELD_WHEN, FIELD_PUBLISHED_BY, FIELD_PUBLISHED_EMAIL, FIELD_TEXT };
 	protected static String[] fieldsForRecordSet				= new String[] {FIELD_ID, FIELD_DATE_EXPIRY, FIELD_WHAT, FIELD_WHERE, FIELD_WHEN, FIELD_WAS_READ };
 
-	private static String databaseTable							= "ZAnnouncement";
-
 
 	public AnnouncementDAO(Context context) {
-		super(context);
+		super(context, DATABASE_TABLE);
 	}
 
 
@@ -61,13 +61,7 @@ public class AnnouncementDAO extends BaseTextDAO {
 		cv.put(FIELD_PUBLISHED_EMAIL,	announcement.getPublishedByEmail() );
 		cv.put(FIELD_TEXT,						announcement.getContent() );
 
-		return database.insert(getDatabaseTable(), null, cv);
-	}
-
-
-	@Override
-	protected String getDatabaseTable() {
-		return databaseTable;
+		return database.insert(DATABASE_TABLE, null, cv);
 	}
 
 
@@ -80,11 +74,5 @@ public class AnnouncementDAO extends BaseTextDAO {
 	@Override
 	protected String[] getFieldsForRecordSet() {
 		return fieldsForRecordSet;
-	}
-
-
-	@Override
-	protected int getLimitLatestRecords() {
-		return limitLatestRecords;
 	}
 }

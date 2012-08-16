@@ -52,6 +52,7 @@ public class HistoryListActivity extends Activity {
 	private HistoryUpdateBroadcastReceiver receiver;
 	private 	int month;
 	private 	int day;
+	private int limitRows		= 100;
 
 
 	@Override
@@ -77,7 +78,7 @@ public class HistoryListActivity extends Activity {
 		// Access data
 		historyDAO			= new HistoryDAO(this);
 		historyDAO.open();
-		Cursor cursor			= historyDAO.select(month, day);
+		Cursor cursor			= historyDAO.select(month, day, limitRows);
 		startManagingCursor(cursor);
 		
 		// Set list view adapter - this links the view with the data
@@ -154,7 +155,7 @@ public class HistoryListActivity extends Activity {
 		Calendar cal			= Calendar.getInstance();
 		CursorAdapter ca	= (CursorAdapter) listAdapter;
 		// Reload rows
-		Cursor newCursor	= historyDAO.select(cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DATE) );
+		Cursor newCursor	= historyDAO.select(cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DATE), limitRows);
 		ca.changeCursor(newCursor);
 
 		// Make sure the top bar data is up-to-date

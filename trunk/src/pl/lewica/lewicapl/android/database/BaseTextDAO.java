@@ -15,7 +15,7 @@ import android.database.sqlite.SQLiteDatabase;
  * Apart from open(), you'd typically want to define an insert method in your subclass.
  * @author Krzysztof Kobrzak
  */
-public abstract class BaseTextDAO {
+public abstract class BaseTextDAO extends LewicaPLDAO {
 	
 	public static final String MAP_KEY_PREVIOUS	= "Previous";
 	public static final String MAP_KEY_NEXT			= "Next";
@@ -28,30 +28,13 @@ public abstract class BaseTextDAO {
 	protected static String[] fieldsForSingleRecord	= new String[] {FIELD_ID };
 	protected static String[] fieldsForRecordSet			= new String[] {FIELD_ID, FIELD_WAS_READ };
 
-	// Override it in subclass
-	private static String databaseTable 					= "---OVERRIDE_ME---";
-
-	protected int limitLatestRecords							= 10;
-
-	protected Context context;
-	protected SQLiteDatabase database;
-	protected LewicaPLSQLiteOpenHelper dbHelper;
+	private String databaseTable;
 
 
-	public BaseTextDAO(Context context) {
-		this.context	= context;
-	}
+	public BaseTextDAO(Context context, String dbRoutine) {
+		super(context);
 
-
-	public void open()
-			throws SQLException {
-		dbHelper	= new LewicaPLSQLiteOpenHelper(context);
-		database	= dbHelper.getReadableDatabase();
-	}
-
-
-	public void close() {
-		dbHelper.close();
+		this.databaseTable			= dbRoutine;
 	}
 
 
@@ -68,7 +51,7 @@ public abstract class BaseTextDAO {
 		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
 
 		int totalUpdates	= databaseWritable.update(
-			getDatabaseTable(), 
+			databaseTable, 
 			cv, 
 			FIELD_ID + "=" + recordID, 
 			null
@@ -87,7 +70,7 @@ public abstract class BaseTextDAO {
 		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
 
 		int totalUpdates	= databaseWritable.update(
-			getDatabaseTable(), 
+			databaseTable, 
 			cv, 
 			FIELD_WAS_READ + "=" + 0, 
 			null
@@ -105,7 +88,7 @@ public abstract class BaseTextDAO {
 	 * @throws SQLException
 	 */
 	public Cursor selectOne(long recordID) throws SQLException {
-		Cursor cursor = database.query(true, getDatabaseTable(), getFieldsForSingleRecord(),
+		Cursor cursor = database.query(true, databaseTable, getFieldsForSingleRecord(),
 				FIELD_ID + "=" + recordID, null, null, null, null, "1");
 		if (cursor != null) {
 			cursor.moveToFirst();
@@ -114,14 +97,15 @@ public abstract class BaseTextDAO {
 	}
 
 
-	public Cursor selectLatest() throws SQLException {
+	public Cursor selectLatest(int limit)
+			throws SQLException {
 		Cursor cursor = database.query(
 			true, 
-			getDatabaseTable(), 
+			databaseTable, 
 			getFieldsForRecordSet(),
 			null, null, null, null, 
 			FIELD_ID + " DESC", 
-			Integer.toString(getLimitLatestRecords() )
+			Integer.toString(limit)
 		);
 		if (cursor != null) {
 			cursor.moveToFirst();
@@ -136,7 +120,7 @@ public abstract class BaseTextDAO {
 	 */
 	public int fetchLastID() {
 		Cursor cursor = database.query(
-			getDatabaseTable(),
+			databaseTable,
 			new String[] { "MAX(" + FIELD_ID + ")" },
 			null, null, null, null, null, null
 		);
@@ -165,7 +149,7 @@ public abstract class BaseTextDAO {
 		sb.append("), 0) AS id, '");
 		sb.append(MAP_KEY_PREVIOUS);
 		sb.append("' AS type FROM ");
-		sb.append(getDatabaseTable() );
+		sb.append(databaseTable);
 		sb.append(" WHERE ");
 		sb.append(FIELD_ID);
 		sb.append(" < ? ");
@@ -175,7 +159,7 @@ public abstract class BaseTextDAO {
 		sb.append("), 0) AS id, '");
 		sb.append(MAP_KEY_NEXT);
 		sb.append("' AS type FROM ");
-		sb.append(getDatabaseTable() );
+		sb.append(databaseTable);
 		sb.append(" WHERE ");
 		sb.append(FIELD_ID);
 		sb.append(" > ? ");
@@ -212,12 +196,6 @@ public abstract class BaseTextDAO {
 	}
 
 
-	// Helper getters, it's highly likely you will need to override them in subclasses.
-	protected String getDatabaseTable() {
-		return databaseTable;
-	}
-
-
 	protected String[] getFieldsForSingleRecord() {
 		return fieldsForSingleRecord;
 	}
@@ -225,10 +203,5 @@ public abstract class BaseTextDAO {
 
 	protected String[] getFieldsForRecordSet() {
 		return fieldsForRecordSet;
-	}
-
-
-	protected int getLimitLatestRecords() {
-		return limitLatestRecords;
 	}
 }

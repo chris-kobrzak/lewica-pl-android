@@ -423,7 +423,7 @@ public class ContentUpdateManager {
 		Calendar cal			= Calendar.getInstance();
 		int month				= cal.get(Calendar.MONTH) + 1;
 		int day					= cal.get(Calendar.DATE);
-		if (historyDAO.hasEntries(month, day) ) {
+		if (historyDAO.hasEntriesForDate(month, day) ) {
 			historyDAO.close();
 			status.setTotalUpdated(0);
 
