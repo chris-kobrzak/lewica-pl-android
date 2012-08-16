@@ -59,6 +59,7 @@ public class AnnouncementListActivity extends Activity {
 	private ListView listView;
 	private AnnouncementsUpdateBroadcastReceiver receiver;
 
+	private int limitRows		= 15;
 
 
 	@Override
@@ -78,7 +79,7 @@ public class AnnouncementListActivity extends Activity {
 		// Access data
 		annDAO					= new AnnouncementDAO(this);
 		annDAO.open();
-		Cursor cursor			= annDAO.selectLatest();
+		Cursor cursor			= annDAO.selectLatest(limitRows);
 
 		// Set list view adapter - this links the view with the data
 		listAdapter				= new AnnouncementsCursorAdapter(this, cursor, false);
@@ -116,7 +117,7 @@ public class AnnouncementListActivity extends Activity {
 	public void reloadRows() {
 		CursorAdapter ca	= (CursorAdapter) listAdapter;
 		// Reload rows
-		Cursor newCursor	= annDAO.selectLatest();
+		Cursor newCursor	= annDAO.selectLatest(limitRows);
 		ca.changeCursor(newCursor);
 	}
 

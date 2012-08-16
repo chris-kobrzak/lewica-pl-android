@@ -28,6 +28,8 @@ import pl.lewica.api.model.BlogPost;
  */
 public class BlogPostDAO extends BaseTextDAO {
 
+	public static final String DATABASE_TABLE				= "ZBlogPost";
+
 	// Database fields
 	public static final String FIELD_BLOG_ID					= "ZIdBlog";
 	public static final String FIELD_AUTHOR_ID				= "ZIdAuthor";
@@ -37,23 +39,19 @@ public class BlogPostDAO extends BaseTextDAO {
 	public static final String FIELD_TITLE						= "ZTitle";
 	public static final String FIELD_TEXT						= "ZText";
 
-	protected static String[] fieldsForSingleRecord		= new String[] {FIELD_ID, FIELD_DATE_PUBLISHED, FIELD_BLOG_TITLE,  FIELD_AUTHOR, FIELD_TITLE, FIELD_BLOG_ID, FIELD_TEXT };
-	protected static String[] fieldsForRecordSet				= new String[] {FIELD_ID, FIELD_DATE_PUBLISHED, FIELD_BLOG_TITLE, FIELD_AUTHOR, FIELD_TITLE, FIELD_WAS_READ };
-
-	private static String databaseTable							= "ZBlogPost";
-
-	protected int limitLatestRecords								= 15;
+	private static String[] fieldsForSingleRecord		= new String[] {FIELD_ID, FIELD_DATE_PUBLISHED, FIELD_BLOG_TITLE,  FIELD_AUTHOR, FIELD_TITLE, FIELD_BLOG_ID, FIELD_TEXT };
+	private static String[] fieldsForRecordSet				= new String[] {FIELD_ID, FIELD_DATE_PUBLISHED, FIELD_BLOG_TITLE, FIELD_AUTHOR, FIELD_TITLE, FIELD_WAS_READ };
 
 
 	public BlogPostDAO(Context context) {
-		super(context);
+		super(context, DATABASE_TABLE);
 	}
 
 
 	// String wasRead,
 	public long insert(BlogPost blogPost) {
 		ContentValues cv	= new ContentValues();
-		
+
 		cv.put(FIELD_ID,							blogPost.getID() );
 		cv.put(FIELD_BLOG_ID,				blogPost.getBlogID() );
 		cv.put(FIELD_AUTHOR_ID,			blogPost.getAuthorID() );
@@ -64,31 +62,25 @@ public class BlogPostDAO extends BaseTextDAO {
 		cv.put(FIELD_TITLE,					blogPost.getTitle() );
 		cv.put(FIELD_TEXT,						blogPost.getText() );
 
-		return database.insert(getDatabaseTable(), null, cv);
+		return database.insert(DATABASE_TABLE, null, cv);
 	}
 
 
-	public Cursor selectLatestByBlogID(int blogID)
+	public Cursor selectLatestByBlogID(int blogID, int limit)
 			throws SQLException {
 		Cursor cursor = database.query(
 			true, 
-			getDatabaseTable(), 
+			DATABASE_TABLE, 
 			getFieldsForRecordSet(),
 			FIELD_BLOG_ID + "=" + blogID,
 			null, null, null, 
 			FIELD_ID + " DESC", 
-			Integer.toString(getLimitLatestRecords() * 2)
+			Integer.toString(limit)
 		);
 		if (cursor != null) {
 			cursor.moveToFirst();
 		}
 		return cursor;
-	}
-
-
-	@Override
-	protected String getDatabaseTable() {
-		return databaseTable;
 	}
 
 
@@ -101,11 +93,5 @@ public class BlogPostDAO extends BaseTextDAO {
 	@Override
 	protected String[] getFieldsForRecordSet() {
 		return fieldsForRecordSet;
-	}
-
-
-	@Override
-	protected int getLimitLatestRecords() {
-		return limitLatestRecords;
 	}
 }

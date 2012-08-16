@@ -65,6 +65,7 @@ public class BlogPostListActivity extends Activity {
 	private ListView listView;
 	private BroadcastReceiver receiver;
 
+	private int limitRows		= 15;
 
 
 	@Override
@@ -84,7 +85,7 @@ public class BlogPostListActivity extends Activity {
 		// Access data
 		blogPostDAO					= new BlogPostDAO(this);
 		blogPostDAO.open();
-		Cursor cursor			= blogPostDAO.selectLatest();
+		Cursor cursor			= blogPostDAO.selectLatest(limitRows);
 
 		// Set list view adapter - this links the view with the data
 		listAdapter				= new BlogPostsCursorAdapter(this, cursor, false);
@@ -122,7 +123,7 @@ public class BlogPostListActivity extends Activity {
 	private void reloadRows() {
 		CursorAdapter ca	= (CursorAdapter) listAdapter;
 		// Reload rows
-		Cursor newCursor	= blogPostDAO.selectLatest();
+		Cursor newCursor	= blogPostDAO.selectLatest(limitRows);
 		ca.changeCursor(newCursor);
 	}
 
@@ -130,7 +131,7 @@ public class BlogPostListActivity extends Activity {
 	private void reloadRowsFilterByBlogID(int blogID) {
 		CursorAdapter ca	= (CursorAdapter) listAdapter;
 		// Reload rows
-		Cursor newCursor	= blogPostDAO.selectLatestByBlogID(blogID);
+		Cursor newCursor	= blogPostDAO.selectLatestByBlogID(blogID, limitRows * 2);
 		ca.changeCursor(newCursor);
 	}
 
