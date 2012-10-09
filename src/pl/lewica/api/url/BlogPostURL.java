@@ -56,7 +56,9 @@ public class BlogPostURL implements WebServiceURL {
 
 		// If the query string has length, that means that the first char is "&" and it has to be replaced with "?".
 		int qsStart	= WEB_SERVICE.length();
-		sb.replace(qsStart, qsStart + 1, "?");
+		if (sb.length() > qsStart) {
+			sb.replace(qsStart, qsStart + 1, "?");
+		}
 
 		return sb.toString();
 	}
