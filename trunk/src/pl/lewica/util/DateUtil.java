@@ -34,11 +34,11 @@ public class DateUtil {
 	/**
 	 * Be cautious when using this method inside a loop as it creates SimpleDateFormat objects every time it's called.
 	 * @param date
-	 * @param dateFormat E.g.: "dd/MM/yyyy HH:mm"
+	 * @param mask E.g.: "dd/MM/yyyy HH:mm"
 	 * @return
 	 */
-	public static String convertDateToString(Date date, String dateFormat) {
-		SimpleDateFormat sdf	= new SimpleDateFormat(dateFormat);
+	public static String convertDateToString(Date date, String mask) {
+		SimpleDateFormat sdf	= new SimpleDateFormat(mask);
 
 		return sdf.format(date);
 	}
