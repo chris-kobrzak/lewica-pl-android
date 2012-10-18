@@ -121,7 +121,7 @@ public class ContentUpdateManager {
 	 * @return boolean
 	 */
 	public boolean isRunning() {
-		int sinceLastUpdate	= DateUtil.currentUnixTime() % lastUpdated; 
+		int sinceLastUpdate	= DateUtil.getCurrentUnixTime() % lastUpdated; 
 		if (isRunning && sinceLastUpdate > timeout) {
 			broadcastSender.indicateDeviceNetworkActivity(false);
 			this.lastUpdated		= 1;
@@ -140,7 +140,7 @@ public class ContentUpdateManager {
 	 */
 	public void setRunning(boolean isRunning) {
 		if (! this.isRunning && isRunning) {
-			setLastUpdated(DateUtil.currentUnixTime() );
+			setLastUpdated(DateUtil.getCurrentUnixTime() );
 		}
 		this.isRunning = isRunning;
 	}
@@ -171,7 +171,7 @@ public class ContentUpdateManager {
 	 * @return
 	 */
 	public int getIntervalSinceLastUpdate() {
-		int currentTimestamp	= DateUtil.currentUnixTime();
+		int currentTimestamp	= DateUtil.getCurrentUnixTime();
 		if (lastUpdated == 1) {
 			return currentTimestamp;
 		}

@@ -35,7 +35,7 @@ public class DateUtil {
 	}
 
 
-	public static int currentUnixTime() {
+	public static int getCurrentUnixTime() {
 		return (int) (System.currentTimeMillis() / 1000L);
 	}
 
