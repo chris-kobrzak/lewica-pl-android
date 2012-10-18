@@ -15,7 +15,6 @@
 */
 package pl.lewica.util;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
@@ -25,14 +24,6 @@ import java.text.SimpleDateFormat;
  */
 public class DateUtil {
 	public static final String DATE_MASK_SQL = "yyyy-MM-dd HH:mm:ss";
-
-
-	public static String now() {
-		Calendar cal					= Calendar.getInstance();
-		SimpleDateFormat sdf		= new SimpleDateFormat(DATE_MASK_SQL);
-
-		return sdf.format(cal.getTime());
-	}
 
 
 	public static int getCurrentUnixTime() {
