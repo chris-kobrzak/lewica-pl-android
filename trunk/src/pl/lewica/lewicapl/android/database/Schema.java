@@ -26,6 +26,9 @@ import pl.lewica.util.FileUtil;
 
 
 /**
+ * This class is related to the database set-up scripts.
+ * It knows everything about their paths and format.
+ * 
  * @author Krzysztof Kobrzak
  */
 public class Schema {
@@ -45,7 +48,7 @@ public class Schema {
 		AssetManager am	= context.getAssets();
 		InputStream is		= am.open(DATABASE_SCRIPT);
 
-		return FileUtil.importSQL(is);
+		return extractSqlStatements(is);
 	}
 
 
@@ -63,7 +66,7 @@ public class Schema {
 		AssetManager am	= context.getAssets();
 		InputStream is		= am.open(getUpgradeFileName(oldVersion, newVersion) );
 
-		return FileUtil.importSQL(is);
+		return extractSqlStatements(is);
 	}
 
 
@@ -76,5 +79,12 @@ public class Schema {
 	 */
 	private static String getUpgradeFileName(int oldVersion, int newVersion) {
 		return "LewicaPLUpgrade" + oldVersion + "To" + newVersion + ".sql";
+	}
+
+
+	private static List<String> extractSqlStatements(InputStream is) {
+		String semicolonNewLineRegEx	= "; *\r?\n";
+		
+		return FileUtil.convertStreamToStrings(is, semicolonNewLineRegEx);
 	}
 }
