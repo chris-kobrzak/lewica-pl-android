@@ -40,29 +40,29 @@ public class FileUtil {
 
 
 	/**
-	 * Reads contents of SQL script and splits it into separate queries.
-	 * This is required by Android that is unable to e.g. create multiple tables in one go.
-	 * The regular expression that searches for query delimiters is pretty fragile, i.e.: 
-	 * it assumes queries are ended with ; followed by a new line character.
+	 * Reads contents of a stream (e.g. SQL script) and splits it into separate statements.
+	 * IMPORTANT: The assumption is the statements are delimited by semicolons followed by new lines.
+	 * 
+	 * If you are using this method to convert a string with multiple SQL queries to individual statements,
+	 * make sure the semicolon-new line sequence doesn't exist anywhere inside the SQL statements, perhaps
+	 * somewhere in the middle of long varchars or text fields as they would be treated as SQL statement
+	 * delimiters and you would therefore get unexpected results. 
+	 * 
+	 * The method might be useful on Android that is unable to e.g. create multiple tables in one go.
 	 */
-	public static List<String> importSQL(InputStream is) {
+	public static List<String> convertStreamToStrings(InputStream is, String delimiter) {
 		List<String> result		= new ArrayList<String>();
 		Scanner s					= new Scanner(is);
-		s.useDelimiter("(; *(\r)?\n)|(--\n)");
+		s.useDelimiter(delimiter);
 
 		while (s.hasNext() ) {
-			String line		= s.next();
-
-			if (line.startsWith("/*!") && line.endsWith("*/") ) {
-				int i	= line.indexOf(" ");
-				line	= line.substring(i + 1, line.length() - " */".length() );
-			}
-
-			if (line.trim().length() > 0) {
+			String line		= s.next().trim();
+			if (line.length() > 0) {
 				result.add(line);
 			}
 		}
 
 		return result;
-    }
+	}
+
 }
