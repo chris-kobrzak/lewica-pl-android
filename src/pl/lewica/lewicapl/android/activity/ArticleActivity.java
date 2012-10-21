@@ -131,7 +131,7 @@ public class ArticleActivity extends Activity {
 	@Override
 	protected void onStop() {
 		super.onStop();
-		
+
 		articleDAO.close();
 	}
 
@@ -145,7 +145,7 @@ public class ArticleActivity extends Activity {
 
 		MenuInflater infl	= getMenuInflater();
 		infl.inflate(R.menu.menu_article, menu);
-		
+
 		return true;
 	}
 
@@ -154,7 +154,7 @@ public class ArticleActivity extends Activity {
 	public boolean onPrepareOptionsMenu (Menu menu) {
 		long id;
 		nextPrevID		= articleDAO.fetchPreviousNextID(articleID, categoryID);
-		
+
 		menu.getItem(0).setEnabled(true);
 		menu.getItem(1).setEnabled(true);
 
@@ -166,7 +166,7 @@ public class ArticleActivity extends Activity {
 		if (id == 0) {
 			menu.getItem(1).setEnabled(false);
 		}
-		
+
 		return true;
 	}
 
@@ -226,7 +226,7 @@ public class ArticleActivity extends Activity {
 	 */
 	@Override
 	public Object onRetainNonConfigurationInstance() {
-	    final Long ID = articleID;
+		final Long ID = articleID;
 		return ID;
 	}
 
@@ -252,7 +252,7 @@ public class ArticleActivity extends Activity {
 		colIndex_Title			= cursor.getColumnIndex(ArticleDAO.FIELD_TITLE);
 		colIndex_DatePub		= cursor.getColumnIndex(ArticleDAO.FIELD_DATE_PUBLISHED);
 		colIndex_Content		= cursor.getColumnIndex(ArticleDAO.FIELD_TEXT);
-		colIndex_Comment		= cursor.getColumnIndex(ArticleDAO.FIELD_EDITOR_COMMENT);
+		colIndex_Comment	= cursor.getColumnIndex(ArticleDAO.FIELD_EDITOR_COMMENT);
 		colIndex_WasRead		= cursor.getColumnIndex(ArticleDAO.FIELD_WAS_READ);
 		colIndex_HasThumb	= cursor.getColumnIndex(ArticleDAO.FIELD_HAS_IMAGE);
 		colIndex_ThumbExt	= cursor.getColumnIndex(ArticleDAO.FIELD_IMAGE_EXTENSION);
