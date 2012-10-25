@@ -27,7 +27,7 @@ import pl.lewica.api.model.History;
  * Collection of Data Access method for interacting with the calendar/history entity.
  * @author Krzysztof Kobrzak
  */
-public class HistoryDAO extends LewicaPLDAO {
+public class HistoryDAO extends BaseLewicaPLDAO {
 
 	private static final String DATABASE_TABLE	= "ZCalendar";
 	// Database fields

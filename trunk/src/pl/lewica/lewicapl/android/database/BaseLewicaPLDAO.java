@@ -5,14 +5,14 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 
-public abstract class LewicaPLDAO {
+public abstract class BaseLewicaPLDAO {
 
 	private Context context;
 	protected SQLiteDatabase database;
 	protected LewicaPLSQLiteOpenHelper dbHelper;
 
 
-	public LewicaPLDAO(Context context) {
+	public BaseLewicaPLDAO(Context context) {
 		this.context	= context;
 	}
 
