@@ -5,7 +5,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 
-public class LewicaPLDAO {
+public abstract class LewicaPLDAO {
 
 	private Context context;
 	protected SQLiteDatabase database;
