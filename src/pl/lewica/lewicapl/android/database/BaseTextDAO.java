@@ -15,7 +15,7 @@ import android.database.sqlite.SQLiteDatabase;
  * Apart from open(), you'd typically want to define an insert method in your subclass.
  * @author Krzysztof Kobrzak
  */
-public abstract class BaseTextDAO extends LewicaPLDAO {
+public abstract class BaseTextDAO extends BaseLewicaPLDAO {
 	
 	public static final String MAP_KEY_PREVIOUS	= "Previous";
 	public static final String MAP_KEY_NEXT			= "Next";
