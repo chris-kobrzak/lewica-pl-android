@@ -113,11 +113,13 @@ public class ArticleSAXHandler extends DefaultHandler implements SAXParserDelega
 		}
 		else if (name.equalsIgnoreCase(ARTICLE_RELATED_IDS) ) {
 			List<Integer> articleIDs	= new ArrayList<Integer>();
-			Scanner s						= new Scanner(builder.toString() ).useDelimiter(",");
+			Scanner s						= new Scanner(builder.toString() );
+			s.useDelimiter(",");
 
 			while (s.hasNextInt() ) {
 				articleIDs.add(s.nextInt() );
 			}
+			s.close();
 			currentArticle.setRelatedIDs(articleIDs);
 		}
 		else if (name.equalsIgnoreCase(ARTICLE_PUB_DATE) ) {

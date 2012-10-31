@@ -61,6 +61,7 @@ public class FileUtil {
 				result.add(line);
 			}
 		}
+		s.close();
 
 		return result;
 	}
