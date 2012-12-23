@@ -20,12 +20,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -38,6 +41,7 @@ import android.widget.TextView;
 
 import pl.lewica.URLDictionary;
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.AndroidUtil;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
@@ -94,6 +98,8 @@ public class BlogPostActivity extends Activity {
 
 		// Fill views with data
 		loadContent(blogPostID, this);
+
+		AndroidUtil.ActionBarCompat.setBackgroundDrawable(this, new ColorDrawable(Color.RED) );
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
 		View titleView = getWindow().findViewById(android.R.id.title);

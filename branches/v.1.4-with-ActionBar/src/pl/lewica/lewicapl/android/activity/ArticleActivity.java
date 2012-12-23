@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -32,7 +33,9 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -48,6 +51,7 @@ import android.widget.TextView;
 import pl.lewica.api.model.Article;
 import pl.lewica.api.url.ArticleURL;
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.AndroidUtil;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
@@ -122,6 +126,41 @@ public class ArticleActivity extends Activity {
 				parentView.setBackgroundColor(res.getColor(R.color.red) );
 			}
 		}
+
+//		ActionBarCompat.setDisplayHomeAsUpEnabled(this, true);
+		AndroidUtil.ActionBarCompat.setBackgroundDrawable(this, new ColorDrawable(Color.RED) );
+	}
+
+
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+		android.util.Log.i("ArticleActivity", "onStart");
+	}
+
+
+	@Override
+	protected void onRestart() {
+		// TODO Auto-generated method stub
+		super.onRestart();
+		android.util.Log.i("ArticleActivity", "onRestart");
+	}
+
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		android.util.Log.i("ArticleActivity", "onResume");
+	}
+
+
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		android.util.Log.i("ArticleActivity", "onPause");
 	}
 
 
@@ -133,6 +172,15 @@ public class ArticleActivity extends Activity {
 		super.onStop();
 
 		articleDAO.close();
+		android.util.Log.i("ArticleActivity", "onStop");
+	}
+
+
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		android.util.Log.i("ArticleActivity", "onDestroy");
 	}
 
 
@@ -179,6 +227,7 @@ public class ArticleActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		long id;
 		Intent intent;
+		nextPrevID		= articleDAO.fetchPreviousNextID(articleID, categoryID);
 
 		switch (item.getItemId()) {
 			case R.id.menu_previous:

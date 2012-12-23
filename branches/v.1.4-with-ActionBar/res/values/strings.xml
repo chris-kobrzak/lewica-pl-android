@@ -10,15 +10,15 @@
 	<color name="blue_facebook">#1D4088</color>
 	<color name="unread">#BF0000</color>
 	<color name="read">#136F80</color>
-	<string name="title_news">LewicaPL: informacje</string>
-	<string name="title_opinions">LewicaPL: publicystyka</string>
-	<string name="title_article">LewicaPL: artykuł</string>
-	<string name="title_blogs">LewicaPL: blogi</string>
-	<string name="title_announcements">LewicaPL: ogłoszenia</string>
-	<string name="title_announcement">LewicaPL: ogłoszenie</string>
-	<string name="title_history">LewicaPL: historia</string>
-	<string name="title_more">LewicaPL: więcej</string>
-	<string name="title_readers_comments">LewicaPL: komentarze czytelników</string>
+	<string name="title_news">Informacje</string>
+	<string name="title_opinions">Publicystyka</string>
+	<string name="title_article">Artykuł</string>
+	<string name="title_blogs">Blogi</string>
+	<string name="title_announcements">Ogłoszenia</string>
+	<string name="title_announcement">Ogłoszenie</string>
+	<string name="title_history">Historia</string>
+	<string name="title_more">Linki</string>
+	<string name="title_readers_comments">Komentarze czytelników</string>
 	<string name="tab_news">Newsy</string>
 	<string name="tab_texts">Teksty</string>
 	<string name="tab_blog">Blogi</string>
@@ -65,4 +65,8 @@
 	<string name="placeholder_where">Gdzie</string>
 	<string name="placeholder_year">Rok</string>
 	<string name="path_images">/lewicapl/images/</string>
+	<string name="local_service_started">Serwis aktualizacji został uruchomiony</string>
+	<string name="local_service_connected">Serwis aktualizacji został włączony</string>
+	<string name="local_service_disconnected">Serwis aktualizacji zakończył działanie</string>
+	<string name="local_service_label">Serwis aktualizacji lewica.pl</string>
 </resources>

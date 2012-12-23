@@ -15,12 +15,16 @@
 */
 package pl.lewica.lewicapl.android.activity;
 
+
 import pl.lewica.URLDictionary;
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.AndroidUtil;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -57,6 +61,7 @@ public class MoreActivity extends Activity {
 				parentView.setBackgroundColor(res.getColor(R.color.red) );
 			}
 		}
+		AndroidUtil.ActionBarCompat.setBackgroundDrawable(this, new ColorDrawable(Color.RED) );
 	}
 
 

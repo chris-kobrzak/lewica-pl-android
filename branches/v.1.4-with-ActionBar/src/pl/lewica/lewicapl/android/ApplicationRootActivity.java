@@ -18,21 +18,26 @@ package pl.lewica.lewicapl.android;
 import java.io.File;
 import java.io.IOException;
 
+
 import android.app.TabActivity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.content.ServiceConnection;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewParent;
 import android.view.Window;
 import android.widget.TabHost;
+import android.widget.Toast;
 
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.activity.AnnouncementListActivity;
@@ -139,16 +144,19 @@ public class ApplicationRootActivity extends TabActivity {
 		tabHost.addTab(spec);
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
-		View titleView = getWindow().findViewById(android.R.id.title);
+		/*View titleView = getWindow().findViewById(android.R.id.title);
 		if (titleView != null) {
 			ViewParent parent	= titleView.getParent();
 			if (parent != null && (parent instanceof View) ) {
 				View parentView	= (View)parent;
 				parentView.setBackgroundColor(res.getColor(R.color.red) );
 			}
-		}
+		}*/
+		AndroidUtil.ActionBarCompat.setBackgroundDrawable(this, new ColorDrawable(Color.RED) );
 
 		tabHost.setCurrentTab(Tab.NEWS.ordinal() );
+
+		doBindService();
 	}
 
 
@@ -268,7 +276,7 @@ public class ApplicationRootActivity extends TabActivity {
 						annDAO.updateMarkAllAsRead();
 						annDAO.close();
 
-						broadcastSender.reloadTab(Tab.HISTORY);
+						broadcastSender.reloadTab(Tab.ANNOUNCEMENTS);
 						break;
 
 					case HISTORY:
@@ -281,6 +289,60 @@ public class ApplicationRootActivity extends TabActivity {
 		}
 	}
 
+
+	private LocalService mBoundService;
+	private boolean mIsBound;
+
+	private ServiceConnection mConnection = new ServiceConnection() {
+		@Override
+	    public void onServiceConnected(ComponentName className, IBinder service) {
+	        // This is called when the connection with the service has been
+	        // established, giving us the service object we can use to
+	        // interact with the service.  Because we have bound to a explicit
+	        // service that we know is running in our own process, we can
+	        // cast its IBinder to a concrete class and directly access it.
+	        mBoundService = ((LocalService.LocalBinder)service).getService();
+
+	        // Tell the user about this for our demo.
+	        Toast.makeText(getApplicationContext(), R.string.local_service_connected,
+	                Toast.LENGTH_SHORT).show();
+	    }
+		@Override
+	    public void onServiceDisconnected(ComponentName className) {
+	        // This is called when the connection with the service has been
+	        // unexpectedly disconnected -- that is, its process crashed.
+	        // Because it is running in our same process, we should never
+	        // see this happen.
+	        mBoundService = null;
+	        Toast.makeText(getApplicationContext(), R.string.local_service_disconnected,
+	                Toast.LENGTH_SHORT).show();
+	    }
+
+
+	};
+
+	void doBindService() {
+	    // Establish a connection with the service.  We use an explicit
+	    // class name because we want a specific service implementation that
+	    // we know will be running in our own process (and thus won't be
+	    // supporting component replacement by other applications).
+	    bindService(new Intent(this, LocalService.class), mConnection, Context.BIND_AUTO_CREATE);
+	    mIsBound = true;
+	}
+
+	void doUnbindService() {
+	    if (mIsBound) {
+	        // Detach our existing connection.
+	        unbindService(mConnection);
+	        mIsBound = false;
+	    }
+	}
+
+	@Override
+	protected void onDestroy() {
+	    super.onDestroy();
+	    doUnbindService();
+	}
 
 	/**
 	 * Checks if the update is not running already and also compares the current time with the one it last ran 
