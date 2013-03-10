@@ -50,6 +50,7 @@ import pl.lewica.api.url.ArticleURL;
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
+import pl.lewica.lewicapl.android.UserPreferences;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 
 
@@ -78,6 +79,10 @@ public class ArticleActivity extends Activity {
 	private int colIndex_Comment;
 	private int colIndex_HasThumb;
 	private int colIndex_ThumbExt;
+
+	private TextView tvTitle;
+	private TextView tvContent;
+	private TextView tvComment;
 
 	private static SimpleDateFormat dateFormat	= new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
@@ -214,6 +219,22 @@ public class ArticleActivity extends Activity {
 				startActivity(intent);
 				return true;
 
+			case R.id.menu_increase_font:
+				UserPreferences.changeUserTextSize(UserPreferences.TextSizeAction.INCREASE, this);
+
+				tvTitle.setTextSize(UserPreferences.getUserTextSizeHeading(this) );
+				tvContent.setTextSize(UserPreferences.getUserTextSizeStandard(this) );
+				tvComment.setTextSize(UserPreferences.getUserTextSizeStandard(this) );
+				return true;
+				
+			case R.id.menu_decrease_font:
+				UserPreferences.changeUserTextSize(UserPreferences.TextSizeAction.DECREASE, this);
+				
+				tvTitle.setTextSize(UserPreferences.getUserTextSizeHeading(this) );
+				tvContent.setTextSize(UserPreferences.getUserTextSizeStandard(this) );
+				tvComment.setTextSize(UserPreferences.getUserTextSizeStandard(this) );
+				return true;
+
 			default :
 				return super.onOptionsItemSelected(item);
 		}
@@ -270,11 +291,13 @@ public class ArticleActivity extends Activity {
 		// Save the URL in memory so the "share link" option in menu can access it easily
 		articleURL				= cursor.getString(colIndex_URL);
 
+		float textSizeTitle	= UserPreferences.getUserTextSizeHeading(this);
 		// Now start populating all views with data
-		TextView tv, tvComment;
-		tv							= (TextView) findViewById(R.id.article_title);
-		tv.setText(cursor.getString(colIndex_Title) );
+		tvTitle					= (TextView) findViewById(R.id.article_title);
+		tvTitle.setTextSize(textSizeTitle);
+		tvTitle.setText(cursor.getString(colIndex_Title) );
 
+		TextView tv;
 		tv							= (TextView) findViewById(R.id.article_category);
 		categoryID				= cursor.getInt(colIndex_CategoryID);
 		tv.setTypeface(categoryTypeface);
@@ -306,20 +329,24 @@ public class ArticleActivity extends Activity {
 		Date d					= new Date(unixTime);
 		tv.setText(dateFormat.format(d) );
 
-		tv							= (TextView) findViewById(R.id.article_content);
-		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
-		tv.setText(cursor.getString(colIndex_Content).replace("\r", "") );
+		float textSizeStandard	= UserPreferences.getUserTextSizeStandard(this);
 
-		tv							= (TextView) findViewById(R.id.article_editor_comment);
-		tvComment			= (TextView) findViewById(R.id.article_editor_comment_top);
+		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
+		tvContent	= (TextView) findViewById(R.id.article_content);
+		tvContent.setTextSize(textSizeStandard);
+		tvContent.setText(cursor.getString(colIndex_Content).replace("\r", "") );
+
+		tvComment				= (TextView) findViewById(R.id.article_editor_comment);
+		tv			= (TextView) findViewById(R.id.article_editor_comment_top);
 		String commentString		= cursor.getString(colIndex_Comment);
 		if (commentString != null && commentString.length() > 0) {
-			tv.setText(commentString.replace("\r", "") );
+			tvComment.setTextSize(textSizeStandard);
+			tvComment.setText(commentString.replace("\r", "") );
 			// Reset visibility, may be useful when users navigate between articles (previous-next facility to be added in the future)
 			tv.setVisibility(View.VISIBLE);
 			tvComment.setVisibility(View.VISIBLE);
 		} else {
-			tv.setText("");
+			tvComment.setText("");
 			tv.setVisibility(View.GONE);
 			// Hide top, dark grey bar
 			tvComment.setVisibility(View.GONE);
@@ -409,7 +436,6 @@ public class ArticleActivity extends Activity {
 	}
 
 
-	
 	/**
 	 * Inner class that abstracts out the publication image attachment caching.
 	 * Images are cached in a parent class member called images.
