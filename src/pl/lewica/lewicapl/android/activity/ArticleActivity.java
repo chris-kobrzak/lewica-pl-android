@@ -26,7 +26,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -36,13 +38,16 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.ScrollView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import pl.lewica.api.model.Article;
@@ -229,6 +234,36 @@ public class ArticleActivity extends Activity {
 				return true;
 
 			case R.id.menu_increase_font:
+				LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				View layout = inflater.inflate(R.layout.dialog_text_size, (ViewGroup) findViewById(R.id.dialog_text_size_root) );
+				AlertDialog.Builder builder = new AlertDialog.Builder(this).setView(layout);
+				builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+			           public void onClick(DialogInterface dialog, int id) {
+			               // User clicked OK button
+			           }
+			       });
+				builder.setTitle(R.string.heading_change_text_size);
+				AlertDialog alertDialog = builder.create();
+				alertDialog.show();
+				SeekBar sb = (SeekBar)layout.findViewById(R.id.dialog_text_size_seekbar);
+				sb.setMax(7);
+				sb.setProgress(2);
+				sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+					public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+						//Do something here with new value
+					}
+
+					@Override
+					public void onStartTrackingTouch(SeekBar arg0) {
+						// TODO Auto-generated method stub
+					}
+
+					@Override
+					public void onStopTrackingTouch(SeekBar arg0) {
+						// TODO Auto-generated method stub
+					}
+				});
+
 				UserPreferences.changeUserTextSize(UserPreferences.TextSizeAction.INCREASE, this);
 
 				tvTitle.setTextSize(UserPreferences.getUserTextSizeHeading(this) );

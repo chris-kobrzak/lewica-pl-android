@@ -32,6 +32,7 @@
 	<string name="nav_show_this_blog_only">Inne wpisy na tym blogu</string>
 	<string name="menu_increase_font">Powiększ czcionkę</string>
 	<string name="menu_decrease_font">Zmniejsz czcionkę</string>
+	<string name="heading_change_text_size">Zmiana rozmiaru czcionki</string>
 	<string name="heading_poland">polska</string>
 	<string name="heading_world">świat</string>
 	<string name="heading_texts">publicystyka</string>
@@ -67,4 +68,5 @@
 	<string name="placeholder_where">Gdzie</string>
 	<string name="placeholder_year">Rok</string>
 	<string name="path_images">/lewicapl/images/</string>
+	<string name="ok">OK</string>
 </resources>
