@@ -40,6 +40,7 @@ import pl.lewica.URLDictionary;
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
+import pl.lewica.lewicapl.android.UserPreferences;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
 
 
@@ -63,6 +64,9 @@ public class BlogPostActivity extends Activity {
 	private int colIndex_PublishedBy;
 	private int colIndex_Title;
 	private int colIndex_Text;
+	
+	private TextView tvTitle;
+	private TextView tvContent;
 
 	private static SimpleDateFormat dateFormat	= new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
@@ -141,6 +145,8 @@ public class BlogPostActivity extends Activity {
 
 		menu.getItem(0).setEnabled(true);
 		menu.getItem(1).setEnabled(true);
+		menu.getItem(4).setEnabled(true);
+		menu.getItem(5).setEnabled(true);
 
 		id	= nextPrevID.get(BlogPostDAO.MAP_KEY_PREVIOUS);
 		if (id == 0) {
@@ -149,6 +155,13 @@ public class BlogPostActivity extends Activity {
 		id	= nextPrevID.get(BlogPostDAO.MAP_KEY_NEXT);
 		if (id == 0) {
 			menu.getItem(1).setEnabled(false);
+		}
+
+		if (! UserPreferences.canIncreaseTextSize(this) ) {
+			menu.getItem(4).setEnabled(false);
+		}
+		if (! UserPreferences.canDecreaseTextSize(this) ) {
+			menu.getItem(5).setEnabled(false);
 		}
 
 		return true;
@@ -192,6 +205,20 @@ public class BlogPostActivity extends Activity {
 				BroadcastSender broadcastSender	= BroadcastSender.getInstance(this);
 				broadcastSender.reloadTab_BlogPostListFilteredByBlogID(blogID);
 				finish();
+				return true;
+
+			case R.id.menu_increase_font:
+				UserPreferences.changeUserTextSize(UserPreferences.TextSizeAction.INCREASE, this);
+
+				tvTitle.setTextSize(UserPreferences.getUserTextSizeHeading(this) );
+				tvContent.setTextSize(UserPreferences.getUserTextSizeStandard(this) );
+				return true;
+
+			case R.id.menu_decrease_font:
+				UserPreferences.changeUserTextSize(UserPreferences.TextSizeAction.DECREASE, this);
+
+				tvTitle.setTextSize(UserPreferences.getUserTextSizeHeading(this) );
+				tvContent.setTextSize(UserPreferences.getUserTextSizeStandard(this) );
 				return true;
 
 			default :
@@ -243,10 +270,12 @@ public class BlogPostActivity extends Activity {
 		blogID					= cursor.getInt(colIndex_BlogID);
 		blogPostURL			= URLDictionary.buildURL_BlogPost(cursor.getInt(colIndex_BlogID), ID);
 
+		float textSizeTitle	= UserPreferences.getUserTextSizeHeading(this);
 		// Now start populating all views with data
 		TextView tv;
-		tv							= (TextView) findViewById(R.id.blog_post_title);
-		tv.setText(cursor.getString(colIndex_Title) );
+		tvTitle					= (TextView) findViewById(R.id.blog_post_title);
+		tvTitle.setTextSize(textSizeTitle);
+		tvTitle.setText(cursor.getString(colIndex_Title) );
 
 		tv							= (TextView) findViewById(R.id.blog_post_category);
 		StringBuilder sb	= new StringBuilder(context.getString(R.string.heading_blog) );
@@ -265,15 +294,19 @@ public class BlogPostActivity extends Activity {
 		Date d					= new Date(unixTime);
 		tv.setText(dateFormat.format(d) );
 
-		tv							= (TextView) findViewById(R.id.blog_post_content);
+		float textSizeStandard	= UserPreferences.getUserTextSizeStandard(this);
+
+		tvContent					= (TextView) findViewById(R.id.blog_post_content);
+		tvContent.setTextSize(textSizeStandard);
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
-		tv.setText(cursor.getString(colIndex_Text).replace("\r", "") );
+		tvContent.setText(cursor.getString(colIndex_Text).replace("\r", "") );
 
 		tv							= (TextView) findViewById(R.id.blog_post_author);
 		String author			= cursor.getString(colIndex_PublishedBy);
 
 		if (author.length() > 0) {
 			tv.setText(author);
+			tv.setTextSize(textSizeStandard);
 			tv.setVisibility(View.VISIBLE);
 		} else {
 			tv.setText("");

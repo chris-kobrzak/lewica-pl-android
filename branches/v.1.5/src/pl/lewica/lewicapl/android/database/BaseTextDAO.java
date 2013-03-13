@@ -8,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.BaseColumns;
 
 
 /**
@@ -15,7 +16,7 @@ import android.database.sqlite.SQLiteDatabase;
  * Apart from open(), you'd typically want to define an insert method in your subclass.
  * @author Krzysztof Kobrzak
  */
-public abstract class BaseTextDAO extends BaseLewicaPLDAO {
+public abstract class BaseTextDAO extends BaseLewicaPLDAO implements BaseColumns {
 	
 	public static final String MAP_KEY_PREVIOUS	= "Previous";
 	public static final String MAP_KEY_NEXT			= "Next";

@@ -2,4 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:id="@+id/menu_previous" android:icon="@drawable/ic_menu_back" android:title="@string/nav_previous" />
 	<item android:id="@+id/menu_next" android:icon="@drawable/ic_menu_forward" android:title="@string/nav_next" />
+	<item android:id="@+id/menu_increase_font" android:icon="@drawable/ic_menu_zoom" android:title="@string/menu_increase_font" />
+	<item android:id="@+id/menu_decrease_font" android:icon="@drawable/ic_menu_zoomout" android:title="@string/menu_decrease_font" />
 </menu>
