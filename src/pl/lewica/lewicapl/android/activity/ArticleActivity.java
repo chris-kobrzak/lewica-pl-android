@@ -162,6 +162,8 @@ public class ArticleActivity extends Activity {
 
 		menu.getItem(0).setEnabled(true);
 		menu.getItem(1).setEnabled(true);
+		menu.getItem(4).setEnabled(true);
+		menu.getItem(5).setEnabled(true);
 
 		id	= nextPrevID.get(ArticleDAO.MAP_KEY_PREVIOUS);
 		if (id == 0) {
@@ -170,6 +172,13 @@ public class ArticleActivity extends Activity {
 		id	= nextPrevID.get(ArticleDAO.MAP_KEY_NEXT);
 		if (id == 0) {
 			menu.getItem(1).setEnabled(false);
+		}
+
+		if (! UserPreferences.canIncreaseTextSize(this) ) {
+			menu.getItem(4).setEnabled(false);
+		}
+		if (! UserPreferences.canDecreaseTextSize(this) ) {
+			menu.getItem(5).setEnabled(false);
 		}
 
 		return true;
@@ -331,9 +340,9 @@ public class ArticleActivity extends Activity {
 
 		float textSizeStandard	= UserPreferences.getUserTextSizeStandard(this);
 
-		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
 		tvContent	= (TextView) findViewById(R.id.article_content);
 		tvContent.setTextSize(textSizeStandard);
+		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
 		tvContent.setText(cursor.getString(colIndex_Content).replace("\r", "") );
 
 		tvComment				= (TextView) findViewById(R.id.article_editor_comment);

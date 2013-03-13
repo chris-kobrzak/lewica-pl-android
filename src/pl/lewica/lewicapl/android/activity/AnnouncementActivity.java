@@ -39,6 +39,7 @@ import android.widget.TextView;
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
+import pl.lewica.lewicapl.android.UserPreferences;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.BaseTextDAO;
 
@@ -61,6 +62,9 @@ public class AnnouncementActivity extends Activity {
 	private int colIndex_Content;
 	private int colIndex_PublishedBy;
 	private int colIndex_PublishedByEmail;
+
+	private TextView tvTitle;
+	private TextView tvContent;
 
 
 	@Override
@@ -132,9 +136,10 @@ public class AnnouncementActivity extends Activity {
 	public boolean onPrepareOptionsMenu (Menu menu) {
 		long id;
 		nextPrevID		= annDAO.fetchPreviousNextID(annID);
-		
-		menu.getItem(0).setEnabled(true);
-		menu.getItem(1).setEnabled(true);
+
+		for (int i = 0; i <=3; i++) {
+			menu.getItem(i).setEnabled(true);
+		}
 
 		id	= nextPrevID.get(AnnouncementDAO.MAP_KEY_PREVIOUS);
 		if (id == 0) {
@@ -144,7 +149,14 @@ public class AnnouncementActivity extends Activity {
 		if (id == 0) {
 			menu.getItem(1).setEnabled(false);
 		}
-		
+
+		if (! UserPreferences.canIncreaseTextSize(this) ) {
+			menu.getItem(2).setEnabled(false);
+		}
+		if (! UserPreferences.canDecreaseTextSize(this) ) {
+			menu.getItem(3).setEnabled(false);
+		}
+
 		return true;
 	}
 
@@ -172,6 +184,20 @@ public class AnnouncementActivity extends Activity {
 				if (id > 0) {
 					loadContent(nextPrevID.get(AnnouncementDAO.MAP_KEY_NEXT), this);
 				}
+				return true;
+
+			case R.id.menu_increase_font:
+				UserPreferences.changeUserTextSize(UserPreferences.TextSizeAction.INCREASE, this);
+
+				tvTitle.setTextSize(UserPreferences.getUserTextSizeHeading(this) );
+				tvContent.setTextSize(UserPreferences.getUserTextSizeStandard(this) );
+				return true;
+
+			case R.id.menu_decrease_font:
+				UserPreferences.changeUserTextSize(UserPreferences.TextSizeAction.DECREASE, this);
+
+				tvTitle.setTextSize(UserPreferences.getUserTextSizeHeading(this) );
+				tvContent.setTextSize(UserPreferences.getUserTextSizeStandard(this) );
 				return true;
 
 			default :
@@ -222,16 +248,18 @@ public class AnnouncementActivity extends Activity {
 
 		// Now start populating all views with data
 		TextView tv, tvLabel;
-		tv							= (TextView) findViewById(R.id.announcement_title);
-		tv.setText(cursor.getString(colIndex_Title) );
+		tvTitle					= (TextView) findViewById(R.id.announcement_title);
+		tvTitle.setTextSize(UserPreferences.getUserTextSizeHeading(this) );
+		tvTitle.setText(cursor.getString(colIndex_Title) );
 
 		tv							= (TextView) findViewById(R.id.announcement_category);
 		tv.setTypeface(categoryTypeface);
 		tv.setText(context.getString(R.string.heading_announcements) );
 
-		tv							= (TextView) findViewById(R.id.announcement_content);
+		tvContent				= (TextView) findViewById(R.id.announcement_content);
+		tvContent.setTextSize(UserPreferences.getUserTextSizeStandard(this) );
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
-		tv.setText(cursor.getString(colIndex_Content).replace("\r", "") );
+		tvContent.setText(cursor.getString(colIndex_Content).replace("\r", "") );
 
 		// Where
 		tv							= (TextView) findViewById(R.id.announcement_where);
