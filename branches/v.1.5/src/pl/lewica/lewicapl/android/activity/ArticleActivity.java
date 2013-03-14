@@ -5,7 +5,7 @@
  you may not use this file except in compliance with the Licence.
  You may obtain a copy of the Licence at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
  Unless required by applicable law or agreed to in writing, software
  distributed under the Licence is distributed on an "AS IS" BASIS,
@@ -38,6 +38,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -167,8 +168,6 @@ public class ArticleActivity extends Activity {
 
 		menu.getItem(0).setEnabled(true);
 		menu.getItem(1).setEnabled(true);
-		menu.getItem(4).setEnabled(true);
-		menu.getItem(5).setEnabled(true);
 
 		id	= nextPrevID.get(ArticleDAO.MAP_KEY_PREVIOUS);
 		if (id == 0) {
@@ -177,13 +176,6 @@ public class ArticleActivity extends Activity {
 		id	= nextPrevID.get(ArticleDAO.MAP_KEY_NEXT);
 		if (id == 0) {
 			menu.getItem(1).setEnabled(false);
-		}
-
-		if (! UserPreferences.canIncreaseTextSize(this) ) {
-			menu.getItem(4).setEnabled(false);
-		}
-		if (! UserPreferences.canDecreaseTextSize(this) ) {
-			menu.getItem(5).setEnabled(false);
 		}
 
 		return true;
@@ -233,55 +225,70 @@ public class ArticleActivity extends Activity {
 				startActivity(intent);
 				return true;
 
-			case R.id.menu_increase_font:
-				LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				View layout = inflater.inflate(R.layout.dialog_text_size, (ViewGroup) findViewById(R.id.dialog_text_size_root) );
-				AlertDialog.Builder builder = new AlertDialog.Builder(this).setView(layout);
-				builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-			           public void onClick(DialogInterface dialog, int id) {
-			               // User clicked OK button
-			           }
-			       });
-				builder.setTitle(R.string.heading_change_text_size);
-				AlertDialog alertDialog = builder.create();
-				alertDialog.show();
-				SeekBar sb = (SeekBar)layout.findViewById(R.id.dialog_text_size_seekbar);
-				sb.setMax(7);
-				sb.setProgress(2);
-				sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-					public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
-						//Do something here with new value
-					}
+			case R.id.menu_change_text_size:
+				int sizeInPoints	= convertTextSizeToPoint(UserPreferences.getUserTextSizeStandard(this) );
+				showDialogWithSlider(sizeInPoints, 6);
 
-					@Override
-					public void onStartTrackingTouch(SeekBar arg0) {
-						// TODO Auto-generated method stub
-					}
-
-					@Override
-					public void onStopTrackingTouch(SeekBar arg0) {
-						// TODO Auto-generated method stub
-					}
-				});
-
-				UserPreferences.changeUserTextSize(UserPreferences.TextSizeAction.INCREASE, this);
-
-				tvTitle.setTextSize(UserPreferences.getUserTextSizeHeading(this) );
-				tvContent.setTextSize(UserPreferences.getUserTextSizeStandard(this) );
-				tvComment.setTextSize(UserPreferences.getUserTextSizeStandard(this) );
-				return true;
-				
-			case R.id.menu_decrease_font:
-				UserPreferences.changeUserTextSize(UserPreferences.TextSizeAction.DECREASE, this);
-				
-				tvTitle.setTextSize(UserPreferences.getUserTextSizeHeading(this) );
-				tvContent.setTextSize(UserPreferences.getUserTextSizeStandard(this) );
-				tvComment.setTextSize(UserPreferences.getUserTextSizeStandard(this) );
 				return true;
 
 			default :
 				return super.onOptionsItemSelected(item);
 		}
+	}
+
+
+	public int convertTextSizeToPoint(float textSize) {
+		int textSizeInt	= Math.round(textSize);
+		int minSize		= Math.round(UserPreferences.MIN_TEXT_SIZE_STANDARD);
+		int increment	= Math.round(UserPreferences.FONT_TEXT_INCREMENT);
+
+		return (textSizeInt - minSize) / increment;
+	}
+	
+	
+	public float convertTextSizeToFloat(int textSize) {
+		int increment	= Math.round(UserPreferences.FONT_TEXT_INCREMENT);
+		int minSize		= Math.round(UserPreferences.MIN_TEXT_SIZE_STANDARD);
+		return (float) (textSize * increment) + minSize;
+	}
+
+
+	public void showDialogWithSlider(int sliderValue, int sliderMax) {
+		final Activity activity		= this;
+		LayoutInflater inflater		= (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View layout					= inflater.inflate(R.layout.dialog_text_size, (ViewGroup) findViewById(R.id.dialog_text_size_root) );
+		AlertDialog.Builder builder	= new AlertDialog.Builder(this).setView(layout);
+
+		builder.setTitle(R.string.heading_change_text_size);
+		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {}
+		});
+
+		AlertDialog dialog	= builder.create();
+		SeekBar slider		= (SeekBar)layout.findViewById(R.id.dialog_text_size_seekbar);
+		slider.setMax(sliderMax);
+		slider.setProgress(sliderValue);
+		slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+				// TODO Move this code to a call-back function and place this method in a utility class
+				float textSize		= convertTextSizeToFloat(progress);
+				float titleTextSize = textSize + 9.f;
+
+				tvTitle.setTextSize(titleTextSize);
+				tvContent.setTextSize(textSize);
+				tvComment.setTextSize(textSize);
+
+				UserPreferences.setUserTextSizeStandard(textSize, activity);
+				UserPreferences.setUserTextSizeHeading(titleTextSize, activity);
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar arg0) {}
+
+			@Override
+			public void onStopTrackingTouch(SeekBar arg0) {}
+		});
+		dialog.show();
 	}
 
 
