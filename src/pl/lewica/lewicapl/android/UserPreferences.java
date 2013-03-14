@@ -7,13 +7,15 @@ import android.content.SharedPreferences.Editor;
 
 public class UserPreferences {
 
-	public static final float DEFAULT_TEXT_SIZE_HEADING		= 24.f;
-	public static final float DEFAULT_TEXT_SIZE_STANDARD	= 15.f;
-	public static final float MIN_TEXT_SIZE_HEADING			= 16.f;
-	public static final float MIN_TEXT_SIZE_STANDARD		=  7.f;
-	public static final float MAX_TEXT_SIZE_HEADING			= 36.f;
-	public static final float MAX_TEXT_SIZE_STANDARD		= 27.f;
-	public static final float FONT_TEXT_INCREMENT			=  4.f;
+	public static final float DEFAULT_TEXT_SIZE_HEADING	= 25.f;
+	public static final float DEFAULT_TEXT_SIZE_STANDARD	= 16.f;
+	public static final float MIN_TEXT_SIZE_HEADING			= 17.f;
+	public static final float MIN_TEXT_SIZE_STANDARD			=  8.f;
+	public static final float MAX_TEXT_SIZE_HEADING			= 45.f;
+	public static final float MAX_TEXT_SIZE_STANDARD		= 36.f;
+	public static final float TEXT_SIZE_INCREMENT				=  2.f;
+	public static final int TEXT_SIZES_TOTAL		= (int) ( (MAX_TEXT_SIZE_STANDARD - MIN_TEXT_SIZE_STANDARD) / TEXT_SIZE_INCREMENT) + 1;
+	
 
 	public enum TextSizeAction	{
 		INCREASE,
@@ -22,10 +24,10 @@ public class UserPreferences {
 
 	public static void changeUserTextSize(TextSizeAction action, Activity activity) {
 		float textSize;
-		float change	= FONT_TEXT_INCREMENT;
+		float change	= TEXT_SIZE_INCREMENT;
 
 		if (action == TextSizeAction.DECREASE) {
-			change	= -FONT_TEXT_INCREMENT;
+			change	= -TEXT_SIZE_INCREMENT;
 		}
 		textSize		= getUserTextSizeHeading(activity);
 		textSize	+= change;

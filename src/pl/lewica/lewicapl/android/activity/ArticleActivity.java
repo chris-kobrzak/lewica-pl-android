@@ -227,7 +227,7 @@ public class ArticleActivity extends Activity {
 
 			case R.id.menu_change_text_size:
 				int sizeInPoints	= convertTextSizeToPoint(UserPreferences.getUserTextSizeStandard(this) );
-				showDialogWithSlider(sizeInPoints, 6);
+				showDialogWithSlider(sizeInPoints, UserPreferences.TEXT_SIZES_TOTAL);
 
 				return true;
 
@@ -240,14 +240,14 @@ public class ArticleActivity extends Activity {
 	public int convertTextSizeToPoint(float textSize) {
 		int textSizeInt	= Math.round(textSize);
 		int minSize		= Math.round(UserPreferences.MIN_TEXT_SIZE_STANDARD);
-		int increment	= Math.round(UserPreferences.FONT_TEXT_INCREMENT);
+		int increment	= Math.round(UserPreferences.TEXT_SIZE_INCREMENT);
 
 		return (textSizeInt - minSize) / increment;
 	}
 	
 	
 	public float convertTextSizeToFloat(int textSize) {
-		int increment	= Math.round(UserPreferences.FONT_TEXT_INCREMENT);
+		int increment	= Math.round(UserPreferences.TEXT_SIZE_INCREMENT);
 		int minSize		= Math.round(UserPreferences.MIN_TEXT_SIZE_STANDARD);
 		return (float) (textSize * increment) + minSize;
 	}
@@ -268,6 +268,7 @@ public class ArticleActivity extends Activity {
 		SeekBar slider		= (SeekBar)layout.findViewById(R.id.dialog_text_size_seekbar);
 		slider.setMax(sliderMax);
 		slider.setProgress(sliderValue);
+		slider.setPadding(50, 20, 50, 20);
 		slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
 				// TODO Move this code to a call-back function and place this method in a utility class
