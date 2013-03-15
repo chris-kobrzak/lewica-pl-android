@@ -40,11 +40,11 @@ import pl.lewica.URLDictionary;
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
-import pl.lewica.lewicapl.android.UserPreferences;
+import pl.lewica.lewicapl.android.TextSize;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
 
 
-public class BlogPostActivity extends Activity {
+public class BlogPostActivity extends Activity implements ITextSizeSliderEventHandler {
 	// This intent's base Uri.  It should have a numeric ID appended to it.
 	public static final String BASE_URI	= "content://lewicapl/blog_posts/blog_post/";
 
@@ -146,7 +146,6 @@ public class BlogPostActivity extends Activity {
 		menu.getItem(0).setEnabled(true);
 		menu.getItem(1).setEnabled(true);
 		menu.getItem(4).setEnabled(true);
-		menu.getItem(5).setEnabled(true);
 
 		id	= nextPrevID.get(BlogPostDAO.MAP_KEY_PREVIOUS);
 		if (id == 0) {
@@ -155,13 +154,6 @@ public class BlogPostActivity extends Activity {
 		id	= nextPrevID.get(BlogPostDAO.MAP_KEY_NEXT);
 		if (id == 0) {
 			menu.getItem(1).setEnabled(false);
-		}
-
-		if (! UserPreferences.canIncreaseTextSize(this) ) {
-			menu.getItem(4).setEnabled(false);
-		}
-		if (! UserPreferences.canDecreaseTextSize(this) ) {
-			menu.getItem(5).setEnabled(false);
 		}
 
 		return true;
@@ -207,18 +199,10 @@ public class BlogPostActivity extends Activity {
 				finish();
 				return true;
 
-			case R.id.menu_increase_font:
-				UserPreferences.changeUserTextSize(UserPreferences.TextSizeAction.INCREASE, this);
+			case R.id.menu_change_text_size:
+				int sizeInPoints	= TextSize.convertTextSizeToPoint(TextSize.getUserTextSizeStandard(this) );
+				DialogHandler.showDialogWithTextSizeSlider(sizeInPoints, TextSize.TEXT_SIZES_TOTAL, this, this);
 
-				tvTitle.setTextSize(UserPreferences.getUserTextSizeHeading(this) );
-				tvContent.setTextSize(UserPreferences.getUserTextSizeStandard(this) );
-				return true;
-
-			case R.id.menu_decrease_font:
-				UserPreferences.changeUserTextSize(UserPreferences.TextSizeAction.DECREASE, this);
-
-				tvTitle.setTextSize(UserPreferences.getUserTextSizeHeading(this) );
-				tvContent.setTextSize(UserPreferences.getUserTextSizeStandard(this) );
 				return true;
 
 			default :
@@ -226,6 +210,18 @@ public class BlogPostActivity extends Activity {
 		}
 	}
 
+
+	@Override
+	public void updateTextSize(int points) {
+		float textSize		= TextSize.convertTextSizeToFloat(points);
+		float titleTextSize = textSize + 9.f;
+
+		tvTitle.setTextSize(titleTextSize);
+		tvContent.setTextSize(textSize);
+
+		TextSize.setUserTextSizeStandard(textSize, this);
+		TextSize.setUserTextSizeHeading(titleTextSize, this);
+	}
 
 	/**
 	 * Caches the current blog post ID.  Called when device orientation changes.
@@ -270,7 +266,7 @@ public class BlogPostActivity extends Activity {
 		blogID					= cursor.getInt(colIndex_BlogID);
 		blogPostURL			= URLDictionary.buildURL_BlogPost(cursor.getInt(colIndex_BlogID), ID);
 
-		float textSizeTitle	= UserPreferences.getUserTextSizeHeading(this);
+		float textSizeTitle	= TextSize.getUserTextSizeHeading(this);
 		// Now start populating all views with data
 		TextView tv;
 		tvTitle					= (TextView) findViewById(R.id.blog_post_title);
@@ -294,7 +290,7 @@ public class BlogPostActivity extends Activity {
 		Date d					= new Date(unixTime);
 		tv.setText(dateFormat.format(d) );
 
-		float textSizeStandard	= UserPreferences.getUserTextSizeStandard(this);
+		float textSizeStandard	= TextSize.getUserTextSizeStandard(this);
 
 		tvContent					= (TextView) findViewById(R.id.blog_post_content);
 		tvContent.setTextSize(textSizeStandard);

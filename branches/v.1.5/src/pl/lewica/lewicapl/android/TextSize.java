@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
-public class UserPreferences {
+public class TextSize {
 
 	public static final float DEFAULT_TEXT_SIZE_HEADING	= 25.f;
 	public static final float DEFAULT_TEXT_SIZE_STANDARD	= 16.f;
@@ -15,27 +15,21 @@ public class UserPreferences {
 	public static final float MAX_TEXT_SIZE_STANDARD		= 36.f;
 	public static final float TEXT_SIZE_INCREMENT				=  2.f;
 	public static final int TEXT_SIZES_TOTAL		= (int) ( (MAX_TEXT_SIZE_STANDARD - MIN_TEXT_SIZE_STANDARD) / TEXT_SIZE_INCREMENT) + 1;
-	
 
-	public enum TextSizeAction	{
-		INCREASE,
-		DECREASE
-	};
 
-	public static void changeUserTextSize(TextSizeAction action, Activity activity) {
-		float textSize;
-		float change	= TEXT_SIZE_INCREMENT;
+	public static int convertTextSizeToPoint(float textSize) {
+		int textSizeInt	= Math.round(textSize);
+		int minSize		= Math.round(MIN_TEXT_SIZE_STANDARD);
+		int increment	= Math.round(TEXT_SIZE_INCREMENT);
 
-		if (action == TextSizeAction.DECREASE) {
-			change	= -TEXT_SIZE_INCREMENT;
-		}
-		textSize		= getUserTextSizeHeading(activity);
-		textSize	+= change;
-		setUserTextSizeHeading(textSize, activity);
+		return (textSizeInt - minSize) / increment;
+	}
 
-		textSize		= getUserTextSizeStandard(activity);
-		textSize	+= change;
-		setUserTextSizeStandard(textSize, activity);
+
+	public static float convertTextSizeToFloat(int textSize) {
+		int increment	= Math.round(TEXT_SIZE_INCREMENT);
+		int minSize		= Math.round(MIN_TEXT_SIZE_STANDARD);
+		return (float) (textSize * increment) + minSize;
 	}
 
 
@@ -69,17 +63,5 @@ public class UserPreferences {
 		Editor prefsEditor			= prefs.edit();
 		prefsEditor.putFloat("textSizeHeading", size);
 		prefsEditor.commit();
-	}
-	
-	
-	public static boolean canIncreaseTextSize(Activity activity) {
-		float size	= getUserTextSizeStandard(activity);
-		return size <= MAX_TEXT_SIZE_STANDARD;
-	}
-
-
-	public static boolean canDecreaseTextSize(Activity activity) {
-		float size	= getUserTextSizeStandard(activity);
-		return size >= MIN_TEXT_SIZE_STANDARD;
 	}
 }

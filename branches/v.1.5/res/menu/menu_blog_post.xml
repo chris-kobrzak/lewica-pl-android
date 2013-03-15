@@ -4,6 +4,5 @@
 	<item android:id="@+id/menu_next" android:icon="@drawable/ic_menu_forward" android:title="@string/nav_next" />
 	<item android:id="@+id/menu_share" android:icon="@drawable/ic_menu_share" android:title="@string/nav_share" />
 	<item android:id="@+id/menu_other_posts" android:title="@string/nav_show_this_blog_only" />
-	<item android:id="@+id/menu_increase_font" android:icon="@drawable/ic_menu_zoom" android:title="@string/menu_increase_font" />
-	<item android:id="@+id/menu_decrease_font" android:icon="@drawable/ic_menu_zoomout" android:title="@string/menu_decrease_font" />
+	<item android:id="@+id/menu_change_text_size" android:icon="@drawable/ic_menu_zoom" android:title="@string/menu_change_text_size" />
 </menu>
