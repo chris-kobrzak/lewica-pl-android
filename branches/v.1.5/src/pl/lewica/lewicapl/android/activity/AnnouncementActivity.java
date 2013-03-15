@@ -39,12 +39,14 @@ import android.widget.TextView;
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
+import pl.lewica.lewicapl.android.DialogHandler;
 import pl.lewica.lewicapl.android.TextSize;
+import pl.lewica.lewicapl.android.DialogHandler.TextSizeSliderEventHandler;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.BaseTextDAO;
 
 
-public class AnnouncementActivity extends Activity implements ITextSizeSliderEventHandler {
+public class AnnouncementActivity extends Activity implements TextSizeSliderEventHandler {
 	// This intent's base Uri.  It should have a numeric ID appended to it.
 	public static final String BASE_URI	= "content://lewicapl/announcements/announcement/";
 
@@ -64,7 +66,12 @@ public class AnnouncementActivity extends Activity implements ITextSizeSliderEve
 	private int colIndex_PublishedByEmail;
 
 	private TextView tvTitle;
+	private TextView tvWhereLbl;
+	private TextView tvWhenLbl;
+	private TextView tvWhere;
+	private TextView tvWhen;
 	private TextView tvContent;
+	private TextView tvAuthor;
 
 
 	@Override
@@ -137,17 +144,16 @@ public class AnnouncementActivity extends Activity implements ITextSizeSliderEve
 		long id;
 		nextPrevID		= annDAO.fetchPreviousNextID(annID);
 
-		for (int i = 0; i <=2; i++) {
-			menu.getItem(i).setEnabled(true);
-		}
+		menu.getItem(1).setEnabled(true);
+		menu.getItem(2).setEnabled(true);
 
 		id	= nextPrevID.get(AnnouncementDAO.MAP_KEY_PREVIOUS);
 		if (id == 0) {
-			menu.getItem(0).setEnabled(false);
+			menu.getItem(1).setEnabled(false);
 		}
 		id	= nextPrevID.get(AnnouncementDAO.MAP_KEY_NEXT);
 		if (id == 0) {
-			menu.getItem(1).setEnabled(false);
+			menu.getItem(2).setEnabled(false);
 		}
 
 		return true;
@@ -180,7 +186,7 @@ public class AnnouncementActivity extends Activity implements ITextSizeSliderEve
 				return true;
 
 			case R.id.menu_change_text_size:
-				int sizeInPoints	= TextSize.convertTextSizeToPoint(TextSize.getUserTextSizeStandard(this) );
+				int sizeInPoints	= TextSize.convertTextSizeToPoint(TextSize.getUserTextSize(this) );
 				DialogHandler.showDialogWithTextSizeSlider(sizeInPoints, TextSize.TEXT_SIZES_TOTAL, this, this);
 
 				return true;
@@ -197,9 +203,14 @@ public class AnnouncementActivity extends Activity implements ITextSizeSliderEve
 		float titleTextSize = textSize + 9.f;
 
 		tvTitle.setTextSize(titleTextSize);
+		tvWhere.setTextSize(textSize);
+		tvWhereLbl.setTextSize(textSize);
+		tvWhen.setTextSize(textSize);
+		tvWhenLbl.setTextSize(textSize);
 		tvContent.setTextSize(textSize);
+		tvAuthor.setTextSize(textSize);
 
-		TextSize.setUserTextSizeStandard(textSize, this);
+		TextSize.setUserTextSize(textSize, this);
 		TextSize.setUserTextSizeHeading(titleTextSize, this);
 	}
 
@@ -231,6 +242,8 @@ public class AnnouncementActivity extends Activity implements ITextSizeSliderEve
 
 		startManagingCursor(cursor);
 
+		float userTextSize	= TextSize.getUserTextSize(this);
+
 		// In order to capture a cell, you need to work what their index
 		colIndex_Title					= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHAT);
 		colIndex_Content				= cursor.getColumnIndex(AnnouncementDAO.FIELD_TEXT);
@@ -245,58 +258,59 @@ public class AnnouncementActivity extends Activity implements ITextSizeSliderEve
 		sv.setSmoothScrollingEnabled(true);
 
 		// Now start populating all views with data
-		TextView tv, tvLabel;
 		tvTitle					= (TextView) findViewById(R.id.announcement_title);
 		tvTitle.setTextSize(TextSize.getUserTextSizeHeading(this) );
 		tvTitle.setText(cursor.getString(colIndex_Title) );
 
+		TextView tv;
 		tv							= (TextView) findViewById(R.id.announcement_category);
 		tv.setTypeface(categoryTypeface);
 		tv.setText(context.getString(R.string.heading_announcements) );
 
 		tvContent				= (TextView) findViewById(R.id.announcement_content);
-		tvContent.setTextSize(TextSize.getUserTextSizeStandard(this) );
+		tvContent.setTextSize(userTextSize);
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
 		tvContent.setText(cursor.getString(colIndex_Content).replace("\r", "") );
 
 		// Where
-		tv							= (TextView) findViewById(R.id.announcement_where);
-		tvLabel					= (TextView) findViewById(R.id.announcement_where_label);
+		tvWhere					= (TextView) findViewById(R.id.announcement_where);
+		tvWhereLbl			= (TextView) findViewById(R.id.announcement_where_label);
 		String where			= cursor.getString(colIndex_Where);
 		if (where != null && where.length() > 0) {
-			tv.setText(where);
+			tvWhere.setText(where);
 			// Reset visibility, may be useful when users navigate between announcements (previous-next facility to be added in the future)
-			tv.setVisibility(View.VISIBLE);
+			tvWhere.setVisibility(View.VISIBLE);
 			
-			tvLabel.setText(getString(R.string.label_where) );
-			tvLabel.setVisibility(View.VISIBLE);
+			tvWhereLbl.setText(getString(R.string.label_where) );
+			tvWhereLbl.setVisibility(View.VISIBLE);
 		} else {
-			tv.setText("");
-			tv.setVisibility(View.GONE);
+			tvWhere.setText("");
+			tvWhere.setVisibility(View.GONE);
 			// Hide top, dark grey bar
-			tvLabel.setText("");
-			tvLabel.setVisibility(View.GONE);
+			tvWhereLbl.setText("");
+			tvWhereLbl.setVisibility(View.GONE);
 		}
 		// When
-		tv							= (TextView) findViewById(R.id.announcement_when);
-		tvLabel					= (TextView) findViewById(R.id.announcement_when_label);
+		tvWhen					= (TextView) findViewById(R.id.announcement_when);
+		tvWhenLbl				= (TextView) findViewById(R.id.announcement_when_label);
 		String when			= cursor.getString(colIndex_When);
 		if (when != null && when.length() > 0) {
-			tv.setText(when);
+			tvWhen.setText(when);
 			// Reset visibility, may be useful when users navigate between announcements (previous-next facility to be added in the future)
-			tv.setVisibility(View.VISIBLE);
+			tvWhen.setVisibility(View.VISIBLE);
 			
-			tvLabel.setText(getString(R.string.label_when) );
-			tvLabel.setVisibility(View.VISIBLE);
+			tvWhenLbl.setText(getString(R.string.label_when) );
+			tvWhenLbl.setVisibility(View.VISIBLE);
 		} else {
-			tv.setText("");
-			tv.setVisibility(View.GONE);
+			tvWhen.setText("");
+			tvWhen.setVisibility(View.GONE);
 			// Hide top, dark grey bar
-			tvLabel.setText("");
-			tvLabel.setVisibility(View.GONE);
+			tvWhenLbl.setText("");
+			tvWhenLbl.setVisibility(View.GONE);
 		}
 
-		tv							= (TextView) findViewById(R.id.announcement_author);
+		tvAuthor				= (TextView) findViewById(R.id.announcement_author);
+		tvAuthor.setTextSize(userTextSize);
 		String author			= cursor.getString(colIndex_PublishedBy);
 		String authorEmail	= cursor.getString(colIndex_PublishedByEmail);
 
@@ -305,15 +319,15 @@ public class AnnouncementActivity extends Activity implements ITextSizeSliderEve
 		}
 		if (author.length() > 0) {
 			if (authorEmail.length() > 0) {
-				tv.setText(Html.fromHtml("<a href=\"mailto:" + authorEmail + "?subject=" + context.getString(R.string.email_subject_announcement) + "\">" + author + "</a>") );
-				tv.setMovementMethod(LinkMovementMethod.getInstance() );
+				tvAuthor.setText(Html.fromHtml("<a href=\"mailto:" + authorEmail + "?subject=" + context.getString(R.string.email_subject_announcement) + "\">" + author + "</a>") );
+				tvAuthor.setMovementMethod(LinkMovementMethod.getInstance() );
 			} else {
-				tv.setText(author);
+				tvAuthor.setText(author);
 			}
-			tv.setVisibility(View.VISIBLE);
+			tvAuthor.setVisibility(View.VISIBLE);
 		} else {
-			tv.setText("");
-			tv.setVisibility(View.INVISIBLE);
+			tvAuthor.setText("");
+			tvAuthor.setVisibility(View.INVISIBLE);
 		}
 		// Only mark the announcement as read once.  If it's already marked as such - just stop here.
 		if (cursor.getInt(colIndex_WasRead) == 1) {

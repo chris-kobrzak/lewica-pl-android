@@ -50,11 +50,12 @@ import pl.lewica.api.url.ArticleURL;
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
+import pl.lewica.lewicapl.android.DialogHandler;
 import pl.lewica.lewicapl.android.TextSize;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 
 
-public class ArticleActivity extends Activity implements ITextSizeSliderEventHandler {
+public class ArticleActivity extends Activity implements DialogHandler.TextSizeSliderEventHandler {
 	// This intent's base Uri.  It should have a numeric ID appended to it.
 	public static final String URI_BASE						= "content://lewicapl/articles/article/";
 	public static final String URI_BASE_COMMENTS	= "content://lewicapl/articles/article/comments/";
@@ -160,16 +161,16 @@ public class ArticleActivity extends Activity implements ITextSizeSliderEventHan
 		long id;
 		nextPrevID		= articleDAO.fetchPreviousNextID(articleID, categoryID);
 
-		menu.getItem(0).setEnabled(true);
 		menu.getItem(1).setEnabled(true);
+		menu.getItem(2).setEnabled(true);
 
 		id	= nextPrevID.get(ArticleDAO.MAP_KEY_PREVIOUS);
 		if (id == 0) {
-			menu.getItem(0).setEnabled(false);
+			menu.getItem(1).setEnabled(false);
 		}
 		id	= nextPrevID.get(ArticleDAO.MAP_KEY_NEXT);
 		if (id == 0) {
-			menu.getItem(1).setEnabled(false);
+			menu.getItem(2).setEnabled(false);
 		}
 
 		return true;
@@ -220,7 +221,7 @@ public class ArticleActivity extends Activity implements ITextSizeSliderEventHan
 				return true;
 
 			case R.id.menu_change_text_size:
-				int sizeInPoints	= TextSize.convertTextSizeToPoint(TextSize.getUserTextSizeStandard(this) );
+				int sizeInPoints	= TextSize.convertTextSizeToPoint(TextSize.getUserTextSize(this) );
 				DialogHandler.showDialogWithTextSizeSlider(sizeInPoints, TextSize.TEXT_SIZES_TOTAL, this, this);
 
 				return true;
@@ -240,7 +241,7 @@ public class ArticleActivity extends Activity implements ITextSizeSliderEventHan
 		tvContent.setTextSize(textSize);
 		tvComment.setTextSize(textSize);
 
-		TextSize.setUserTextSizeStandard(textSize, this);
+		TextSize.setUserTextSize(textSize, this);
 		TextSize.setUserTextSizeHeading(titleTextSize, this);
 	}
 
@@ -333,7 +334,7 @@ public class ArticleActivity extends Activity implements ITextSizeSliderEventHan
 		Date d					= new Date(unixTime);
 		tv.setText(dateFormat.format(d) );
 
-		float textSizeStandard	= TextSize.getUserTextSizeStandard(this);
+		float textSizeStandard	= TextSize.getUserTextSize(this);
 
 		tvContent	= (TextView) findViewById(R.id.article_content);
 		tvContent.setTextSize(textSizeStandard);

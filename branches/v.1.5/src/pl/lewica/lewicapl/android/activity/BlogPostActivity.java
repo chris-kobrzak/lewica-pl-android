@@ -40,11 +40,13 @@ import pl.lewica.URLDictionary;
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
+import pl.lewica.lewicapl.android.DialogHandler;
 import pl.lewica.lewicapl.android.TextSize;
+import pl.lewica.lewicapl.android.DialogHandler.TextSizeSliderEventHandler;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
 
 
-public class BlogPostActivity extends Activity implements ITextSizeSliderEventHandler {
+public class BlogPostActivity extends Activity implements TextSizeSliderEventHandler {
 	// This intent's base Uri.  It should have a numeric ID appended to it.
 	public static final String BASE_URI	= "content://lewicapl/blog_posts/blog_post/";
 
@@ -145,7 +147,6 @@ public class BlogPostActivity extends Activity implements ITextSizeSliderEventHa
 
 		menu.getItem(0).setEnabled(true);
 		menu.getItem(1).setEnabled(true);
-		menu.getItem(4).setEnabled(true);
 
 		id	= nextPrevID.get(BlogPostDAO.MAP_KEY_PREVIOUS);
 		if (id == 0) {
@@ -200,7 +201,7 @@ public class BlogPostActivity extends Activity implements ITextSizeSliderEventHa
 				return true;
 
 			case R.id.menu_change_text_size:
-				int sizeInPoints	= TextSize.convertTextSizeToPoint(TextSize.getUserTextSizeStandard(this) );
+				int sizeInPoints	= TextSize.convertTextSizeToPoint(TextSize.getUserTextSize(this) );
 				DialogHandler.showDialogWithTextSizeSlider(sizeInPoints, TextSize.TEXT_SIZES_TOTAL, this, this);
 
 				return true;
@@ -219,7 +220,7 @@ public class BlogPostActivity extends Activity implements ITextSizeSliderEventHa
 		tvTitle.setTextSize(titleTextSize);
 		tvContent.setTextSize(textSize);
 
-		TextSize.setUserTextSizeStandard(textSize, this);
+		TextSize.setUserTextSize(textSize, this);
 		TextSize.setUserTextSizeHeading(titleTextSize, this);
 	}
 
@@ -290,7 +291,7 @@ public class BlogPostActivity extends Activity implements ITextSizeSliderEventHa
 		Date d					= new Date(unixTime);
 		tv.setText(dateFormat.format(d) );
 
-		float textSizeStandard	= TextSize.getUserTextSizeStandard(this);
+		float textSizeStandard	= TextSize.getUserTextSize(this);
 
 		tvContent					= (TextView) findViewById(R.id.blog_post_content);
 		tvContent.setTextSize(textSizeStandard);
