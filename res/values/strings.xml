@@ -31,8 +31,6 @@
 	<string name="nav_share">Poleć</string>
 	<string name="nav_show_this_blog_only">Inne wpisy na tym blogu</string>
 	<string name="menu_change_text_size">Zmień rozmiar czcionki</string>
-	<string name="menu_increase_font">Powiększ czcionkę</string>
-	<string name="menu_decrease_font">Zmniejsz czcionkę</string>
 	<string name="heading_change_text_size">Zmiana rozmiaru czcionki</string>
 	<string name="heading_poland">polska</string>
 	<string name="heading_world">świat</string>

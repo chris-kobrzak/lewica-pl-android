@@ -1,4 +1,4 @@
-package pl.lewica.lewicapl.android.activity;
+package pl.lewica.lewicapl.android;
 
 import pl.lewica.lewicapl.R;
 import android.app.AlertDialog;
@@ -13,7 +13,12 @@ import android.widget.SeekBar;
 
 public class DialogHandler {
 
-	public static void showDialogWithTextSizeSlider(int sliderValue, int sliderMax, Activity activity, final ITextSizeSliderEventHandler sliderProgressDelegate) {
+	public interface TextSizeSliderEventHandler {
+		public void updateTextSize(int points);
+	}
+
+
+	public static void showDialogWithTextSizeSlider(int sliderValue, int sliderMax, Activity activity, final TextSizeSliderEventHandler sliderProgressDelegate) {
 		LayoutInflater inflater		= (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View layout					= inflater.inflate(R.layout.dialog_text_size, (ViewGroup) activity.findViewById(R.id.dialog_text_size_root) );
 		AlertDialog.Builder builder	= new AlertDialog.Builder(activity).setView(layout);
