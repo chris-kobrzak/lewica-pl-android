@@ -26,9 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -38,17 +36,13 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.ScrollView;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import pl.lewica.api.model.Article;
@@ -56,11 +50,11 @@ import pl.lewica.api.url.ArticleURL;
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
-import pl.lewica.lewicapl.android.UserPreferences;
+import pl.lewica.lewicapl.android.TextSize;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 
 
-public class ArticleActivity extends Activity {
+public class ArticleActivity extends Activity implements ITextSizeSliderEventHandler {
 	// This intent's base Uri.  It should have a numeric ID appended to it.
 	public static final String URI_BASE						= "content://lewicapl/articles/article/";
 	public static final String URI_BASE_COMMENTS	= "content://lewicapl/articles/article/comments/";
@@ -226,8 +220,8 @@ public class ArticleActivity extends Activity {
 				return true;
 
 			case R.id.menu_change_text_size:
-				int sizeInPoints	= convertTextSizeToPoint(UserPreferences.getUserTextSizeStandard(this) );
-				showDialogWithSlider(sizeInPoints, UserPreferences.TEXT_SIZES_TOTAL);
+				int sizeInPoints	= TextSize.convertTextSizeToPoint(TextSize.getUserTextSizeStandard(this) );
+				DialogHandler.showDialogWithTextSizeSlider(sizeInPoints, TextSize.TEXT_SIZES_TOTAL, this, this);
 
 				return true;
 
@@ -237,59 +231,17 @@ public class ArticleActivity extends Activity {
 	}
 
 
-	public int convertTextSizeToPoint(float textSize) {
-		int textSizeInt	= Math.round(textSize);
-		int minSize		= Math.round(UserPreferences.MIN_TEXT_SIZE_STANDARD);
-		int increment	= Math.round(UserPreferences.TEXT_SIZE_INCREMENT);
+	@Override
+	public void updateTextSize(int points) {
+		float textSize		= TextSize.convertTextSizeToFloat(points);
+		float titleTextSize = textSize + 9.f;
 
-		return (textSizeInt - minSize) / increment;
-	}
-	
-	
-	public float convertTextSizeToFloat(int textSize) {
-		int increment	= Math.round(UserPreferences.TEXT_SIZE_INCREMENT);
-		int minSize		= Math.round(UserPreferences.MIN_TEXT_SIZE_STANDARD);
-		return (float) (textSize * increment) + minSize;
-	}
+		tvTitle.setTextSize(titleTextSize);
+		tvContent.setTextSize(textSize);
+		tvComment.setTextSize(textSize);
 
-
-	public void showDialogWithSlider(int sliderValue, int sliderMax) {
-		final Activity activity		= this;
-		LayoutInflater inflater		= (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View layout					= inflater.inflate(R.layout.dialog_text_size, (ViewGroup) findViewById(R.id.dialog_text_size_root) );
-		AlertDialog.Builder builder	= new AlertDialog.Builder(this).setView(layout);
-
-		builder.setTitle(R.string.heading_change_text_size);
-		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {}
-		});
-
-		AlertDialog dialog	= builder.create();
-		SeekBar slider		= (SeekBar)layout.findViewById(R.id.dialog_text_size_seekbar);
-		slider.setMax(sliderMax);
-		slider.setProgress(sliderValue);
-		slider.setPadding(50, 20, 50, 20);
-		slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
-				// TODO Move this code to a call-back function and place this method in a utility class
-				float textSize		= convertTextSizeToFloat(progress);
-				float titleTextSize = textSize + 9.f;
-
-				tvTitle.setTextSize(titleTextSize);
-				tvContent.setTextSize(textSize);
-				tvComment.setTextSize(textSize);
-
-				UserPreferences.setUserTextSizeStandard(textSize, activity);
-				UserPreferences.setUserTextSizeHeading(titleTextSize, activity);
-			}
-
-			@Override
-			public void onStartTrackingTouch(SeekBar arg0) {}
-
-			@Override
-			public void onStopTrackingTouch(SeekBar arg0) {}
-		});
-		dialog.show();
+		TextSize.setUserTextSizeStandard(textSize, this);
+		TextSize.setUserTextSizeHeading(titleTextSize, this);
 	}
 
 
@@ -343,7 +295,7 @@ public class ArticleActivity extends Activity {
 		// Save the URL in memory so the "share link" option in menu can access it easily
 		articleURL				= cursor.getString(colIndex_URL);
 
-		float textSizeTitle	= UserPreferences.getUserTextSizeHeading(this);
+		float textSizeTitle	= TextSize.getUserTextSizeHeading(this);
 		// Now start populating all views with data
 		tvTitle					= (TextView) findViewById(R.id.article_title);
 		tvTitle.setTextSize(textSizeTitle);
@@ -381,7 +333,7 @@ public class ArticleActivity extends Activity {
 		Date d					= new Date(unixTime);
 		tv.setText(dateFormat.format(d) );
 
-		float textSizeStandard	= UserPreferences.getUserTextSizeStandard(this);
+		float textSizeStandard	= TextSize.getUserTextSizeStandard(this);
 
 		tvContent	= (TextView) findViewById(R.id.article_content);
 		tvContent.setTextSize(textSizeStandard);
