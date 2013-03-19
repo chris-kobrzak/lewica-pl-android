@@ -198,7 +198,7 @@ public class AnnouncementActivity extends Activity implements TextSizeSliderEven
 
 
 	@Override
-	public void updateTextSize(int points) {
+	public void changeTextSize(int points) {
 		float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
 		float titleTextSize = textSize + 9.f;
 

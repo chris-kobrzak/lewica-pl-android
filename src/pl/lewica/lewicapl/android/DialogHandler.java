@@ -1,6 +1,9 @@
 package pl.lewica.lewicapl.android;
 
+import java.security.acl.LastOwnerException;
+
 import pl.lewica.lewicapl.R;
+import pl.lewica.util.DateUtil;
 import android.app.AlertDialog;
 import android.app.Activity;
 import android.content.Context;
@@ -13,8 +16,11 @@ import android.widget.SeekBar;
 
 public class DialogHandler {
 
+	private static int lastSliderAction	= 0;
+
+
 	public interface TextSizeSliderEventHandler {
-		public void updateTextSize(int points);
+		public void changeTextSize(int points);
 	}
 
 
@@ -32,10 +38,10 @@ public class DialogHandler {
 		SeekBar slider		= (SeekBar)layout.findViewById(R.id.dialog_text_size_seekbar);
 		slider.setMax(sliderMax);
 		slider.setProgress(sliderValue);
-		slider.setPadding(50, 20, 50, 20);
+		slider.setPadding(70, 20, 70, 20);
 		slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
-				sliderProgressDelegate.updateTextSize(progress);
+				sliderProgressDelegate.changeTextSize(progress);
 			}
 
 			@Override

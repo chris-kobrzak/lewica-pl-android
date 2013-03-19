@@ -10,6 +10,7 @@
 	<color name="blue_facebook">#1D4088</color>
 	<color name="unread">#BF0000</color>
 	<color name="read">#136F80</color>
+	<color name="blue_light">#D2EFF5</color>
 	<string name="title_news">LewicaPL: informacje</string>
 	<string name="title_opinions">LewicaPL: publicystyka</string>
 	<string name="title_article">LewicaPL: artykuł</string>
@@ -30,7 +31,7 @@
 	<string name="nav_readers_comments">Komentarze</string>
 	<string name="nav_share">Poleć</string>
 	<string name="nav_show_this_blog_only">Inne wpisy na tym blogu</string>
-	<string name="menu_change_text_size">Zmień rozmiar czcionki</string>
+	<string name="menu_change_text_size">Rozmiar czcionki</string>
 	<string name="menu_change_background">Zmień tło</string>
 	<string name="heading_change_text_size">Zmiana rozmiaru czcionki</string>
 	<string name="heading_poland">polska</string>
