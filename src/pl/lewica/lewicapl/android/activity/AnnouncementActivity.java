@@ -40,7 +40,7 @@ import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.DialogHandler;
-import pl.lewica.lewicapl.android.TextSize;
+import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.DialogHandler.TextSizeSliderEventHandler;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.BaseTextDAO;
@@ -186,8 +186,8 @@ public class AnnouncementActivity extends Activity implements TextSizeSliderEven
 				return true;
 
 			case R.id.menu_change_text_size:
-				int sizeInPoints	= TextSize.convertTextSizeToPoint(TextSize.getUserTextSize(this) );
-				DialogHandler.showDialogWithTextSizeSlider(sizeInPoints, TextSize.TEXT_SIZES_TOTAL, this, this);
+				int sizeInPoints	= TextPreferencesManager.convertTextSizeToPoint(TextPreferencesManager.getUserTextSize(this) );
+				DialogHandler.showDialogWithTextSizeSlider(sizeInPoints, TextPreferencesManager.TEXT_SIZES_TOTAL, this, this);
 
 				return true;
 
@@ -199,7 +199,7 @@ public class AnnouncementActivity extends Activity implements TextSizeSliderEven
 
 	@Override
 	public void updateTextSize(int points) {
-		float textSize		= TextSize.convertTextSizeToFloat(points);
+		float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
 		float titleTextSize = textSize + 9.f;
 
 		tvTitle.setTextSize(titleTextSize);
@@ -210,8 +210,8 @@ public class AnnouncementActivity extends Activity implements TextSizeSliderEven
 		tvContent.setTextSize(textSize);
 		tvAuthor.setTextSize(textSize);
 
-		TextSize.setUserTextSize(textSize, this);
-		TextSize.setUserTextSizeHeading(titleTextSize, this);
+		TextPreferencesManager.setUserTextSize(textSize, this);
+		TextPreferencesManager.setUserTextSizeHeading(titleTextSize, this);
 	}
 
 
@@ -242,7 +242,7 @@ public class AnnouncementActivity extends Activity implements TextSizeSliderEven
 
 		startManagingCursor(cursor);
 
-		float userTextSize	= TextSize.getUserTextSize(this);
+		float userTextSize	= TextPreferencesManager.getUserTextSize(this);
 
 		// In order to capture a cell, you need to work what their index
 		colIndex_Title					= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHAT);
@@ -259,7 +259,7 @@ public class AnnouncementActivity extends Activity implements TextSizeSliderEven
 
 		// Now start populating all views with data
 		tvTitle					= (TextView) findViewById(R.id.announcement_title);
-		tvTitle.setTextSize(TextSize.getUserTextSizeHeading(this) );
+		tvTitle.setTextSize(TextPreferencesManager.getUserTextSizeHeading(this) );
 		tvTitle.setText(cursor.getString(colIndex_Title) );
 
 		TextView tv;

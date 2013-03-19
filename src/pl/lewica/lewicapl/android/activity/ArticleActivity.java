@@ -51,7 +51,7 @@ import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.DialogHandler;
-import pl.lewica.lewicapl.android.TextSize;
+import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 
 
@@ -160,17 +160,19 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 	public boolean onPrepareOptionsMenu (Menu menu) {
 		long id;
 		nextPrevID		= articleDAO.fetchPreviousNextID(articleID, categoryID);
-
-		menu.getItem(1).setEnabled(true);
-		menu.getItem(2).setEnabled(true);
+		MenuItem next	= menu.findItem(R.id.menu_next);
+		MenuItem prev	= menu.findItem(R.id.menu_previous);
+		
+		next.setEnabled(true);
+		prev.setEnabled(true);
 
 		id	= nextPrevID.get(ArticleDAO.MAP_KEY_PREVIOUS);
 		if (id == 0) {
-			menu.getItem(1).setEnabled(false);
+			next.setEnabled(false);
 		}
 		id	= nextPrevID.get(ArticleDAO.MAP_KEY_NEXT);
 		if (id == 0) {
-			menu.getItem(2).setEnabled(false);
+			prev.setEnabled(false);
 		}
 
 		return true;
@@ -221,9 +223,14 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 				return true;
 
 			case R.id.menu_change_text_size:
-				int sizeInPoints	= TextSize.convertTextSizeToPoint(TextSize.getUserTextSize(this) );
-				DialogHandler.showDialogWithTextSizeSlider(sizeInPoints, TextSize.TEXT_SIZES_TOTAL, this, this);
+				int sizeInPoints	= TextPreferencesManager.convertTextSizeToPoint(TextPreferencesManager.getUserTextSize(this) );
+				DialogHandler.showDialogWithTextSizeSlider(sizeInPoints, TextPreferencesManager.TEXT_SIZES_TOTAL, this, this);
 
+				return true;
+				
+			case R.id.menu_change_background:
+				// TODO
+				
 				return true;
 
 			default :
@@ -234,15 +241,19 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 
 	@Override
 	public void updateTextSize(int points) {
-		float textSize		= TextSize.convertTextSizeToFloat(points);
+		float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
 		float titleTextSize = textSize + 9.f;
 
 		tvTitle.setTextSize(titleTextSize);
 		tvContent.setTextSize(textSize);
 		tvComment.setTextSize(textSize);
 
-		TextSize.setUserTextSize(textSize, this);
-		TextSize.setUserTextSizeHeading(titleTextSize, this);
+		TextPreferencesManager.setUserTextSize(textSize, this);
+		TextPreferencesManager.setUserTextSizeHeading(titleTextSize, this);
+	}
+
+
+	public void swapTextBackgrounds() {
 	}
 
 
@@ -296,7 +307,7 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 		// Save the URL in memory so the "share link" option in menu can access it easily
 		articleURL				= cursor.getString(colIndex_URL);
 
-		float textSizeTitle	= TextSize.getUserTextSizeHeading(this);
+		float textSizeTitle	= TextPreferencesManager.getUserTextSizeHeading(this);
 		// Now start populating all views with data
 		tvTitle					= (TextView) findViewById(R.id.article_title);
 		tvTitle.setTextSize(textSizeTitle);
@@ -334,7 +345,7 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 		Date d					= new Date(unixTime);
 		tv.setText(dateFormat.format(d) );
 
-		float textSizeStandard	= TextSize.getUserTextSize(this);
+		float textSizeStandard	= TextPreferencesManager.getUserTextSize(this);
 
 		tvContent	= (TextView) findViewById(R.id.article_content);
 		tvContent.setTextSize(textSizeStandard);

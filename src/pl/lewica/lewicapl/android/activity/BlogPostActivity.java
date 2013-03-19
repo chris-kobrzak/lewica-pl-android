@@ -41,7 +41,7 @@ import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.DialogHandler;
-import pl.lewica.lewicapl.android.TextSize;
+import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.DialogHandler.TextSizeSliderEventHandler;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
 
@@ -201,8 +201,8 @@ public class BlogPostActivity extends Activity implements TextSizeSliderEventHan
 				return true;
 
 			case R.id.menu_change_text_size:
-				int sizeInPoints	= TextSize.convertTextSizeToPoint(TextSize.getUserTextSize(this) );
-				DialogHandler.showDialogWithTextSizeSlider(sizeInPoints, TextSize.TEXT_SIZES_TOTAL, this, this);
+				int sizeInPoints	= TextPreferencesManager.convertTextSizeToPoint(TextPreferencesManager.getUserTextSize(this) );
+				DialogHandler.showDialogWithTextSizeSlider(sizeInPoints, TextPreferencesManager.TEXT_SIZES_TOTAL, this, this);
 
 				return true;
 
@@ -214,14 +214,14 @@ public class BlogPostActivity extends Activity implements TextSizeSliderEventHan
 
 	@Override
 	public void updateTextSize(int points) {
-		float textSize		= TextSize.convertTextSizeToFloat(points);
+		float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
 		float titleTextSize = textSize + 9.f;
 
 		tvTitle.setTextSize(titleTextSize);
 		tvContent.setTextSize(textSize);
 
-		TextSize.setUserTextSize(textSize, this);
-		TextSize.setUserTextSizeHeading(titleTextSize, this);
+		TextPreferencesManager.setUserTextSize(textSize, this);
+		TextPreferencesManager.setUserTextSizeHeading(titleTextSize, this);
 	}
 
 	/**
@@ -267,7 +267,7 @@ public class BlogPostActivity extends Activity implements TextSizeSliderEventHan
 		blogID					= cursor.getInt(colIndex_BlogID);
 		blogPostURL			= URLDictionary.buildURL_BlogPost(cursor.getInt(colIndex_BlogID), ID);
 
-		float textSizeTitle	= TextSize.getUserTextSizeHeading(this);
+		float textSizeTitle	= TextPreferencesManager.getUserTextSizeHeading(this);
 		// Now start populating all views with data
 		TextView tv;
 		tvTitle					= (TextView) findViewById(R.id.blog_post_title);
@@ -291,7 +291,7 @@ public class BlogPostActivity extends Activity implements TextSizeSliderEventHan
 		Date d					= new Date(unixTime);
 		tv.setText(dateFormat.format(d) );
 
-		float textSizeStandard	= TextSize.getUserTextSize(this);
+		float textSizeStandard	= TextPreferencesManager.getUserTextSize(this);
 
 		tvContent					= (TextView) findViewById(R.id.blog_post_content);
 		tvContent.setTextSize(textSizeStandard);
