@@ -53,6 +53,7 @@ import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.DialogHandler;
 import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
+import pl.lewica.util.DateUtil;
 
 
 public class ArticleActivity extends Activity implements DialogHandler.TextSizeSliderEventHandler {
@@ -70,6 +71,7 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 	private ArticleDAO articleDAO;
 	private Map<String,Long> nextPrevID;
 	private ImageLoadTask imageTask;
+	private int lastTextChange;
 
 	private int colIndex_CategoryID;
 	private int colIndex_WasRead;
@@ -118,6 +120,7 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 		}
 		// Fill views with data
 		loadContent(articleID, this);
+		loadTheme();
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
 		View titleView = getWindow().findViewById(android.R.id.title);
@@ -160,19 +163,17 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 	public boolean onPrepareOptionsMenu (Menu menu) {
 		long id;
 		nextPrevID		= articleDAO.fetchPreviousNextID(articleID, categoryID);
-		MenuItem next	= menu.findItem(R.id.menu_next);
-		MenuItem prev	= menu.findItem(R.id.menu_previous);
-		
-		next.setEnabled(true);
-		prev.setEnabled(true);
+
+		menu.getItem(0).setEnabled(true);
+		menu.getItem(1).setEnabled(true);
 
 		id	= nextPrevID.get(ArticleDAO.MAP_KEY_PREVIOUS);
 		if (id == 0) {
-			next.setEnabled(false);
+			menu.getItem(0).setEnabled(false);
 		}
 		id	= nextPrevID.get(ArticleDAO.MAP_KEY_NEXT);
 		if (id == 0) {
-			prev.setEnabled(false);
+			menu.getItem(1).setEnabled(false);
 		}
 
 		return true;
@@ -225,12 +226,10 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 			case R.id.menu_change_text_size:
 				int sizeInPoints	= TextPreferencesManager.convertTextSizeToPoint(TextPreferencesManager.getUserTextSize(this) );
 				DialogHandler.showDialogWithTextSizeSlider(sizeInPoints, TextPreferencesManager.TEXT_SIZES_TOTAL, this, this);
-
 				return true;
-				
+
 			case R.id.menu_change_background:
-				// TODO
-				
+				changeTheme();
 				return true;
 
 			default :
@@ -240,7 +239,7 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 
 
 	@Override
-	public void updateTextSize(int points) {
+	public void changeTextSize(int points) {
 		float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
 		float titleTextSize = textSize + 9.f;
 
@@ -253,7 +252,61 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 	}
 
 
-	public void swapTextBackgrounds() {
+	private void changeTheme() {
+		switch (TextPreferencesManager.getUserTheme(this) ) {
+			case TextPreferencesManager.THEME_BLACK_ON_WHITE:
+				setThemeDark();
+
+				TextPreferencesManager.setUserTheme(TextPreferencesManager.THEME_WHITE_ON_BLACK, this);
+				break;
+
+			case TextPreferencesManager.THEME_WHITE_ON_BLACK:
+				setThemeLight();
+
+				TextPreferencesManager.setUserTheme(TextPreferencesManager.THEME_BLACK_ON_WHITE, this);
+				break;
+		}
+	}
+
+
+	private void loadTheme() {
+		switch (TextPreferencesManager.getUserTheme(this) ) {
+			case TextPreferencesManager.THEME_BLACK_ON_WHITE:
+				setThemeLight();
+				break;
+				
+			case TextPreferencesManager.THEME_WHITE_ON_BLACK:
+				setThemeDark();
+				break;
+		}
+	}
+
+
+	private void setThemeDark() {
+		int dark			= getResources().getColor(R.color.grey_darker);
+		int white		= getResources().getColor(R.color.white);
+		int lightBlue	= getResources().getColor(R.color.blue_light);
+
+		tvTitle.setBackgroundColor(dark);
+		tvTitle.setTextColor(lightBlue);
+		tvContent.setBackgroundColor(dark);
+		tvContent.setTextColor(white);
+		tvComment.setBackgroundColor(dark);
+		tvComment.setTextColor(white);
+	}
+
+
+	private void setThemeLight() {
+		int dark			= getResources().getColor(R.color.grey_darker);
+		int white		= getResources().getColor(R.color.white);
+		int blue			= getResources().getColor(R.color.read);
+
+		tvTitle.setBackgroundColor(white);
+		tvTitle.setTextColor(blue);
+		tvContent.setBackgroundColor(white);
+		tvContent.setTextColor(dark);
+		tvComment.setBackgroundColor(white);
+		tvComment.setTextColor(dark);
 	}
 
 

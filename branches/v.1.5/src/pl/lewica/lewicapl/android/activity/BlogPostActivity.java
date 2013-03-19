@@ -213,7 +213,7 @@ public class BlogPostActivity extends Activity implements TextSizeSliderEventHan
 
 
 	@Override
-	public void updateTextSize(int points) {
+	public void changeTextSize(int points) {
 		float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
 		float titleTextSize = textSize + 9.f;
 
