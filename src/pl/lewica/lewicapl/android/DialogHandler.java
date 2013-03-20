@@ -1,9 +1,6 @@
 package pl.lewica.lewicapl.android;
 
-import java.security.acl.LastOwnerException;
-
 import pl.lewica.lewicapl.R;
-import pl.lewica.util.DateUtil;
 import android.app.AlertDialog;
 import android.app.Activity;
 import android.content.Context;
@@ -15,8 +12,6 @@ import android.widget.SeekBar;
 
 
 public class DialogHandler {
-
-	private static int lastSliderAction	= 0;
 
 
 	public interface TextSizeSliderEventHandler {

@@ -33,6 +33,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -42,6 +43,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewParent;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -53,7 +55,6 @@ import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.DialogHandler;
 import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
-import pl.lewica.util.DateUtil;
 
 
 public class ArticleActivity extends Activity implements DialogHandler.TextSizeSliderEventHandler {
@@ -71,7 +72,6 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 	private ArticleDAO articleDAO;
 	private Map<String,Long> nextPrevID;
 	private ImageLoadTask imageTask;
-	private int lastTextChange;
 
 	private int colIndex_CategoryID;
 	private int colIndex_WasRead;
@@ -238,6 +238,17 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 	}
 
 
+	/**
+	 * Caches the current article ID.  Called when device orientation changes.
+	 * @see android.app.Activity#onRetainNonConfigurationInstance()
+	 */
+	@Override
+	public Object onRetainNonConfigurationInstance() {
+		final Long ID = articleID;
+		return ID;
+	}
+
+
 	@Override
 	public void changeTextSize(int points) {
 		float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
@@ -283,13 +294,14 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 
 
 	private void setThemeDark() {
+		RelativeLayout lay			= (RelativeLayout) findViewById(R.id.article_layout);
+		int black			= getResources().getColor(R.color.black);
 		int dark			= getResources().getColor(R.color.grey_darker);
 		int white		= getResources().getColor(R.color.white);
 		int lightBlue	= getResources().getColor(R.color.blue_light);
 
-		tvTitle.setBackgroundColor(dark);
+		lay.setBackgroundColor(black);
 		tvTitle.setTextColor(lightBlue);
-		tvContent.setBackgroundColor(dark);
 		tvContent.setTextColor(white);
 		tvComment.setBackgroundColor(dark);
 		tvComment.setTextColor(white);
@@ -297,35 +309,25 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 
 
 	private void setThemeLight() {
+		RelativeLayout lay			= (RelativeLayout) findViewById(R.id.article_layout);
 		int dark			= getResources().getColor(R.color.grey_darker);
 		int white		= getResources().getColor(R.color.white);
 		int blue			= getResources().getColor(R.color.read);
+		Drawable darkFrame	= getResources().getDrawable(R.drawable.background_comment);
 
-		tvTitle.setBackgroundColor(white);
+		lay.setBackgroundColor(white);
 		tvTitle.setTextColor(blue);
-		tvContent.setBackgroundColor(white);
 		tvContent.setTextColor(dark);
-		tvComment.setBackgroundColor(white);
+		tvComment.setBackgroundDrawable(darkFrame);
 		tvComment.setTextColor(dark);
 	}
-
-
-	/**
-	 * Caches the current article ID.  Called when device orientation changes.
-	 * @see android.app.Activity#onRetainNonConfigurationInstance()
-	 */
-	@Override
-	public Object onRetainNonConfigurationInstance() {
-		final Long ID = articleID;
-		return ID;
-	}
-
 
 
 	/**
 	 * Responsible for loading content to the views and marking the current article as read.
 	 * It is meant to be called every time user accesses this activity, either by selecting an article from the list
 	 * or navigating between articles using the previous-next facility (not yet implemented).
+	 * TODO Break this method down into smaller parts
 	 * @param id
 	 */
 	public void loadContent(long ID, Context context) {
