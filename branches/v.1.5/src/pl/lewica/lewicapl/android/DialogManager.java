@@ -19,19 +19,18 @@ public class DialogManager {
 	}
 
 
-	// TODO Remove references to "text size" as it should be a context-agnostic slider pop-up
-	public static void showDialogWithTextSizeSlider(int sliderValue, int sliderMax, Activity activity, final SliderEventHandler sliderProgressDelegate) {
+	public static void showDialogWithSlider(int sliderValue, int sliderMax, int titleResource, Activity activity, final SliderEventHandler sliderProgressDelegate) {
 		LayoutInflater inflater		= (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View layout					= inflater.inflate(R.layout.dialog_text_size, (ViewGroup) activity.findViewById(R.id.dialog_text_size_root) );
+		View layout					= inflater.inflate(R.layout.dialog_slider, (ViewGroup) activity.findViewById(R.id.dialog_slider_layout) );
 		AlertDialog.Builder builder	= new AlertDialog.Builder(activity).setView(layout);
 
-		builder.setTitle(R.string.heading_change_text_size);
+		builder.setTitle(titleResource);
 		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {}
 		});
 
 		AlertDialog dialog	= builder.create();
-		SeekBar slider		= (SeekBar)layout.findViewById(R.id.dialog_text_size_seekbar);
+		SeekBar slider		= (SeekBar)layout.findViewById(R.id.dialog_slider);
 		slider.setMax(sliderMax);
 		slider.setProgress(sliderValue);
 		slider.setPadding(70, 20, 70, 20);
