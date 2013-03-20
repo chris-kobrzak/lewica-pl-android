@@ -93,7 +93,7 @@ public class BlogPostActivity extends Activity {
 		blogPostDAO.open();
 
 		mTextSizeHandler	= new TextSizeHandler(this);
-		mThemeHandler	= new ArticleThemeHandler();
+		mThemeHandler	= new ApplicationThemeHandler();
 
 		// When user changes the orientation, Android restarts the activity.  Say, users navigated through articles using
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
@@ -371,7 +371,7 @@ public class BlogPostActivity extends Activity {
 	}
 
 
-	private class ArticleThemeHandler implements TextPreferencesManager.ThemeHandler {
+	private class ApplicationThemeHandler implements TextPreferencesManager.ThemeHandler {
 
 		@Override
 		public void setThemeDark() {

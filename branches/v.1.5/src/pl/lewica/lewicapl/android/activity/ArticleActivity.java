@@ -43,7 +43,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewParent;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -113,7 +112,7 @@ public class ArticleActivity extends Activity {
 		articleDAO.open();
 
 		mTextSizeHandler	= new TextSizeHandler(this);
-		mThemeHandler	= new ArticleThemeHandler();
+		mThemeHandler	= new ApplicationThemeHandler();
 
 		// When user changes the orientation, Android restarts the activity.  Say, users navigated through articles using
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
@@ -464,7 +463,7 @@ public class ArticleActivity extends Activity {
 	}
 
 
-	private class ArticleThemeHandler implements TextPreferencesManager.ThemeHandler {
+	private class ApplicationThemeHandler implements TextPreferencesManager.ThemeHandler {
 
 		@Override
 		public void setThemeDark() {
