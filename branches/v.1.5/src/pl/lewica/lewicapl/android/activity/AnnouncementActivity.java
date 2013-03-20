@@ -40,6 +40,7 @@ import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.DialogManager;
+import pl.lewica.lewicapl.android.SliderDialog;
 import pl.lewica.lewicapl.android.DialogManager.SliderEventHandler;
 import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.TextPreferencesManager.ThemeHandler;
@@ -194,7 +195,13 @@ public class AnnouncementActivity extends Activity {
 
 			case R.id.menu_change_text_size:
 				int sizeInPoints	= TextPreferencesManager.convertTextSizeToPoint(TextPreferencesManager.getUserTextSize(this) );
-				DialogManager.showDialogWithSlider(sizeInPoints, TextPreferencesManager.TEXT_SIZES_TOTAL, R.string.heading_change_text_size, this, mTextSizeHandler);
+				SliderDialog sd		= new SliderDialog();
+				sd.setSliderValue(sizeInPoints);
+				sd.setSliderMax(TextPreferencesManager.TEXT_SIZES_TOTAL);
+				sd.setTitleResource(R.string.heading_change_text_size);
+				sd.setOkButtonResource(R.string.ok);
+
+				DialogManager.showDialogWithSlider(sd, this, mTextSizeHandler);
 
 				return true;
 

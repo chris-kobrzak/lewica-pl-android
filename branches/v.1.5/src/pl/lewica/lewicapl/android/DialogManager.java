@@ -19,22 +19,40 @@ public class DialogManager {
 	}
 
 
-	public static void showDialogWithSlider(int sliderValue, int sliderMax, int titleResource, Activity activity, final SliderEventHandler sliderProgressDelegate) {
-		LayoutInflater inflater		= (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View layout					= inflater.inflate(R.layout.dialog_slider, (ViewGroup) activity.findViewById(R.id.dialog_slider_layout) );
-		AlertDialog.Builder builder	= new AlertDialog.Builder(activity).setView(layout);
+	public static void showDialogWithSlider(SliderDialog slider, Activity activityContext, final SliderEventHandler sliderProgressDelegate) {
+		View layout	= getDialogLayout(activityContext);
 
-		builder.setTitle(titleResource);
-		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+		configureSlider(slider, layout, sliderProgressDelegate);
+
+		AlertDialog dialog	= buildAlertDialogWithOneButton(slider, activityContext, layout);
+
+		dialog.show();
+	}
+
+
+	private static View getDialogLayout(Activity activity) {
+		LayoutInflater inflater	= (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		return inflater.inflate(R.layout.dialog_slider, (ViewGroup) activity.findViewById(R.id.dialog_slider_layout) );
+	}
+
+
+	private static AlertDialog buildAlertDialogWithOneButton(SliderDialog slider, Activity activity, View layout) {
+		AlertDialog.Builder builder	= new AlertDialog.Builder(activity).setView(layout);
+		builder.setTitle(slider.getTitleResource() );
+		builder.setPositiveButton(slider.getOkButtonResource(), new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {}
 		});
 
-		AlertDialog dialog	= builder.create();
-		SeekBar slider		= (SeekBar)layout.findViewById(R.id.dialog_slider);
-		slider.setMax(sliderMax);
-		slider.setProgress(sliderValue);
-		slider.setPadding(70, 20, 70, 20);
-		slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+		return builder.create();
+	}
+
+
+	private static void configureSlider(SliderDialog slider, View layout, final SliderEventHandler sliderProgressDelegate) {
+		SeekBar sb		= (SeekBar) layout.findViewById(R.id.dialog_slider);
+		sb.setMax(slider.getSliderMax() );
+		sb.setProgress(slider.getSliderValue() );
+		sb.setPadding(70, 20, 70, 20);
+		sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
 				sliderProgressDelegate.changeValue(progress);
 			}
@@ -45,6 +63,5 @@ public class DialogManager {
 			@Override
 			public void onStopTrackingTouch(SeekBar arg0) {}
 		});
-		dialog.show();
 	}
 }
