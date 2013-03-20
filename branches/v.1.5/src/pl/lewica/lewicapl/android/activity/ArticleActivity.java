@@ -53,7 +53,9 @@ import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.DialogManager;
+import pl.lewica.lewicapl.android.DialogManager.SliderEventHandler;
 import pl.lewica.lewicapl.android.TextPreferencesManager;
+import pl.lewica.lewicapl.android.TextPreferencesManager.ThemeHandler;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 
 
@@ -72,8 +74,8 @@ public class ArticleActivity extends Activity {
 	private Map<String,Long> nextPrevID;
 	private ImageLoadTask imageTask;
 	private ImageCache imageCache;
-	private TextSizeHandler mTextSizeHandler;
-	private ArticleThemeHandler mThemeHandler;
+	private SliderEventHandler mTextSizeHandler;
+	private ThemeHandler mThemeHandler;
 
 	private int colIndex_CategoryID;
 	private int colIndex_WasRead;
@@ -466,13 +468,13 @@ public class ArticleActivity extends Activity {
 
 		@Override
 		public void setThemeDark() {
-			RelativeLayout lay			= (RelativeLayout) findViewById(R.id.article_layout);
+			RelativeLayout layout		= (RelativeLayout) findViewById(R.id.article_layout);
 			int black			= getResources().getColor(R.color.black);
 			int dark			= getResources().getColor(R.color.grey_darker);
 			int white		= getResources().getColor(R.color.white);
 			int lightBlue	= getResources().getColor(R.color.blue_light);
 
-			lay.setBackgroundColor(black);
+			layout.setBackgroundColor(black);
 			tvTitle.setTextColor(lightBlue);
 			tvContent.setTextColor(white);
 			tvComment.setBackgroundColor(dark);
