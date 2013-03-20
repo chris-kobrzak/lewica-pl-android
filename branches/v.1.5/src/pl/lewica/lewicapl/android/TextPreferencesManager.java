@@ -1,7 +1,6 @@
 package pl.lewica.lewicapl.android;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
@@ -26,7 +25,6 @@ public class TextPreferencesManager {
 
 	public static int getUserTheme(Activity activity) {
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(activity);
-//		SharedPreferences prefs	= activity.getPreferences(Context.MODE_PRIVATE);
 
 		return prefs.getInt(USER_SETTING_THEME, THEME_BLACK_ON_WHITE);
 	}
@@ -34,7 +32,6 @@ public class TextPreferencesManager {
 
 	public static void setUserTheme(int theme, Activity activity) {
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(activity);
-//		SharedPreferences prefs	= activity.getPreferences(Context.MODE_PRIVATE);
 		Editor prefsEditor			= prefs.edit();
 		prefsEditor.putInt(USER_SETTING_THEME, theme);
 		prefsEditor.commit();
@@ -59,7 +56,6 @@ public class TextPreferencesManager {
 
 	public static float getUserTextSize(Activity activity) {
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(activity);
-//		SharedPreferences prefs	= activity.getPreferences(Context.MODE_PRIVATE);
 
 		return prefs.getFloat(USER_SETTING_TEXT_SIZE, DEFAULT_TEXT_SIZE);
 	}
@@ -67,7 +63,6 @@ public class TextPreferencesManager {
 
 	public static void setUserTextSize(float size, Activity activity) {
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(activity);
-//		SharedPreferences prefs	= activity.getPreferences(Context.MODE_PRIVATE);
 		Editor prefsEditor			= prefs.edit();
 		prefsEditor.putFloat(USER_SETTING_TEXT_SIZE, size);
 		prefsEditor.commit();
@@ -76,7 +71,6 @@ public class TextPreferencesManager {
 
 	public static float getUserTextSizeHeading(Activity activity) {
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(activity);
-//		SharedPreferences prefs	= activity.getPreferences(Context.MODE_PRIVATE);
 		
 		return prefs.getFloat(USER_SETTING_TEXT_SIZE_HEADING, DEFAULT_TEXT_SIZE_HEADING);
 	}
@@ -87,7 +81,6 @@ public class TextPreferencesManager {
 			return;
 		}
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(activity);
-//		SharedPreferences prefs	= activity.getPreferences(Context.MODE_PRIVATE);
 		Editor prefsEditor			= prefs.edit();
 		prefsEditor.putFloat(USER_SETTING_TEXT_SIZE_HEADING, size);
 		prefsEditor.commit();
