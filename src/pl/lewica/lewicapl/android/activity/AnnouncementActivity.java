@@ -33,6 +33,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewParent;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -40,13 +41,14 @@ import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.DialogManager;
-import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.DialogManager.SliderEventHandler;
+import pl.lewica.lewicapl.android.TextPreferencesManager;
+import pl.lewica.lewicapl.android.TextPreferencesManager.ThemeHandler;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.BaseTextDAO;
 
 
-public class AnnouncementActivity extends Activity implements SliderEventHandler {
+public class AnnouncementActivity extends Activity {
 	// This intent's base Uri.  It should have a numeric ID appended to it.
 	public static final String BASE_URI	= "content://lewicapl/announcements/announcement/";
 
@@ -55,6 +57,8 @@ public class AnnouncementActivity extends Activity implements SliderEventHandler
 	private long annID;
 	private BaseTextDAO annDAO;
 	private Map<String,Long> nextPrevID;
+	private SliderEventHandler mTextSizeHandler;
+	private ThemeHandler mThemeHandler;
 
 //	private int colIndex_ID;
 	private int colIndex_WasRead;
@@ -88,6 +92,9 @@ public class AnnouncementActivity extends Activity implements SliderEventHandler
 		annDAO				= new AnnouncementDAO(this);
 		annDAO.open();
 
+		mTextSizeHandler	= new TextSizeHandler(this);
+		mThemeHandler	= new ArticleThemeHandler();
+
 		// When user changes the orientation, Android restarts the activity.  Say, users navigated through articles using
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
 		// article that was loaded through the intent.  In other words, changing the orientation would change the article displayed...
@@ -101,6 +108,7 @@ public class AnnouncementActivity extends Activity implements SliderEventHandler
 
 		// Fill views with data
 		loadContent(annID, this);
+		TextPreferencesManager.loadTheme(mThemeHandler, this);
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
 		View titleView = getWindow().findViewById(android.R.id.title);
@@ -187,35 +195,17 @@ public class AnnouncementActivity extends Activity implements SliderEventHandler
 
 			case R.id.menu_change_text_size:
 				int sizeInPoints	= TextPreferencesManager.convertTextSizeToPoint(TextPreferencesManager.getUserTextSize(this) );
-				DialogManager.showDialogWithTextSizeSlider(sizeInPoints, TextPreferencesManager.TEXT_SIZES_TOTAL, this, this);
+				DialogManager.showDialogWithTextSizeSlider(sizeInPoints, TextPreferencesManager.TEXT_SIZES_TOTAL, this, mTextSizeHandler);
 
 				return true;
 
 			case R.id.menu_change_background:
-				//changeTheme();
+				TextPreferencesManager.switchTheme(mThemeHandler, this);
 				return true;
 
 			default :
 				return super.onOptionsItemSelected(item);
 		}
-	}
-
-
-	@Override
-	public void changeValue(int points) {
-		float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
-		float titleTextSize = textSize + 9.f;
-
-		tvTitle.setTextSize(titleTextSize);
-		tvWhere.setTextSize(textSize);
-		tvWhereLbl.setTextSize(textSize);
-		tvWhen.setTextSize(textSize);
-		tvWhenLbl.setTextSize(textSize);
-		tvContent.setTextSize(textSize);
-		tvAuthor.setTextSize(textSize);
-
-		TextPreferencesManager.setUserTextSize(textSize, this);
-		TextPreferencesManager.setUserTextSizeHeading(titleTextSize, this);
 	}
 
 
@@ -367,5 +357,72 @@ public class AnnouncementActivity extends Activity implements SliderEventHandler
 		// TODO Make sure announcementID is a number
 		Long announcementID			= Long.valueOf(announcementIDString);
 		return announcementID;
+	}
+
+
+	private class TextSizeHandler implements DialogManager.SliderEventHandler {
+
+		private Activity mActivity;
+
+		public TextSizeHandler(Activity activity) {
+			mActivity	= activity;
+		}
+
+
+		@Override
+		public void changeValue(int points) {
+			float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
+			float titleTextSize = textSize + 9.f;
+
+			tvTitle.setTextSize(titleTextSize);
+			tvWhere.setTextSize(textSize);
+			tvWhereLbl.setTextSize(textSize);
+			tvWhen.setTextSize(textSize);
+			tvWhenLbl.setTextSize(textSize);
+			tvContent.setTextSize(textSize);
+			tvAuthor.setTextSize(textSize);
+
+			TextPreferencesManager.setUserTextSize(textSize, mActivity);
+			TextPreferencesManager.setUserTextSizeHeading(titleTextSize, mActivity);
+		}
+	}
+
+
+	private class ArticleThemeHandler implements TextPreferencesManager.ThemeHandler {
+
+		@Override
+		public void setThemeDark() {
+			RelativeLayout layout		= (RelativeLayout) findViewById(R.id.announcement_layout);
+			int black			= getResources().getColor(R.color.black);
+			int white		= getResources().getColor(R.color.white);
+			int lightBlue	= getResources().getColor(R.color.blue_light);
+
+			layout.setBackgroundColor(black);
+			tvTitle.setTextColor(lightBlue);
+			tvWhere.setTextColor(white);
+			tvWhereLbl.setTextColor(white);
+			tvWhen.setTextColor(white);
+			tvWhenLbl.setTextColor(white);
+			tvContent.setTextColor(white);
+			tvAuthor.setTextColor(white);
+		}
+
+
+		@Override
+		public void setThemeLight() {
+			RelativeLayout lay			= (RelativeLayout) findViewById(R.id.announcement_layout);
+			int dark			= getResources().getColor(R.color.grey_darker);
+			int white		= getResources().getColor(R.color.white);
+			int blue			= getResources().getColor(R.color.read);
+
+			lay.setBackgroundColor(white);
+			tvTitle.setTextColor(blue);
+			tvWhere.setTextColor(dark);
+			tvWhereLbl.setTextColor(dark);
+			tvWhen.setTextColor(dark);
+			tvWhenLbl.setTextColor(dark);
+			tvContent.setTextColor(dark);
+			tvAuthor.setTextColor(dark);
+		}
 	}
 }
