@@ -23,14 +23,51 @@ public class TextPreferencesManager {
 	public static final int TEXT_SIZES_TOTAL		= (int) ( (MAX_TEXT_SIZE - MIN_TEXT_SIZE) / TEXT_SIZE_INCREMENT) + 1;
 
 
-	public static int getUserTheme(Activity activity) {
+	public interface ThemeHandler {
+		public void setThemeDark();
+
+		public void setThemeLight();
+	}
+
+
+	public static void switchTheme(ThemeHandler themeHandler, Activity activity) {
+		switch (getUserTheme(activity) ) {
+			case THEME_BLACK_ON_WHITE:
+				themeHandler.setThemeDark();
+
+				setUserTheme(THEME_WHITE_ON_BLACK, activity);
+				break;
+
+			case THEME_WHITE_ON_BLACK:
+				themeHandler.setThemeLight();
+
+				setUserTheme(THEME_BLACK_ON_WHITE, activity);
+				break;
+		}
+	}
+
+
+	public static void loadTheme(ThemeHandler themeHandler, Activity activity) {
+		switch (getUserTheme(activity) ) {
+			case THEME_BLACK_ON_WHITE:
+				themeHandler.setThemeLight();
+				break;
+				
+			case THEME_WHITE_ON_BLACK:
+				themeHandler.setThemeDark();
+				break;
+		}
+	}
+
+
+	private static int getUserTheme(Activity activity) {
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(activity);
 
 		return prefs.getInt(USER_SETTING_THEME, THEME_BLACK_ON_WHITE);
 	}
 
 
-	public static void setUserTheme(int theme, Activity activity) {
+	private static void setUserTheme(int theme, Activity activity) {
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(activity);
 		Editor prefsEditor			= prefs.edit();
 		prefsEditor.putInt(USER_SETTING_THEME, theme);

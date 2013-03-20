@@ -52,12 +52,12 @@ import pl.lewica.api.url.ArticleURL;
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
-import pl.lewica.lewicapl.android.DialogHandler;
+import pl.lewica.lewicapl.android.DialogManager;
 import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 
 
-public class ArticleActivity extends Activity implements DialogHandler.TextSizeSliderEventHandler {
+public class ArticleActivity extends Activity {
 	// This intent's base Uri.  It should have a numeric ID appended to it.
 	public static final String URI_BASE						= "content://lewicapl/articles/article/";
 	public static final String URI_BASE_COMMENTS	= "content://lewicapl/articles/article/comments/";
@@ -65,13 +65,15 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 	private static Typeface categoryTypeface;
 	private static Map<Long, SoftReference<Bitmap>> images	= new HashMap<Long,SoftReference<Bitmap>>();
 
-	private ImageCache imageCache;
 	private long articleID;
 	private int categoryID;
 	private String articleURL;
 	private ArticleDAO articleDAO;
 	private Map<String,Long> nextPrevID;
 	private ImageLoadTask imageTask;
+	private ImageCache imageCache;
+	private TextSizeHandler mTextSizeHandler;
+	private ArticleThemeHandler mThemeHandler;
 
 	private int colIndex_CategoryID;
 	private int colIndex_WasRead;
@@ -108,6 +110,9 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 		articleDAO				= new ArticleDAO(this);
 		articleDAO.open();
 
+		mTextSizeHandler	= new TextSizeHandler(this);
+		mThemeHandler	= new ArticleThemeHandler();
+
 		// When user changes the orientation, Android restarts the activity.  Say, users navigated through articles using
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
 		// article that was loaded through the intent.  In other words, changing the orientation would change the article displayed...
@@ -120,7 +125,7 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 		}
 		// Fill views with data
 		loadContent(articleID, this);
-		loadTheme();
+		TextPreferencesManager.loadTheme(mThemeHandler, this);
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
 		View titleView = getWindow().findViewById(android.R.id.title);
@@ -225,11 +230,11 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 
 			case R.id.menu_change_text_size:
 				int sizeInPoints	= TextPreferencesManager.convertTextSizeToPoint(TextPreferencesManager.getUserTextSize(this) );
-				DialogHandler.showDialogWithTextSizeSlider(sizeInPoints, TextPreferencesManager.TEXT_SIZES_TOTAL, this, this);
+				DialogManager.showDialogWithTextSizeSlider(sizeInPoints, TextPreferencesManager.TEXT_SIZES_TOTAL, this, mTextSizeHandler);
 				return true;
 
 			case R.id.menu_change_background:
-				changeTheme();
+				TextPreferencesManager.switchTheme(mThemeHandler, this);
 				return true;
 
 			default :
@@ -246,80 +251,6 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 	public Object onRetainNonConfigurationInstance() {
 		final Long ID = articleID;
 		return ID;
-	}
-
-
-	@Override
-	public void changeTextSize(int points) {
-		float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
-		float titleTextSize = textSize + 9.f;
-
-		tvTitle.setTextSize(titleTextSize);
-		tvContent.setTextSize(textSize);
-		tvComment.setTextSize(textSize);
-
-		TextPreferencesManager.setUserTextSize(textSize, this);
-		TextPreferencesManager.setUserTextSizeHeading(titleTextSize, this);
-	}
-
-
-	private void changeTheme() {
-		switch (TextPreferencesManager.getUserTheme(this) ) {
-			case TextPreferencesManager.THEME_BLACK_ON_WHITE:
-				setThemeDark();
-
-				TextPreferencesManager.setUserTheme(TextPreferencesManager.THEME_WHITE_ON_BLACK, this);
-				break;
-
-			case TextPreferencesManager.THEME_WHITE_ON_BLACK:
-				setThemeLight();
-
-				TextPreferencesManager.setUserTheme(TextPreferencesManager.THEME_BLACK_ON_WHITE, this);
-				break;
-		}
-	}
-
-
-	private void loadTheme() {
-		switch (TextPreferencesManager.getUserTheme(this) ) {
-			case TextPreferencesManager.THEME_BLACK_ON_WHITE:
-				setThemeLight();
-				break;
-				
-			case TextPreferencesManager.THEME_WHITE_ON_BLACK:
-				setThemeDark();
-				break;
-		}
-	}
-
-
-	private void setThemeDark() {
-		RelativeLayout lay			= (RelativeLayout) findViewById(R.id.article_layout);
-		int black			= getResources().getColor(R.color.black);
-		int dark			= getResources().getColor(R.color.grey_darker);
-		int white		= getResources().getColor(R.color.white);
-		int lightBlue	= getResources().getColor(R.color.blue_light);
-
-		lay.setBackgroundColor(black);
-		tvTitle.setTextColor(lightBlue);
-		tvContent.setTextColor(white);
-		tvComment.setBackgroundColor(dark);
-		tvComment.setTextColor(white);
-	}
-
-
-	private void setThemeLight() {
-		RelativeLayout lay			= (RelativeLayout) findViewById(R.id.article_layout);
-		int dark			= getResources().getColor(R.color.grey_darker);
-		int white		= getResources().getColor(R.color.white);
-		int blue			= getResources().getColor(R.color.read);
-		Drawable darkFrame	= getResources().getDrawable(R.drawable.background_comment);
-
-		lay.setBackgroundColor(white);
-		tvTitle.setTextColor(blue);
-		tvContent.setTextColor(dark);
-		tvComment.setBackgroundDrawable(darkFrame);
-		tvComment.setTextColor(dark);
 	}
 
 
@@ -504,6 +435,65 @@ public class ArticleActivity extends Activity implements DialogHandler.TextSizeS
 		// TODO Make sure articleID is a number
 		Long articleID			= Long.valueOf(articleIDString);
 		return articleID;
+	}
+
+
+	private class TextSizeHandler implements DialogManager.SliderEventHandler {
+
+		private Activity mActivity;
+
+		public TextSizeHandler(Activity activity) {
+			mActivity	= activity;
+		}
+
+
+		@Override
+		public void changeValue(int points) {
+			float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
+			float titleTextSize = textSize + 9.f;
+
+			tvTitle.setTextSize(titleTextSize);
+			tvContent.setTextSize(textSize);
+			tvComment.setTextSize(textSize);
+
+			TextPreferencesManager.setUserTextSize(textSize, mActivity);
+			TextPreferencesManager.setUserTextSizeHeading(titleTextSize, mActivity);
+		}
+	}
+
+
+	private class ArticleThemeHandler implements TextPreferencesManager.ThemeHandler {
+
+		@Override
+		public void setThemeDark() {
+			RelativeLayout lay			= (RelativeLayout) findViewById(R.id.article_layout);
+			int black			= getResources().getColor(R.color.black);
+			int dark			= getResources().getColor(R.color.grey_darker);
+			int white		= getResources().getColor(R.color.white);
+			int lightBlue	= getResources().getColor(R.color.blue_light);
+
+			lay.setBackgroundColor(black);
+			tvTitle.setTextColor(lightBlue);
+			tvContent.setTextColor(white);
+			tvComment.setBackgroundColor(dark);
+			tvComment.setTextColor(white);
+		}
+
+
+		@Override
+		public void setThemeLight() {
+			RelativeLayout lay			= (RelativeLayout) findViewById(R.id.article_layout);
+			int dark			= getResources().getColor(R.color.grey_darker);
+			int white		= getResources().getColor(R.color.white);
+			int blue			= getResources().getColor(R.color.read);
+			Drawable darkFrame	= getResources().getDrawable(R.drawable.background_comment);
+
+			lay.setBackgroundColor(white);
+			tvTitle.setTextColor(blue);
+			tvContent.setTextColor(dark);
+			tvComment.setBackgroundDrawable(darkFrame);
+			tvComment.setTextColor(dark);
+		}
 	}
 
 
