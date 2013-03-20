@@ -231,7 +231,7 @@ public class ArticleActivity extends Activity {
 
 			case R.id.menu_change_text_size:
 				int sizeInPoints	= TextPreferencesManager.convertTextSizeToPoint(TextPreferencesManager.getUserTextSize(this) );
-				DialogManager.showDialogWithTextSizeSlider(sizeInPoints, TextPreferencesManager.TEXT_SIZES_TOTAL, this, mTextSizeHandler);
+				DialogManager.showDialogWithSlider(sizeInPoints, TextPreferencesManager.TEXT_SIZES_TOTAL, R.string.heading_change_text_size, this, mTextSizeHandler);
 				return true;
 
 			case R.id.menu_change_background:
