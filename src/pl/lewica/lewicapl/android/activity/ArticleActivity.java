@@ -468,7 +468,7 @@ public class ArticleActivity extends Activity {
 
 		@Override
 		public void setThemeDark() {
-			RelativeLayout layout		= (RelativeLayout) findViewById(R.id.article_layout);
+			ScrollView layout		= (ScrollView) findViewById(R.id.article_scroll_view);
 			int black			= getResources().getColor(R.color.black);
 			int dark			= getResources().getColor(R.color.grey_darker);
 			int white		= getResources().getColor(R.color.white);
@@ -484,13 +484,13 @@ public class ArticleActivity extends Activity {
 
 		@Override
 		public void setThemeLight() {
-			RelativeLayout lay			= (RelativeLayout) findViewById(R.id.article_layout);
+			ScrollView layout		= (ScrollView) findViewById(R.id.article_scroll_view);
 			int dark			= getResources().getColor(R.color.grey_darker);
 			int white		= getResources().getColor(R.color.white);
 			int blue			= getResources().getColor(R.color.read);
 			Drawable darkFrame	= getResources().getDrawable(R.drawable.background_comment);
 
-			lay.setBackgroundColor(white);
+			layout.setBackgroundColor(white);
 			tvTitle.setTextColor(blue);
 			tvContent.setTextColor(dark);
 			tvComment.setBackgroundDrawable(darkFrame);

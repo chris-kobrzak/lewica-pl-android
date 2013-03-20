@@ -43,10 +43,11 @@ import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.DialogManager;
 import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.DialogManager.SliderEventHandler;
+import pl.lewica.lewicapl.android.TextPreferencesManager.ThemeHandler;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
 
 
-public class BlogPostActivity extends Activity implements SliderEventHandler {
+public class BlogPostActivity extends Activity {
 	// This intent's base Uri.  It should have a numeric ID appended to it.
 	public static final String BASE_URI	= "content://lewicapl/blog_posts/blog_post/";
 
@@ -57,6 +58,8 @@ public class BlogPostActivity extends Activity implements SliderEventHandler {
 	private BlogPostDAO blogPostDAO;
 	private Map<String,Long> nextPrevID;
 	private String blogPostURL;
+	private SliderEventHandler mTextSizeHandler;
+	private ThemeHandler mThemeHandler;
 
 //	private int colIndex_ID;
 	private int colIndex_WasRead;
@@ -69,8 +72,10 @@ public class BlogPostActivity extends Activity implements SliderEventHandler {
 	
 	private TextView tvTitle;
 	private TextView tvContent;
+	private TextView tvAuthor;
 
 	private static SimpleDateFormat dateFormat	= new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
 
 
 	@Override
@@ -87,6 +92,9 @@ public class BlogPostActivity extends Activity implements SliderEventHandler {
 		blogPostDAO				= new BlogPostDAO(this);
 		blogPostDAO.open();
 
+		mTextSizeHandler	= new TextSizeHandler(this);
+		mThemeHandler	= new ArticleThemeHandler();
+
 		// When user changes the orientation, Android restarts the activity.  Say, users navigated through articles using
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
 		// article that was loaded through the intent.  In other words, changing the orientation would change the article displayed...
@@ -100,6 +108,7 @@ public class BlogPostActivity extends Activity implements SliderEventHandler {
 
 		// Fill views with data
 		loadContent(blogPostID, this);
+		TextPreferencesManager.loadTheme(mThemeHandler, this);
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
 		View titleView = getWindow().findViewById(android.R.id.title);
@@ -202,8 +211,12 @@ public class BlogPostActivity extends Activity implements SliderEventHandler {
 
 			case R.id.menu_change_text_size:
 				int sizeInPoints	= TextPreferencesManager.convertTextSizeToPoint(TextPreferencesManager.getUserTextSize(this) );
-				DialogManager.showDialogWithTextSizeSlider(sizeInPoints, TextPreferencesManager.TEXT_SIZES_TOTAL, this, this);
+				DialogManager.showDialogWithTextSizeSlider(sizeInPoints, TextPreferencesManager.TEXT_SIZES_TOTAL, this, mTextSizeHandler);
 
+				return true;
+
+			case R.id.menu_change_background:
+				TextPreferencesManager.switchTheme(mThemeHandler, this);
 				return true;
 
 			default :
@@ -211,18 +224,6 @@ public class BlogPostActivity extends Activity implements SliderEventHandler {
 		}
 	}
 
-
-	@Override
-	public void changeValue(int points) {
-		float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
-		float titleTextSize = textSize + 9.f;
-
-		tvTitle.setTextSize(titleTextSize);
-		tvContent.setTextSize(textSize);
-
-		TextPreferencesManager.setUserTextSize(textSize, this);
-		TextPreferencesManager.setUserTextSizeHeading(titleTextSize, this);
-	}
 
 	/**
 	 * Caches the current blog post ID.  Called when device orientation changes.
@@ -298,16 +299,16 @@ public class BlogPostActivity extends Activity implements SliderEventHandler {
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
 		tvContent.setText(cursor.getString(colIndex_Text).replace("\r", "") );
 
-		tv							= (TextView) findViewById(R.id.blog_post_author);
+		tvAuthor = (TextView) findViewById(R.id.blog_post_author);
 		String author			= cursor.getString(colIndex_PublishedBy);
 
 		if (author.length() > 0) {
-			tv.setText(author);
-			tv.setTextSize(textSizeStandard);
-			tv.setVisibility(View.VISIBLE);
+			tvAuthor.setText(author);
+			tvAuthor.setTextSize(textSizeStandard);
+			tvAuthor.setVisibility(View.VISIBLE);
 		} else {
-			tv.setText("");
-			tv.setVisibility(View.INVISIBLE);
+			tvAuthor.setText("");
+			tvAuthor.setVisibility(View.INVISIBLE);
 		}
 		// Only mark the blog_post as read once.  If it's already marked as such - just stop here.
 		if (cursor.getInt(colIndex_WasRead) == 1) {
@@ -343,5 +344,60 @@ public class BlogPostActivity extends Activity implements SliderEventHandler {
 		// TODO Make sure blogPostID is a number
 		Long blogPostID			= Long.valueOf(blogPostIDString);
 		return blogPostID;
+	}
+
+
+	private class TextSizeHandler implements DialogManager.SliderEventHandler {
+
+		private Activity mActivity;
+
+		public TextSizeHandler(Activity activity) {
+			mActivity	= activity;
+		}
+
+
+		@Override
+		public void changeValue(int points) {
+			float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
+			float titleTextSize = textSize + 9.f;
+
+			tvTitle.setTextSize(titleTextSize);
+			tvContent.setTextSize(textSize);
+			tvAuthor.setTextSize(textSize);
+
+			TextPreferencesManager.setUserTextSize(textSize, mActivity);
+			TextPreferencesManager.setUserTextSizeHeading(titleTextSize, mActivity);
+		}
+	}
+
+
+	private class ArticleThemeHandler implements TextPreferencesManager.ThemeHandler {
+
+		@Override
+		public void setThemeDark() {
+			ScrollView layout		= (ScrollView) findViewById(R.id.blog_post_scroll_view);
+			int black			= getResources().getColor(R.color.black);
+			int white		= getResources().getColor(R.color.white);
+			int lightBlue	= getResources().getColor(R.color.blue_light);
+
+			layout.setBackgroundColor(black);
+			tvTitle.setTextColor(lightBlue);
+			tvContent.setTextColor(white);
+			tvAuthor.setTextColor(white);
+		}
+
+
+		@Override
+		public void setThemeLight() {
+			ScrollView layout		= (ScrollView) findViewById(R.id.blog_post_scroll_view);
+			int dark			= getResources().getColor(R.color.grey_darker);
+			int white		= getResources().getColor(R.color.white);
+			int blue			= getResources().getColor(R.color.read);
+
+			layout.setBackgroundColor(white);
+			tvTitle.setTextColor(blue);
+			tvContent.setTextColor(dark);
+			tvAuthor.setTextColor(dark);
+		}
 	}
 }

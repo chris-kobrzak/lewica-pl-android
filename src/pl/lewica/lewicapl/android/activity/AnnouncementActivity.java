@@ -392,7 +392,7 @@ public class AnnouncementActivity extends Activity {
 
 		@Override
 		public void setThemeDark() {
-			RelativeLayout layout		= (RelativeLayout) findViewById(R.id.announcement_layout);
+			ScrollView layout		= (ScrollView) findViewById(R.id.announcement_scroll_view);
 			int black			= getResources().getColor(R.color.black);
 			int white		= getResources().getColor(R.color.white);
 			int lightBlue	= getResources().getColor(R.color.blue_light);
@@ -410,12 +410,12 @@ public class AnnouncementActivity extends Activity {
 
 		@Override
 		public void setThemeLight() {
-			RelativeLayout lay			= (RelativeLayout) findViewById(R.id.announcement_layout);
+			ScrollView layout		= (ScrollView) findViewById(R.id.announcement_scroll_view);
 			int dark			= getResources().getColor(R.color.grey_darker);
 			int white		= getResources().getColor(R.color.white);
 			int blue			= getResources().getColor(R.color.read);
 
-			lay.setBackgroundColor(white);
+			layout.setBackgroundColor(white);
 			tvTitle.setTextColor(blue);
 			tvWhere.setTextColor(dark);
 			tvWhereLbl.setTextColor(dark);
