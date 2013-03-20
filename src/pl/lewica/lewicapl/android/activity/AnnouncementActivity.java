@@ -39,14 +39,14 @@ import android.widget.TextView;
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
-import pl.lewica.lewicapl.android.DialogHandler;
+import pl.lewica.lewicapl.android.DialogManager;
 import pl.lewica.lewicapl.android.TextPreferencesManager;
-import pl.lewica.lewicapl.android.DialogHandler.TextSizeSliderEventHandler;
+import pl.lewica.lewicapl.android.DialogManager.SliderEventHandler;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.BaseTextDAO;
 
 
-public class AnnouncementActivity extends Activity implements TextSizeSliderEventHandler {
+public class AnnouncementActivity extends Activity implements SliderEventHandler {
 	// This intent's base Uri.  It should have a numeric ID appended to it.
 	public static final String BASE_URI	= "content://lewicapl/announcements/announcement/";
 
@@ -187,8 +187,12 @@ public class AnnouncementActivity extends Activity implements TextSizeSliderEven
 
 			case R.id.menu_change_text_size:
 				int sizeInPoints	= TextPreferencesManager.convertTextSizeToPoint(TextPreferencesManager.getUserTextSize(this) );
-				DialogHandler.showDialogWithTextSizeSlider(sizeInPoints, TextPreferencesManager.TEXT_SIZES_TOTAL, this, this);
+				DialogManager.showDialogWithTextSizeSlider(sizeInPoints, TextPreferencesManager.TEXT_SIZES_TOTAL, this, this);
 
+				return true;
+
+			case R.id.menu_change_background:
+				//changeTheme();
 				return true;
 
 			default :
@@ -198,7 +202,7 @@ public class AnnouncementActivity extends Activity implements TextSizeSliderEven
 
 
 	@Override
-	public void changeTextSize(int points) {
+	public void changeValue(int points) {
 		float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
 		float titleTextSize = textSize + 9.f;
 

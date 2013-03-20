@@ -11,15 +11,16 @@ import android.view.ViewGroup;
 import android.widget.SeekBar;
 
 
-public class DialogHandler {
+public class DialogManager {
 
 
-	public interface TextSizeSliderEventHandler {
-		public void changeTextSize(int points);
+	public interface SliderEventHandler {
+		public void changeValue(int points);
 	}
 
 
-	public static void showDialogWithTextSizeSlider(int sliderValue, int sliderMax, Activity activity, final TextSizeSliderEventHandler sliderProgressDelegate) {
+	// TODO Remove references to "text size" as it should be a context-agnostic slider pop-up
+	public static void showDialogWithTextSizeSlider(int sliderValue, int sliderMax, Activity activity, final SliderEventHandler sliderProgressDelegate) {
 		LayoutInflater inflater		= (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View layout					= inflater.inflate(R.layout.dialog_text_size, (ViewGroup) activity.findViewById(R.id.dialog_text_size_root) );
 		AlertDialog.Builder builder	= new AlertDialog.Builder(activity).setView(layout);
@@ -36,7 +37,7 @@ public class DialogHandler {
 		slider.setPadding(70, 20, 70, 20);
 		slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
-				sliderProgressDelegate.changeTextSize(progress);
+				sliderProgressDelegate.changeValue(progress);
 			}
 
 			@Override
