@@ -24,7 +24,7 @@ public class DialogManager {
 
 		configureSlider(layout, slider, sliderProgressDelegate);
 
-		AlertDialog dialog	= buildAlertDialogWithOneButton(slider, activityContext, layout);
+		AlertDialog dialog	= buildAlertDialogWithOneButton(slider, layout, activityContext);
 
 		dialog.show();
 	}
@@ -36,7 +36,7 @@ public class DialogManager {
 	}
 
 
-	private static AlertDialog buildAlertDialogWithOneButton(SliderDialog slider, Activity activity, View layout) {
+	private static AlertDialog buildAlertDialogWithOneButton(SliderDialog slider, View layout, Activity activity) {
 		AlertDialog.Builder builder	= new AlertDialog.Builder(activity).setView(layout);
 		builder.setTitle(slider.getTitleResource() );
 		builder.setPositiveButton(slider.getOkButtonResource(), new DialogInterface.OnClickListener() {
