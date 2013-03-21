@@ -49,6 +49,7 @@ import android.widget.TextView;
 import pl.lewica.lewicapl.R;
 import pl.lewica.api.model.Article;
 import pl.lewica.api.url.ArticleURL;
+import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 
 
@@ -69,7 +70,6 @@ public class NewsListActivity extends Activity {
 	// That results in articles still being marked as unread (titles in red rather than blue).
 	// That's why we need to cache the list of clicked articles.  Please note, it is down to ArcticleActivity to flag articles as read in the database.
 	private static Set<Long> clicked	= new HashSet<Long>();
-
 
 
 	@Override
@@ -174,6 +174,8 @@ public class NewsListActivity extends Activity {
 		private int colIndex_HasThumb;
 		private int colIndex_ThumbExt;
 
+		private int mTheme;
+
 		private static SimpleDateFormat dateFormat	= new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
 
@@ -194,6 +196,8 @@ public class NewsListActivity extends Activity {
 			colIndex_HasComment	= cursor.getColumnIndex(ArticleDAO.FIELD_HAS_EDITOR_COMMENT);
 			colIndex_HasThumb		= cursor.getColumnIndex(ArticleDAO.FIELD_HAS_IMAGE);
 			colIndex_ThumbExt		= cursor.getColumnIndex(ArticleDAO.FIELD_IMAGE_EXTENSION);
+
+			mTheme	= TextPreferencesManager.getUserTheme(context);
 		}
 
 		/**
@@ -214,19 +218,19 @@ public class NewsListActivity extends Activity {
 				iv.setVisibility(View.VISIBLE);
 			}
 			// Title
-			tv	= (TextView) view.findViewById(R.id.article_item_title);
+			TextView tvTitle	= (TextView) view.findViewById(R.id.article_item_title);
 			if (cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) ) ) {
 				colour	= res.getColor(R.color.unread);
 			} else {
 				colour	= res.getColor(R.color.read);
 			}
-			tv.setTextColor(colour);
-			tv.setText(cursor.getString(colIndex_Title) );
+			tvTitle.setTextColor(colour);
+			tvTitle.setText(cursor.getString(colIndex_Title) );
 			// Datetime
-			tv	= (TextView) view.findViewById(R.id.article_item_date);
+			TextView tvDate	= (TextView) view.findViewById(R.id.article_item_date);
 			long unixTime	= cursor.getLong(colIndex_DatePub);	// Dates are stored as Unix timestamps
 			Date d				= new Date(unixTime);
-			tv.setText(dateFormat.format(d) );
+			tvDate.setText(dateFormat.format(d) );
 
 			// Thumbnail
 			iv	= (ImageView) view.findViewById(R.id.article_item_icon);
@@ -256,6 +260,16 @@ public class NewsListActivity extends Activity {
 						break;
 				}
 			}
+
+			if (mTheme != TextPreferencesManager.THEME_WHITE_ON_BLACK) {
+				tvDate.setTextColor(res.getColor(R.color.white) );
+				tvTitle.setTextColor(res.getColor(R.color.blue_light) );
+				view.setBackgroundColor(res.getColor(R.color.black) );
+			} else {
+				tvDate.setTextColor(res.getColor(R.color.grey_darker) );
+				view.setBackgroundColor(res.getColor(android.R.color.transparent) );
+			}
+
 		}
 
 		@Override
@@ -318,6 +332,7 @@ public class NewsListActivity extends Activity {
 			});
 			return v;
 		}
+
 
 		/**
 		 * Determines whether the current data item (at the current position
