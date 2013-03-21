@@ -22,7 +22,7 @@ public class DialogManager {
 	public static void showDialogWithSlider(SliderDialog slider, Activity activityContext, final SliderEventHandler sliderProgressDelegate) {
 		View layout	= getDialogLayout(activityContext);
 
-		configureSlider(slider, layout, sliderProgressDelegate);
+		configureSlider(layout, slider, sliderProgressDelegate);
 
 		AlertDialog dialog	= buildAlertDialogWithOneButton(slider, activityContext, layout);
 
@@ -47,7 +47,7 @@ public class DialogManager {
 	}
 
 
-	private static void configureSlider(SliderDialog slider, View layout, final SliderEventHandler sliderProgressDelegate) {
+	private static void configureSlider(View layout, SliderDialog slider, final SliderEventHandler sliderProgressDelegate) {
 		SeekBar sb		= (SeekBar) layout.findViewById(R.id.dialog_slider);
 		sb.setMax(slider.getSliderMax() );
 		sb.setProgress(slider.getSliderValue() );
