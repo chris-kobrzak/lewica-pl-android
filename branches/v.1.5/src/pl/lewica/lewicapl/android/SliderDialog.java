@@ -43,7 +43,7 @@ public class SliderDialog {
 	}
 
 
-	public void setOkButtonResource(int mOkButtonResource) {
-		this.mOkButtonResource = mOkButtonResource;
+	public void setOkButtonResource(int okButtonResource) {
+		this.mOkButtonResource = okButtonResource;
 	}
 }
