@@ -244,7 +244,7 @@ public class ArticleActivity extends Activity {
 
 			case R.id.menu_change_background:
 				TextPreferencesManager.switchTheme(mThemeHandler, this);
-				reloadListingTabs();
+				ApplicationRootActivity.reloadAllTabsInBackground(this);
 
 				return true;
 
@@ -410,15 +410,6 @@ public class ArticleActivity extends Activity {
 		ImageView iv			= (ImageView) findViewById(R.id.article_image);
 
 		iv.setImageBitmap(bm);
-	}
-
-
-	private void reloadListingTabs() {
-		new Thread(new Runnable() {
-			public void run() {
-				BroadcastSender.getInstance(getApplicationContext() ).reloadAllTabs();
-			}
-		}).start();
 	}
 
 

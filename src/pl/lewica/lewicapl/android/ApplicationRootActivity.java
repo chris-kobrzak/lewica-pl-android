@@ -322,4 +322,13 @@ public class ApplicationRootActivity extends TabActivity {
 			}
 		}
 	}
+
+
+	public static void reloadAllTabsInBackground(final Context context) {
+		new Thread(new Runnable() {
+			public void run() {
+				BroadcastSender.getInstance(context).reloadAllTabs();
+			}
+		}).start();
+	}
 }
