@@ -210,7 +210,7 @@ public class AnnouncementListActivity extends Activity {
 			}
 
 			if (TextPreferencesManager.getUserTheme(context) == TextPreferencesManager.THEME_WHITE_ON_BLACK) {
-				tvWhereWhen.setTextColor(res.getColor(R.color.white) );
+				tvWhereWhen.setTextColor(res.getColor(R.color.grey) );
 				view.setBackgroundColor(res.getColor(R.color.black) );
 			} else {
 				tvWhereWhen.setTextColor(res.getColor(R.color.grey_darker) );
