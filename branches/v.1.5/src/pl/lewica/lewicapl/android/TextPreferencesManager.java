@@ -128,15 +128,17 @@ public class TextPreferencesManager {
 
 
 	public static void setListViewDividerColour(ListView listView, Context context) {
+		int colour	= 0;
 		switch (getUserTheme(context) ) {
 			case THEME_BLACK_ON_WHITE:
-				listView.setDivider(new ColorDrawable(context.getResources().getColor(R.color.grey) ) );
+				colour	= R.color.grey;
 				break;
 
 			case THEME_WHITE_ON_BLACK:
-				listView.setDivider(new ColorDrawable(context.getResources().getColor(R.color.grey_darker) ) );
+				colour	= R.color.grey_darker;
 				break;
 		}
+		listView.setDivider(new ColorDrawable(context.getResources().getColor(colour) ) );
 		listView.setDividerHeight(1);
 	}
 }

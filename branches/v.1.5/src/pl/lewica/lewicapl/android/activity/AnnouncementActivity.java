@@ -20,11 +20,9 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -37,6 +35,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.AndroidUtil;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.DialogManager;
@@ -101,7 +100,7 @@ public class AnnouncementActivity extends Activity {
 		// The logic below fixes this issue and it's using the ID set by onRetainNonConfigurationInstance (see docs for details).
 		final Long ID	= (Long) getLastNonConfigurationInstance();
 		if (ID == null) {
-			annID			= filterIDFromUri(getIntent() );
+			annID			= AndroidUtil.filterIDFromUri(getIntent().getData() );
 		} else {
 			annID			= ID;
 		}
@@ -340,22 +339,6 @@ public class AnnouncementActivity extends Activity {
 		cursor.close();
 
 		reloadListingTabAndMarkAsRead(ID, context);
-	}
-
-
-	/**
-	 * Activities on Android are invoked with a Uri string.  This method captures and returns the last bit of this Uri
-	 * which it assumes to be a numeric ID of the current announcement.
-	 * @param intent
-	 * @return
-	 */
-	public long filterIDFromUri(Intent intent) {
-		Uri uri						= intent.getData();
-		String announcementIDString	= uri.getLastPathSegment();
-		
-		// TODO Make sure announcementID is a number
-		Long announcementID			= Long.valueOf(announcementIDString);
-		return announcementID;
 	}
 
 
