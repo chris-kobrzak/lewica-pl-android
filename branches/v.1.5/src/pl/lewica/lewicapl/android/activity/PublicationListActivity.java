@@ -257,7 +257,7 @@ public class PublicationListActivity extends Activity {
 			}
 
 			if (TextPreferencesManager.getUserTheme(context) == TextPreferencesManager.THEME_WHITE_ON_BLACK) {
-				tvDate.setTextColor(res.getColor(R.color.white) );
+				tvDate.setTextColor(res.getColor(R.color.grey) );
 				view.setBackgroundColor(res.getColor(R.color.black) );
 			} else {
 				tvDate.setTextColor(res.getColor(R.color.grey_darker) );
