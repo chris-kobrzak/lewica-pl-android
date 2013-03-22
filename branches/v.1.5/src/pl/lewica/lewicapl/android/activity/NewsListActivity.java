@@ -31,6 +31,8 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -87,7 +89,7 @@ public class NewsListActivity extends Activity {
 		File sdDir				= Environment.getExternalStorageDirectory();
 		storageDir				= new File(sdDir + getResources().getString(R.string.path_images) );
 		storageDir.mkdirs();
-		
+
 		// Register to receive content update messages
 		IntentFilter filter		= new IntentFilter();
 		filter.addAction(RELOAD_VIEW);
@@ -129,6 +131,8 @@ public class NewsListActivity extends Activity {
 				return;
 			}
 		});
+
+		TextPreferencesManager.setListViewDividerColour(listView, this);
 	}
 
 
@@ -145,6 +149,7 @@ public class NewsListActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			reloadRows();
+			TextPreferencesManager.setListViewDividerColour(listView, context);
 		}
 	}
 

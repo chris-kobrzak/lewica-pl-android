@@ -1,9 +1,12 @@
 package pl.lewica.lewicapl.android;
 
+import pl.lewica.lewicapl.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.drawable.ColorDrawable;
 import android.preference.PreferenceManager;
+import android.widget.ListView;
 
 public class TextPreferencesManager {
 
@@ -52,7 +55,7 @@ public class TextPreferencesManager {
 			case THEME_BLACK_ON_WHITE:
 				themeHandler.setThemeLight();
 				break;
-				
+
 			case THEME_WHITE_ON_BLACK:
 				themeHandler.setThemeDark();
 				break;
@@ -108,7 +111,7 @@ public class TextPreferencesManager {
 
 	public static float getUserTextSizeHeading(Context context) {
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(context);
-		
+
 		return prefs.getFloat(USER_SETTING_TEXT_SIZE_HEADING, DEFAULT_TEXT_SIZE_HEADING);
 	}
 
@@ -121,5 +124,19 @@ public class TextPreferencesManager {
 		Editor prefsEditor			= prefs.edit();
 		prefsEditor.putFloat(USER_SETTING_TEXT_SIZE_HEADING, size);
 		prefsEditor.commit();
+	}
+
+
+	public static void setListViewDividerColour(ListView listView, Context context) {
+		switch (getUserTheme(context) ) {
+			case THEME_BLACK_ON_WHITE:
+				listView.setDivider(new ColorDrawable(context.getResources().getColor(R.color.grey) ) );
+				break;
+
+			case THEME_WHITE_ON_BLACK:
+				listView.setDivider(new ColorDrawable(context.getResources().getColor(R.color.grey_darker) ) );
+				break;
+		}
+		listView.setDividerHeight(1);
 	}
 }

@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -112,6 +113,8 @@ public class AnnouncementListActivity extends Activity {
 				return;
 			}
 		});
+
+		TextPreferencesManager.setListViewDividerColour(listView, this);
 	}
 
 
@@ -128,6 +131,7 @@ public class AnnouncementListActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			reloadRows();
+			TextPreferencesManager.setListViewDividerColour(listView, context);
 		}
 	}
 

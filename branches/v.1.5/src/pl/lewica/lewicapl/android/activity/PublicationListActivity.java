@@ -31,6 +31,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -130,6 +131,8 @@ public class PublicationListActivity extends Activity {
 				return;
 			}
 		});
+
+		TextPreferencesManager.setListViewDividerColour(listView, this);
 	}
 
 
@@ -146,6 +149,7 @@ public class PublicationListActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			reloadRows();
+			TextPreferencesManager.setListViewDividerColour(listView, context);
 		}
 	}
 

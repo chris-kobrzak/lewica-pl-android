@@ -5,6 +5,7 @@
 	<color name="red">#fa1000</color>
 	<color name="orange">#ffb31a</color>
 	<color name="grey_light">#eee</color>
+	<color name="grey">#ccc</color>
 	<color name="grey_dark">#aaa</color>
 	<color name="grey_darker">#303030</color>
 	<color name="black">#000</color>

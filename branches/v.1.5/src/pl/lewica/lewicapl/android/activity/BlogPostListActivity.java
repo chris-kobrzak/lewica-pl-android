@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -118,6 +119,8 @@ public class BlogPostListActivity extends Activity {
 				return;
 			}
 		});
+
+		TextPreferencesManager.setListViewDividerColour(listView, this);
 	}
 
 
@@ -147,6 +150,7 @@ public class BlogPostListActivity extends Activity {
 				int blogID		= intent.getIntExtra(BlogPostListActivity.dataFilters.BLOG_ID.name(), 0);
 				reloadRowsFilterByBlogID(blogID);
 			}
+			TextPreferencesManager.setListViewDividerColour(listView, context);
 		}
 	}
 
