@@ -264,7 +264,6 @@ public class NewsListActivity extends Activity {
 				tvDate.setTextColor(res.getColor(R.color.grey_darker) );
 				view.setBackgroundColor(res.getColor(android.R.color.transparent) );
 			}
-
 		}
 
 		@Override

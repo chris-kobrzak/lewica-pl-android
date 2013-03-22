@@ -38,6 +38,7 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.BaseTextDAO;
 
@@ -182,10 +183,10 @@ public class AnnouncementListActivity extends Activity {
 			tv.setTextColor(colour);
 			tv.setText(cursor.getString(colIndex_Title) );
 			// Where and when?
-			tv	= (TextView) view.findViewById(R.id.announcement_item_details);
+			TextView tvWhereWhen	= (TextView) view.findViewById(R.id.announcement_item_details);
 			String where	= cursor.getString(colIndex_Where);
 			String when	= cursor.getString(colIndex_When);
-			tv.setVisibility(View.VISIBLE);
+			tvWhereWhen.setVisibility(View.VISIBLE);
 
 			if (where.length() > 0 && when.length() > 0) {
 				StringBuilder sb	= new StringBuilder();
@@ -193,21 +194,24 @@ public class AnnouncementListActivity extends Activity {
 				sb.append(" | ");
 				sb.append(when);
 
-				tv.setText(sb.toString() );
-				return;
+				tvWhereWhen.setText(sb.toString() );
+			} else if (where.length() > 0) {
+				tvWhereWhen.setText(where);
+			} else if (when.length() > 0) {
+				tvWhereWhen.setText(when);
+			} else {
+				// We are still here - that means both where and when info is empty.
+				tvWhereWhen.setText("");
+				tvWhereWhen.setVisibility(View.GONE);
 			}
 
-			if (where.length() > 0) {
-				tv.setText(where);
-				return;
+			if (TextPreferencesManager.getUserTheme(context) == TextPreferencesManager.THEME_WHITE_ON_BLACK) {
+				tvWhereWhen.setTextColor(res.getColor(R.color.white) );
+				view.setBackgroundColor(res.getColor(R.color.black) );
+			} else {
+				tvWhereWhen.setTextColor(res.getColor(R.color.grey_darker) );
+				view.setBackgroundColor(res.getColor(android.R.color.transparent) );
 			}
-			if (when.length() > 0) {
-				tv.setText(when);
-				return;
-			}
-			// We are still here - that means both where and when info is empty.
-			tv.setText("");
-			tv.setVisibility(View.GONE);
 		}
 
 
