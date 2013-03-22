@@ -35,6 +35,7 @@ import android.widget.TextView;
 
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ContentUpdateManager;
+import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.database.HistoryDAO;
 
 
@@ -60,7 +61,7 @@ public class HistoryListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.list_history);	// This comes from this file's name /res/list_history.xml
 
-		// Load a list view container from list_articles.xml
+		// Load a list view container from list_history.xml
 		listView					= (ListView) findViewById(R.id.list_history_events);
 
 		// Custom font used by the category headings
@@ -80,11 +81,17 @@ public class HistoryListActivity extends Activity {
 		historyDAO.open();
 		Cursor cursor			= historyDAO.select(month, day, limitRows);
 		startManagingCursor(cursor);
-		
+
+		int layout;
+		if (TextPreferencesManager.getUserTheme(this) == TextPreferencesManager.THEME_WHITE_ON_BLACK) {
+			layout	= R.layout.list_history_item_dark;
+		} else {
+			layout	= R.layout.list_history_item;
+		}
 		// Set list view adapter - this links the view with the data
 		listAdapter				= new SimpleCursorAdapter(
 				this, 
-				R.layout.list_history_item,
+				layout,
 				cursor, 
 				new String[] { HistoryDAO.FIELD_YEAR, HistoryDAO.FIELD_EVENT },
 				new int[] { R.id.history_year, R.id.history_event }
