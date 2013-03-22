@@ -224,7 +224,7 @@ public class BlogPostActivity extends Activity {
 
 			case R.id.menu_change_background:
 				TextPreferencesManager.switchTheme(mThemeHandler, this);
-				reloadListingTabs();
+				ApplicationRootActivity.reloadAllTabsInBackground(this);
 
 				return true;
 
@@ -335,15 +335,6 @@ public class BlogPostActivity extends Activity {
 			public void run() {
 				blogPostDAO.updateMarkAsRead(blogPostIDThread);
 				BroadcastSender.getInstance(contextThread).reloadTab(ApplicationRootActivity.Tab.BLOGS);
-			}
-		}).start();
-	}
-
-
-	private void reloadListingTabs() {
-		new Thread(new Runnable() {
-			public void run() {
-				BroadcastSender.getInstance(getApplicationContext() ).reloadAllTabs();
 			}
 		}).start();
 	}

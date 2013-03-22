@@ -59,15 +59,6 @@ public class AnnouncementActivity extends Activity {
 	private SliderEventHandler mTextSizeHandler;
 	private ThemeHandler mThemeHandler;
 
-//	private int colIndex_ID;
-	private int colIndex_WasRead;
-	private int colIndex_Title;
-	private int colIndex_Where;
-	private int colIndex_When;
-	private int colIndex_Content;
-	private int colIndex_PublishedBy;
-	private int colIndex_PublishedByEmail;
-
 	private TextView tvTitle;
 	private TextView tvWhereLbl;
 	private TextView tvWhenLbl;
@@ -141,7 +132,7 @@ public class AnnouncementActivity extends Activity {
 
 		MenuInflater infl	= getMenuInflater();
 		infl.inflate(R.menu.menu_announcement, menu);
-		
+
 		return true;
 	}
 
@@ -206,7 +197,7 @@ public class AnnouncementActivity extends Activity {
 
 			case R.id.menu_change_background:
 				TextPreferencesManager.switchTheme(mThemeHandler, this);
-				reloadListingTabs();
+				ApplicationRootActivity.reloadAllTabsInBackground(this);
 
 				return true;
 
@@ -246,12 +237,13 @@ public class AnnouncementActivity extends Activity {
 		float userTextSize	= TextPreferencesManager.getUserTextSize(this);
 
 		// In order to capture a cell, you need to work what their index
-		colIndex_Title					= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHAT);
-		colIndex_Content				= cursor.getColumnIndex(AnnouncementDAO.FIELD_TEXT);
-		colIndex_Where					= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHERE);
-		colIndex_When					= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHEN);
-		colIndex_PublishedBy			= cursor.getColumnIndex(AnnouncementDAO.FIELD_PUBLISHED_BY);
-		colIndex_PublishedByEmail	= cursor.getColumnIndex(AnnouncementDAO.FIELD_PUBLISHED_EMAIL);
+		int idxWasRead				= cursor.getColumnIndex(AnnouncementDAO.FIELD_WAS_READ);
+		int idxTitle					= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHAT);
+		int idxContent				= cursor.getColumnIndex(AnnouncementDAO.FIELD_TEXT);
+		int idxWhere					= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHERE);
+		int idxWhen					= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHEN);
+		int idxPublishedBy			= cursor.getColumnIndex(AnnouncementDAO.FIELD_PUBLISHED_BY);
+		int idxPublishedByEmail	= cursor.getColumnIndex(AnnouncementDAO.FIELD_PUBLISHED_EMAIL);
 
 		// When using previous-next facility you need to make sure the scroll view's position is at the top of the screen
 		ScrollView sv	= (ScrollView) findViewById(R.id.announcement_scroll_view);
@@ -261,7 +253,7 @@ public class AnnouncementActivity extends Activity {
 		// Now start populating all views with data
 		tvTitle					= (TextView) findViewById(R.id.announcement_title);
 		tvTitle.setTextSize(TextPreferencesManager.getUserTextSizeHeading(this) );
-		tvTitle.setText(cursor.getString(colIndex_Title) );
+		tvTitle.setText(cursor.getString(idxTitle) );
 
 		TextView tv;
 		tv							= (TextView) findViewById(R.id.announcement_category);
@@ -271,12 +263,12 @@ public class AnnouncementActivity extends Activity {
 		tvContent				= (TextView) findViewById(R.id.announcement_content);
 		tvContent.setTextSize(userTextSize);
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
-		tvContent.setText(cursor.getString(colIndex_Content).replace("\r", "") );
+		tvContent.setText(cursor.getString(idxContent).replace("\r", "") );
 
 		// Where
 		tvWhere					= (TextView) findViewById(R.id.announcement_where);
 		tvWhereLbl			= (TextView) findViewById(R.id.announcement_where_label);
-		String where			= cursor.getString(colIndex_Where);
+		String where			= cursor.getString(idxWhere);
 		if (where != null && where.length() > 0) {
 			tvWhere.setText(where);
 			// Reset visibility, may be useful when users navigate between announcements (previous-next facility to be added in the future)
@@ -294,7 +286,7 @@ public class AnnouncementActivity extends Activity {
 		// When
 		tvWhen					= (TextView) findViewById(R.id.announcement_when);
 		tvWhenLbl				= (TextView) findViewById(R.id.announcement_when_label);
-		String when			= cursor.getString(colIndex_When);
+		String when			= cursor.getString(idxWhen);
 		if (when != null && when.length() > 0) {
 			tvWhen.setText(when);
 			// Reset visibility, may be useful when users navigate between announcements (previous-next facility to be added in the future)
@@ -312,8 +304,8 @@ public class AnnouncementActivity extends Activity {
 
 		tvAuthor				= (TextView) findViewById(R.id.announcement_author);
 		tvAuthor.setTextSize(userTextSize);
-		String author			= cursor.getString(colIndex_PublishedBy);
-		String authorEmail	= cursor.getString(colIndex_PublishedByEmail);
+		String author			= cursor.getString(idxPublishedBy);
+		String authorEmail	= cursor.getString(idxPublishedByEmail);
 
 		if (author.length() == 0 && authorEmail.length() > 0) {
 			author				= authorEmail;
@@ -331,7 +323,7 @@ public class AnnouncementActivity extends Activity {
 			tvAuthor.setVisibility(View.INVISIBLE);
 		}
 		// Only mark the announcement as read once.  If it's already marked as such - just stop here.
-		if (cursor.getInt(colIndex_WasRead) == 1) {
+		if (cursor.getInt(idxWasRead) == 1) {
 			cursor.close();
 			return;
 		}
@@ -339,15 +331,6 @@ public class AnnouncementActivity extends Activity {
 		cursor.close();
 
 		reloadListingTabAndMarkAsRead(ID, context);
-	}
-
-
-	private void reloadListingTabs() {
-		new Thread(new Runnable() {
-			public void run() {
-				BroadcastSender.getInstance(getApplicationContext() ).reloadAllTabs();
-			}
-		}).start();
 	}
 
 
