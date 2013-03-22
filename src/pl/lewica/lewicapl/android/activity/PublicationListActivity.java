@@ -49,6 +49,7 @@ import android.widget.TextView;
 import pl.lewica.lewicapl.R;
 import pl.lewica.api.model.Article;
 import pl.lewica.api.url.ArticleURL;
+import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 
 
@@ -214,10 +215,10 @@ public class PublicationListActivity extends Activity {
 			iv	= (ImageView) view.findViewById(R.id.ico_pencil);
 			iv.setVisibility(View.GONE);
 			// Datetime
-			tv	= (TextView) view.findViewById(R.id.article_item_date);
+			TextView tvDate	= (TextView) view.findViewById(R.id.article_item_date);
 			long unixTime	= cursor.getLong(colIndex_DatePub);	// Dates are stored as Unix timestamps
 			Date d				= new Date(unixTime);
-			tv.setText(dateFormat.format(d) );
+			tvDate.setText(dateFormat.format(d) );
 
 			// Thumbnail
 			iv	= (ImageView) view.findViewById(R.id.article_item_icon);
@@ -250,6 +251,14 @@ public class PublicationListActivity extends Activity {
 						tv.setText(context.getString(R.string.heading_culture) );
 						break;
 				}
+			}
+
+			if (TextPreferencesManager.getUserTheme(context) == TextPreferencesManager.THEME_WHITE_ON_BLACK) {
+				tvDate.setTextColor(res.getColor(R.color.white) );
+				view.setBackgroundColor(res.getColor(R.color.black) );
+			} else {
+				tvDate.setTextColor(res.getColor(R.color.grey_darker) );
+				view.setBackgroundColor(res.getColor(android.R.color.transparent) );
 			}
 		}
 

@@ -207,6 +207,8 @@ public class AnnouncementActivity extends Activity {
 
 			case R.id.menu_change_background:
 				TextPreferencesManager.switchTheme(mThemeHandler, this);
+				reloadListingTabs();
+
 				return true;
 
 			default :
@@ -337,16 +339,7 @@ public class AnnouncementActivity extends Activity {
 		// Tidy up
 		cursor.close();
 
-		// Mark this announcement as read without blocking the UI thread
-		// Java threads require variables to be declared as final
-		final long announcementIDThread	= ID;
-		final Context contextThread			= context;
-		new Thread(new Runnable() {
-			public void run() {
-				annDAO.updateMarkAsRead(announcementIDThread);
-				BroadcastSender.getInstance(contextThread).reloadTab(ApplicationRootActivity.Tab.ANNOUNCEMENTS);
-			}
-		}).start();
+		reloadListingTabAndMarkAsRead(ID, context);
 	}
 
 
@@ -363,6 +356,33 @@ public class AnnouncementActivity extends Activity {
 		// TODO Make sure announcementID is a number
 		Long announcementID			= Long.valueOf(announcementIDString);
 		return announcementID;
+	}
+
+
+	private void reloadListingTabs() {
+		new Thread(new Runnable() {
+			public void run() {
+				BroadcastSender.getInstance(getApplicationContext() ).reloadAllTabs();
+			}
+		}).start();
+	}
+
+
+	/**
+	 * 1. Marks this article as read without blocking the UI thread (Java threads require variables to be declared as final)
+	 * 2. Asks listing screens to refresh
+	 * @param articleId
+	 * @param context
+	 */
+	private void reloadListingTabAndMarkAsRead(final long articleId, final Context context) {
+		// Mark this announcement as read without blocking the UI thread
+		// Java threads require variables to be declared as final
+		new Thread(new Runnable() {
+			public void run() {
+				annDAO.updateMarkAsRead(articleId);
+				BroadcastSender.getInstance(context).reloadTab(ApplicationRootActivity.Tab.ANNOUNCEMENTS);
+			}
+		}).start();
 	}
 
 
