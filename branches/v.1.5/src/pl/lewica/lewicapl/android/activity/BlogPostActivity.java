@@ -224,6 +224,8 @@ public class BlogPostActivity extends Activity {
 
 			case R.id.menu_change_background:
 				TextPreferencesManager.switchTheme(mThemeHandler, this);
+				reloadListingTabs();
+
 				return true;
 
 			default :
@@ -351,6 +353,15 @@ public class BlogPostActivity extends Activity {
 		// TODO Make sure blogPostID is a number
 		Long blogPostID			= Long.valueOf(blogPostIDString);
 		return blogPostID;
+	}
+
+
+	private void reloadListingTabs() {
+		new Thread(new Runnable() {
+			public void run() {
+				BroadcastSender.getInstance(getApplicationContext() ).reloadAllTabs();
+			}
+		}).start();
 	}
 
 
