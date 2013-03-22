@@ -386,17 +386,17 @@ public class AnnouncementActivity extends Activity {
 		public void setThemeDark() {
 			ScrollView layout		= (ScrollView) findViewById(R.id.announcement_scroll_view);
 			int black			= getResources().getColor(R.color.black);
-			int white		= getResources().getColor(R.color.white);
+			int light		= getResources().getColor(R.color.grey_light);
 			int lightBlue	= getResources().getColor(R.color.blue_light);
 
 			layout.setBackgroundColor(black);
 			tvTitle.setTextColor(lightBlue);
-			tvWhere.setTextColor(white);
-			tvWhereLbl.setTextColor(white);
-			tvWhen.setTextColor(white);
-			tvWhenLbl.setTextColor(white);
-			tvContent.setTextColor(white);
-			tvAuthor.setTextColor(white);
+			tvWhere.setTextColor(light);
+			tvWhereLbl.setTextColor(light);
+			tvWhen.setTextColor(light);
+			tvWhenLbl.setTextColor(light);
+			tvContent.setTextColor(light);
+			tvAuthor.setTextColor(light);
 		}
 
 

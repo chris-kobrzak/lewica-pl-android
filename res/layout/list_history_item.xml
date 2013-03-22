@@ -20,6 +20,6 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		style="@style/InfoParagraph"
-		android:textColor="@color/grey"
+		android:textColor="@color/grey_darker"
 	/>
 </LinearLayout>

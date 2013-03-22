@@ -18,10 +18,10 @@ public class TextPreferencesManager {
 	public static final String USER_SETTING_TEXT_SIZE_HEADING		= "textSizeHeading";
 	public static final float DEFAULT_TEXT_SIZE					= 16.f;
 	public static final float MIN_TEXT_SIZE							=  8.f;
-	public static final float MAX_TEXT_SIZE							= 36.f;
+	public static final float MAX_TEXT_SIZE							= 52.f;
 	public static final float DEFAULT_TEXT_SIZE_HEADING	= 25.f;
 	public static final float MIN_TEXT_SIZE_HEADING			= 17.f;
-	public static final float MAX_TEXT_SIZE_HEADING			= 45.f;
+	public static final float MAX_TEXT_SIZE_HEADING			= 65.f;
 	public static final float TEXT_SIZE_INCREMENT				=  1.f;
 	public static final int TEXT_SIZES_TOTAL		= (int) ( (MAX_TEXT_SIZE - MIN_TEXT_SIZE) / TEXT_SIZE_INCREMENT) + 1;
 
@@ -77,6 +77,10 @@ public class TextPreferencesManager {
 		prefsEditor.commit();
 	}
 
+
+	public static boolean isDarkTheme(Context context) {
+		return getUserTheme(context) == THEME_WHITE_ON_BLACK;
+	}
 
 	public static int convertTextSizeToPoint(float textSize) {
 		int textSizeInt	= Math.round(textSize);

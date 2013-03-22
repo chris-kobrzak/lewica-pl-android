@@ -104,7 +104,12 @@ public class AnnouncementListActivity extends Activity {
 				startActivity(intent);
 
 				// Mark current announcement as read by changing its colour...
-				int colour		= res.getColor(R.color.read);
+				int colour		= 0;
+				if (TextPreferencesManager.isDarkTheme(context) ) {
+					colour	= res.getColor(R.color.blue_light);
+				} else {
+					colour	= res.getColor(R.color.read);
+				}
 				tv					= (TextView) view.findViewById(R.id.announcement_item_title);
 				tv.setTextColor(colour);
 				// ... and flagging it in local cache accordingly
@@ -177,12 +182,18 @@ public class AnnouncementListActivity extends Activity {
 		public void bindView(View view, Context context, Cursor cursor) {
 			TextView tv;
 			int colour;
+			boolean isDarkTheme	= TextPreferencesManager.getUserTheme(context) == TextPreferencesManager.THEME_WHITE_ON_BLACK;
+
 			// Title
 			tv	= (TextView) view.findViewById(R.id.announcement_item_title);
 			if (cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) ) ) {
 				colour	= res.getColor(R.color.unread);
 			} else {
-				colour	= res.getColor(R.color.read);
+				if (isDarkTheme) {
+					colour	= res.getColor(R.color.blue_light);
+				} else {
+					colour	= res.getColor(R.color.read);
+				}
 			}
 			tv.setTextColor(colour);
 			tv.setText(cursor.getString(colIndex_Title) );
@@ -209,7 +220,7 @@ public class AnnouncementListActivity extends Activity {
 				tvWhereWhen.setVisibility(View.GONE);
 			}
 
-			if (TextPreferencesManager.getUserTheme(context) == TextPreferencesManager.THEME_WHITE_ON_BLACK) {
+			if (isDarkTheme) {
 				tvWhereWhen.setTextColor(res.getColor(R.color.grey) );
 				view.setBackgroundColor(res.getColor(R.color.black) );
 			} else {
