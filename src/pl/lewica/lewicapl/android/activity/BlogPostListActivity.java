@@ -40,6 +40,7 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
 
 
@@ -194,10 +195,9 @@ public class BlogPostListActivity extends Activity {
 		 */
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
-			TextView tv, dtv;
 			int colour;
 			// Title
-			tv	= (TextView) view.findViewById(R.id.blog_post_item_title);
+			TextView tv	= (TextView) view.findViewById(R.id.blog_post_item_title);
 			if (cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) ) ) {
 				colour	= res.getColor(R.color.unread);
 			} else {
@@ -206,23 +206,32 @@ public class BlogPostListActivity extends Activity {
 			tv.setTextColor(colour);
 			tv.setText(cursor.getString(colIndex_Author) + ": " + cursor.getString(colIndex_Title) );
 			// Datetime
-			dtv	= (TextView) view.findViewById(R.id.blog_post_item_date);
+			TextView tvDate	= (TextView) view.findViewById(R.id.blog_post_item_date);
 			long unixTime	= cursor.getLong(colIndex_DatePub);	// Dates are stored as Unix timestamps
 			Date d				= new Date(unixTime);
-			dtv.setText(dateFormat.format(d) );
+			tvDate.setText(dateFormat.format(d) );
 
 			// Blog title
-			tv	= (TextView) view.findViewById(R.id.blog_post_item_blog_title);
+			TextView tvBlog	= (TextView) view.findViewById(R.id.blog_post_item_blog_title);
 			String blogTitle	= cursor.getString(colIndex_Blog);
-			tv.setVisibility(View.VISIBLE);
+			tvBlog.setVisibility(View.VISIBLE);
 
 			if (blogTitle.length() > 0) {
-				tv.setText(blogTitle);
-				return;
+				tvBlog.setText(blogTitle);
+			} else {
+				tvBlog.setText("");
+				tvBlog.setVisibility(View.GONE);
 			}
-			// We are still here - that means both text fields are empty (very unlikely!).
-			tv.setText("");
-			tv.setVisibility(View.GONE);
+
+			if (TextPreferencesManager.getUserTheme(context) == TextPreferencesManager.THEME_WHITE_ON_BLACK) {
+				tvDate.setTextColor(res.getColor(R.color.white) );
+				tvBlog.setTextColor(res.getColor(R.color.white) );
+				view.setBackgroundColor(res.getColor(R.color.black) );
+			} else {
+				tvDate.setTextColor(res.getColor(R.color.grey_darker) );
+				tvBlog.setTextColor(res.getColor(R.color.grey_darker) );
+				view.setBackgroundColor(res.getColor(android.R.color.transparent) );
+			}
 		}
 
 
