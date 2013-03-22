@@ -51,7 +51,7 @@ public class DialogManager {
 		SeekBar sb		= (SeekBar) layout.findViewById(R.id.dialog_slider);
 		sb.setMax(slider.getSliderMax() );
 		sb.setProgress(slider.getSliderValue() );
-		sb.setPadding(70, 20, 70, 20);
+		sb.setPadding(90, 20, 90, 20);
 		sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
 				sliderProgressDelegate.changeValue(progress);

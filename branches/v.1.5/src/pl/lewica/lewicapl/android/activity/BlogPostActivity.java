@@ -370,13 +370,13 @@ public class BlogPostActivity extends Activity {
 		public void setThemeDark() {
 			ScrollView layout		= (ScrollView) findViewById(R.id.blog_post_scroll_view);
 			int black			= getResources().getColor(R.color.black);
-			int white		= getResources().getColor(R.color.white);
+			int light		= getResources().getColor(R.color.grey_light);
 			int lightBlue	= getResources().getColor(R.color.blue_light);
 
 			layout.setBackgroundColor(black);
 			tvTitle.setTextColor(lightBlue);
-			tvContent.setTextColor(white);
-			tvAuthor.setTextColor(white);
+			tvContent.setTextColor(light);
+			tvAuthor.setTextColor(light);
 		}
 
 

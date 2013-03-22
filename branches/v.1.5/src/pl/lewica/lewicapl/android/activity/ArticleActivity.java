@@ -78,16 +78,6 @@ public class ArticleActivity extends Activity {
 	private SliderEventHandler mTextSizeHandler;
 	private ThemeHandler mThemeHandler;
 
-	private int colIndex_CategoryID;
-	private int colIndex_WasRead;
-	private int colIndex_Title;
-	private int colIndex_DatePub;
-	private int colIndex_URL;
-	private int colIndex_Content;
-	private int colIndex_Comment;
-	private int colIndex_HasThumb;
-	private int colIndex_ThumbExt;
-
 	private TextView tvTitle;
 	private TextView tvContent;
 	private TextView tvComment;
@@ -281,15 +271,15 @@ public class ArticleActivity extends Activity {
 		startManagingCursor(cursor);
 
 		// In order to capture a cell, you need to work what their index
-		colIndex_URL				= cursor.getColumnIndex(ArticleDAO.FIELD_URL);
-		colIndex_CategoryID	= cursor.getColumnIndex(ArticleDAO.FIELD_CATEGORY_ID);
-		colIndex_Title			= cursor.getColumnIndex(ArticleDAO.FIELD_TITLE);
-		colIndex_DatePub		= cursor.getColumnIndex(ArticleDAO.FIELD_DATE_PUBLISHED);
-		colIndex_Content		= cursor.getColumnIndex(ArticleDAO.FIELD_TEXT);
-		colIndex_Comment	= cursor.getColumnIndex(ArticleDAO.FIELD_EDITOR_COMMENT);
-		colIndex_WasRead		= cursor.getColumnIndex(ArticleDAO.FIELD_WAS_READ);
-		colIndex_HasThumb	= cursor.getColumnIndex(ArticleDAO.FIELD_HAS_IMAGE);
-		colIndex_ThumbExt	= cursor.getColumnIndex(ArticleDAO.FIELD_IMAGE_EXTENSION);
+		int inxURL				= cursor.getColumnIndex(ArticleDAO.FIELD_URL);
+		int inxCategoryID	= cursor.getColumnIndex(ArticleDAO.FIELD_CATEGORY_ID);
+		int inxTitle			= cursor.getColumnIndex(ArticleDAO.FIELD_TITLE);
+		int inxDatePub		= cursor.getColumnIndex(ArticleDAO.FIELD_DATE_PUBLISHED);
+		int inxContent		= cursor.getColumnIndex(ArticleDAO.FIELD_TEXT);
+		int inxComment		= cursor.getColumnIndex(ArticleDAO.FIELD_EDITOR_COMMENT);
+		int inxWasRead		= cursor.getColumnIndex(ArticleDAO.FIELD_WAS_READ);
+		int inxHasThumb	= cursor.getColumnIndex(ArticleDAO.FIELD_HAS_IMAGE);
+		int inxThumbExt	= cursor.getColumnIndex(ArticleDAO.FIELD_IMAGE_EXTENSION);
 
 		// When using previous-next facility you need to make sure the scroll view's position is at the top of the screen
 		ScrollView sv	= (ScrollView) findViewById(R.id.article_scroll_view);
@@ -302,17 +292,17 @@ public class ArticleActivity extends Activity {
 		}
 
 		// Save the URL in memory so the "share link" option in menu can access it easily
-		articleURL				= cursor.getString(colIndex_URL);
+		articleURL				= cursor.getString(inxURL);
 
 		float textSizeTitle	= TextPreferencesManager.getUserTextSizeHeading(this);
 		// Now start populating all views with data
 		tvTitle					= (TextView) findViewById(R.id.article_title);
 		tvTitle.setTextSize(textSizeTitle);
-		tvTitle.setText(cursor.getString(colIndex_Title) );
+		tvTitle.setText(cursor.getString(inxTitle) );
 
 		TextView tv;
 		tv							= (TextView) findViewById(R.id.article_category);
-		categoryID				= cursor.getInt(colIndex_CategoryID);
+		categoryID				= cursor.getInt(inxCategoryID);
 		tv.setTypeface(categoryTypeface);
 		switch (categoryID) {
 			case Article.SECTION_POLAND:
@@ -338,7 +328,7 @@ public class ArticleActivity extends Activity {
 		}
 
 		tv							= (TextView) findViewById(R.id.article_date);
-		long unixTime		= cursor.getLong(colIndex_DatePub);	// Dates are stored as Unix timestamps
+		long unixTime		= cursor.getLong(inxDatePub);	// Dates are stored as Unix timestamps
 		Date d					= new Date(unixTime);
 		tv.setText(dateFormat.format(d) );
 
@@ -347,11 +337,11 @@ public class ArticleActivity extends Activity {
 		tvContent	= (TextView) findViewById(R.id.article_content);
 		tvContent.setTextSize(textSizeStandard);
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
-		tvContent.setText(cursor.getString(colIndex_Content).replace("\r", "") );
+		tvContent.setText(cursor.getString(inxContent).replace("\r", "") );
 
 		tvComment				= (TextView) findViewById(R.id.article_editor_comment);
 		tv			= (TextView) findViewById(R.id.article_editor_comment_top);
-		String commentString		= cursor.getString(colIndex_Comment);
+		String commentString		= cursor.getString(inxComment);
 		if (commentString != null && commentString.length() > 0) {
 			tvComment.setTextSize(textSizeStandard);
 			tvComment.setText(commentString.replace("\r", "") );
@@ -368,7 +358,7 @@ public class ArticleActivity extends Activity {
 		// Reset image to avoid issues when navigating between previous and next articles
 		ImageView iv			= (ImageView) findViewById(R.id.article_image);
 		iv.setImageBitmap(null);
-		if (cursor.getInt(colIndex_HasThumb) == 1) {
+		if (cursor.getInt(inxHasThumb) == 1) {
 			boolean downloadImage		= true;
 			// Checking if this image is available in our local cache.
 			if (imageCache.isCached(articleID) ) {
@@ -380,7 +370,7 @@ public class ArticleActivity extends Activity {
 			}
 			// Image needs to downloaded from the server
 			if (downloadImage) {
-				String imageUrl		= ArticleURL.buildURLImage(ID, cursor.getString(colIndex_ThumbExt) );
+				String imageUrl		= ArticleURL.buildURLImage(ID, cursor.getString(inxThumbExt) );
 	
 				// Images need to be downloaded in a separate thread as we cannot block the UI thread.
 				// Note: we do not currently cache images on this screen and they are downloaded from the Internet on every request.
@@ -391,7 +381,7 @@ public class ArticleActivity extends Activity {
 		
 
 		// Only mark the article as read once.  If it's already marked as such - just stop here.
-		if (cursor.getInt(colIndex_WasRead) == 1) {
+		if (cursor.getInt(inxWasRead) == 1) {
 			cursor.close();
 			return;
 		}
@@ -472,14 +462,14 @@ public class ArticleActivity extends Activity {
 			ScrollView layout		= (ScrollView) findViewById(R.id.article_scroll_view);
 			int black			= getResources().getColor(R.color.black);
 			int dark			= getResources().getColor(R.color.grey_darker);
-			int white		= getResources().getColor(R.color.white);
+			int light		= getResources().getColor(R.color.grey_light);
 			int lightBlue	= getResources().getColor(R.color.blue_light);
 
 			layout.setBackgroundColor(black);
 			tvTitle.setTextColor(lightBlue);
-			tvContent.setTextColor(white);
+			tvContent.setTextColor(light);
 			tvComment.setBackgroundColor(dark);
-			tvComment.setTextColor(white);
+			tvComment.setTextColor(light);
 		}
 
 
