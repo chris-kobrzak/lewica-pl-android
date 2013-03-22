@@ -243,6 +243,8 @@ public class ArticleActivity extends Activity {
 
 			case R.id.menu_change_background:
 				TextPreferencesManager.switchTheme(mThemeHandler, this);
+				reloadListingTabs();
+
 				return true;
 
 			default :
@@ -395,27 +397,7 @@ public class ArticleActivity extends Activity {
 		// Tidy up
 		cursor.close();
 
-		// Mark this article as read without blocking the UI thread
-		// Java threads require variables to be declared as final
-		final long articleIDThread		= ID;
-		final int categoryIDThread		= categoryID;
-		final Context contextThread	= context;
-		new Thread(new Runnable() {
-			public void run() {
-				articleDAO.updateMarkAsRead(articleIDThread);
-				switch (categoryIDThread) {
-					case Article.SECTION_POLAND:
-					case Article.SECTION_WORLD:
-						BroadcastSender.getInstance(contextThread).reloadTab(ApplicationRootActivity.Tab.NEWS);
-					break;
-					case Article.SECTION_OPINIONS:
-					case Article.SECTION_REVIEWS:
-					case Article.SECTION_CULTURE:
-						BroadcastSender.getInstance(contextThread).reloadTab(ApplicationRootActivity.Tab.ARTICLES);
-					break;
-				}
-			}
-		}).start();
+		reloadListingTabAndMarkAsRead(ID, context);
 	}
 
 
@@ -443,6 +425,44 @@ public class ArticleActivity extends Activity {
 		// TODO Make sure articleID is a number
 		Long articleID			= Long.valueOf(articleIDString);
 		return articleID;
+	}
+
+
+	private void reloadListingTabs() {
+		new Thread(new Runnable() {
+			public void run() {
+				BroadcastSender.getInstance(getApplicationContext() ).reloadTab(ApplicationRootActivity.Tab.NEWS);
+				BroadcastSender.getInstance(getApplicationContext() ).reloadTab(ApplicationRootActivity.Tab.ARTICLES);
+			}
+		}).start();
+	}
+
+
+	/**
+	 * 1. Marks this article as read without blocking the UI thread (Java threads require variables to be declared as final)
+	 * 2. Asks listing screens to refresh
+	 * @param articleId
+	 * @param context
+	 */
+	private void reloadListingTabAndMarkAsRead(final long articleId, final Context context) {
+		final int categoryIdFinal		= categoryID;
+
+		new Thread(new Runnable() {
+			public void run() {
+				articleDAO.updateMarkAsRead(articleId);
+				switch (categoryIdFinal) {
+					case Article.SECTION_POLAND:
+					case Article.SECTION_WORLD:
+						BroadcastSender.getInstance(getApplicationContext() ).reloadTab(ApplicationRootActivity.Tab.NEWS);
+					break;
+					case Article.SECTION_OPINIONS:
+					case Article.SECTION_REVIEWS:
+					case Article.SECTION_CULTURE:
+						BroadcastSender.getInstance(getApplicationContext() ).reloadTab(ApplicationRootActivity.Tab.ARTICLES);
+					break;
+				}
+			}
+		}).start();
 	}
 
 

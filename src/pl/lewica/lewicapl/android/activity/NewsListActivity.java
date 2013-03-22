@@ -174,8 +174,6 @@ public class NewsListActivity extends Activity {
 		private int colIndex_HasThumb;
 		private int colIndex_ThumbExt;
 
-		private int mTheme;
-
 		private static SimpleDateFormat dateFormat	= new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
 
@@ -196,8 +194,6 @@ public class NewsListActivity extends Activity {
 			colIndex_HasComment	= cursor.getColumnIndex(ArticleDAO.FIELD_HAS_EDITOR_COMMENT);
 			colIndex_HasThumb		= cursor.getColumnIndex(ArticleDAO.FIELD_HAS_IMAGE);
 			colIndex_ThumbExt		= cursor.getColumnIndex(ArticleDAO.FIELD_IMAGE_EXTENSION);
-
-			mTheme	= TextPreferencesManager.getUserTheme(context);
 		}
 
 		/**
@@ -261,9 +257,8 @@ public class NewsListActivity extends Activity {
 				}
 			}
 
-			if (mTheme != TextPreferencesManager.THEME_WHITE_ON_BLACK) {
+			if (TextPreferencesManager.getUserTheme(context) == TextPreferencesManager.THEME_WHITE_ON_BLACK) {
 				tvDate.setTextColor(res.getColor(R.color.white) );
-				tvTitle.setTextColor(res.getColor(R.color.blue_light) );
 				view.setBackgroundColor(res.getColor(R.color.black) );
 			} else {
 				tvDate.setTextColor(res.getColor(R.color.grey_darker) );
