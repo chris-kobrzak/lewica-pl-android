@@ -431,8 +431,7 @@ public class ArticleActivity extends Activity {
 	private void reloadListingTabs() {
 		new Thread(new Runnable() {
 			public void run() {
-				BroadcastSender.getInstance(getApplicationContext() ).reloadTab(ApplicationRootActivity.Tab.NEWS);
-				BroadcastSender.getInstance(getApplicationContext() ).reloadTab(ApplicationRootActivity.Tab.ARTICLES);
+				BroadcastSender.getInstance(getApplicationContext() ).reloadAllTabs();
 			}
 		}).start();
 	}
@@ -453,12 +452,12 @@ public class ArticleActivity extends Activity {
 				switch (categoryIdFinal) {
 					case Article.SECTION_POLAND:
 					case Article.SECTION_WORLD:
-						BroadcastSender.getInstance(getApplicationContext() ).reloadTab(ApplicationRootActivity.Tab.NEWS);
+						BroadcastSender.getInstance(context).reloadTab(ApplicationRootActivity.Tab.NEWS);
 					break;
 					case Article.SECTION_OPINIONS:
 					case Article.SECTION_REVIEWS:
 					case Article.SECTION_CULTURE:
-						BroadcastSender.getInstance(getApplicationContext() ).reloadTab(ApplicationRootActivity.Tab.ARTICLES);
+						BroadcastSender.getInstance(context).reloadTab(ApplicationRootActivity.Tab.ARTICLES);
 					break;
 				}
 			}
