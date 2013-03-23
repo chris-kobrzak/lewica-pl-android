@@ -118,7 +118,7 @@ public class AnnouncementActivity extends Activity {
 	@Override
 	protected void onStop() {
 		super.onStop();
-		
+
 		annDAO.close();
 	}
 
@@ -142,16 +142,16 @@ public class AnnouncementActivity extends Activity {
 		long id;
 		nextPrevID		= annDAO.fetchPreviousNextID(annID);
 
+		menu.getItem(0).setEnabled(true);
 		menu.getItem(1).setEnabled(true);
-		menu.getItem(2).setEnabled(true);
 
 		id	= nextPrevID.get(AnnouncementDAO.MAP_KEY_PREVIOUS);
 		if (id == 0) {
-			menu.getItem(1).setEnabled(false);
+			menu.getItem(0).setEnabled(false);
 		}
 		id	= nextPrevID.get(AnnouncementDAO.MAP_KEY_NEXT);
 		if (id == 0) {
-			menu.getItem(2).setEnabled(false);
+			menu.getItem(1).setEnabled(false);
 		}
 
 		return true;
