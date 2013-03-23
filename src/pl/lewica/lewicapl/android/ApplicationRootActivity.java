@@ -59,14 +59,12 @@ public class ApplicationRootActivity extends TabActivity {
 		NEWS, ARTICLES, BLOGS, ANNOUNCEMENTS, HISTORY
 	}
 	// This is to be able switch by enum ordinal
-	public static final Tab[] tabs	= Tab.values();
+	public static final Tab[] TABS	= Tab.values();
 
 	private IntentFilter filter;
 	private BroadcastReceiver receiver;
 	private BroadcastSender broadcastSender;
 	private ContentUpdateManager updateManager;
-	// Number of seconds after which the application will attempt to run an update. 
-	private int updateInterval	= 5 * 60;
 
 
 	public void init() {
@@ -241,7 +239,7 @@ public class ApplicationRootActivity extends TabActivity {
 				ArticleDAO articleDAO;
 
 				// Switching over an integer representing the ordinal of the current tab
-				switch (tabs[tab]) {
+				switch (TABS[tab]) {
 					case NEWS:
 						articleDAO		= new ArticleDAO(this);
 						articleDAO.open();
@@ -298,7 +296,8 @@ public class ApplicationRootActivity extends TabActivity {
 		if (updateManager.isRunning() ) {
 			return;
 		}
-
+		// Number of seconds after which the application will attempt to run an update. 
+		int updateInterval	= 5 * 60;
 		if (updateManager.getIntervalSinceLastUpdate() < updateInterval) {
 			return;
 		}
