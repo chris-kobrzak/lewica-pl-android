@@ -62,15 +62,6 @@ public class BlogPostActivity extends Activity {
 	private SliderEventHandler mTextSizeHandler;
 	private ThemeHandler mThemeHandler;
 
-//	private int colIndex_ID;
-	private int colIndex_WasRead;
-	private int colIndex_DatePub;
-	private int colIndex_BlogID;
-	private int colIndex_Blog;
-	private int colIndex_PublishedBy;
-	private int colIndex_Title;
-	private int colIndex_Text;
-	
 	private TextView tvTitle;
 	private TextView tvContent;
 	private TextView tvAuthor;
@@ -262,42 +253,43 @@ public class BlogPostActivity extends Activity {
 		startManagingCursor(cursor);
 
 		// In order to capture a cell, you need to work what their index
-		colIndex_Title				= cursor.getColumnIndex(BlogPostDAO.FIELD_TITLE);
-		colIndex_Text				= cursor.getColumnIndex(BlogPostDAO.FIELD_TEXT);
-		colIndex_BlogID				= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_ID);
-		colIndex_Blog				= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_TITLE);
-		colIndex_DatePub			= cursor.getColumnIndex(BlogPostDAO.FIELD_DATE_PUBLISHED);
-		colIndex_PublishedBy		= cursor.getColumnIndex(BlogPostDAO.FIELD_AUTHOR);
+		int inxWasRead			= cursor.getColumnIndex(BlogPostDAO.FIELD_WAS_READ);
+		int inxTitle				= cursor.getColumnIndex(BlogPostDAO.FIELD_TITLE);
+		int inxText				= cursor.getColumnIndex(BlogPostDAO.FIELD_TEXT);
+		int inxBlogID				= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_ID);
+		int inxBlog				= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_TITLE);
+		int inxDatePub			= cursor.getColumnIndex(BlogPostDAO.FIELD_DATE_PUBLISHED);
+		int inxPublishedBy		= cursor.getColumnIndex(BlogPostDAO.FIELD_AUTHOR);
 
 		// When using previous-next facility you need to make sure the scroll view's position is at the top of the screen
 		ScrollView sv	= (ScrollView) findViewById(R.id.blog_post_scroll_view);
 		sv.fullScroll(View.FOCUS_UP);
 		sv.setSmoothScrollingEnabled(true);
 
-		blogID					= cursor.getInt(colIndex_BlogID);
-		blogPostURL			= URLDictionary.buildURL_BlogPost(cursor.getInt(colIndex_BlogID), ID);
+		blogID					= cursor.getInt(inxBlogID);
+		blogPostURL			= URLDictionary.buildURL_BlogPost(cursor.getInt(inxBlogID), ID);
 
 		float textSizeTitle	= TextPreferencesManager.getUserTextSizeHeading(this);
 		// Now start populating all views with data
 		TextView tv;
 		tvTitle					= (TextView) findViewById(R.id.blog_post_title);
 		tvTitle.setTextSize(textSizeTitle);
-		tvTitle.setText(cursor.getString(colIndex_Title) );
+		tvTitle.setText(cursor.getString(inxTitle) );
 
 		tv							= (TextView) findViewById(R.id.blog_post_category);
 		StringBuilder sb	= new StringBuilder(context.getString(R.string.heading_blog) );
 		sb.append(": ");
 		// By default we want to show blog title but if it's empty, blogger's name will do
-		if (cursor.getString(colIndex_Blog).length() > 0) {
-			sb.append(cursor.getString(colIndex_Blog).toLowerCase() );
-		} else if (cursor.getString(colIndex_PublishedBy).length() > 0) {
-			sb.append(cursor.getString(colIndex_PublishedBy).toLowerCase() );
+		if (cursor.getString(inxBlog).length() > 0) {
+			sb.append(cursor.getString(inxBlog).toLowerCase() );
+		} else if (cursor.getString(inxPublishedBy).length() > 0) {
+			sb.append(cursor.getString(inxPublishedBy).toLowerCase() );
 		}
 		tv.setTypeface(categoryTypeface);
 		tv.setText(sb.toString() );
 
 		tv							= (TextView) findViewById(R.id.blog_post_date);
-		long unixTime		= cursor.getLong(colIndex_DatePub);	// Dates are stored as Unix timestamps
+		long unixTime		= cursor.getLong(inxDatePub);	// Dates are stored as Unix timestamps
 		Date d					= new Date(unixTime);
 		tv.setText(dateFormat.format(d) );
 
@@ -306,10 +298,10 @@ public class BlogPostActivity extends Activity {
 		tvContent					= (TextView) findViewById(R.id.blog_post_content);
 		tvContent.setTextSize(textSizeStandard);
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
-		tvContent.setText(cursor.getString(colIndex_Text).replace("\r", "") );
+		tvContent.setText(cursor.getString(inxText).replace("\r", "") );
 
 		tvAuthor = (TextView) findViewById(R.id.blog_post_author);
-		String author			= cursor.getString(colIndex_PublishedBy);
+		String author			= cursor.getString(inxPublishedBy);
 
 		if (author.length() > 0) {
 			tvAuthor.setText(author);
@@ -320,7 +312,7 @@ public class BlogPostActivity extends Activity {
 			tvAuthor.setVisibility(View.INVISIBLE);
 		}
 		// Only mark the blog_post as read once.  If it's already marked as such - just stop here.
-		if (cursor.getInt(colIndex_WasRead) == 1) {
+		if (cursor.getInt(inxWasRead) == 1) {
 			cursor.close();
 			return;
 		}
