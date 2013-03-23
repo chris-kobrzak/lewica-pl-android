@@ -30,6 +30,25 @@ public class DialogManager {
 	}
 
 
+	private static void configureSlider(View layout, SliderDialog slider, final SliderEventHandler sliderProgressDelegate) {
+		SeekBar sb		= (SeekBar) layout.findViewById(R.id.dialog_slider);
+		sb.setMax(slider.getSliderMax() );
+		sb.setProgress(slider.getSliderValue() );
+		sb.setPadding(90, 20, 90, 20);
+		sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+				sliderProgressDelegate.changeValue(progress);
+			}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar arg0) {}
+			
+			@Override
+			public void onStopTrackingTouch(SeekBar arg0) {}
+		});
+	}
+
+
 	private static View getDialogLayout(Activity activity) {
 		LayoutInflater inflater	= (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		return inflater.inflate(R.layout.dialog_slider, (ViewGroup) activity.findViewById(R.id.dialog_slider_layout) );
@@ -44,24 +63,5 @@ public class DialogManager {
 		});
 
 		return builder.create();
-	}
-
-
-	private static void configureSlider(View layout, SliderDialog slider, final SliderEventHandler sliderProgressDelegate) {
-		SeekBar sb		= (SeekBar) layout.findViewById(R.id.dialog_slider);
-		sb.setMax(slider.getSliderMax() );
-		sb.setProgress(slider.getSliderValue() );
-		sb.setPadding(90, 20, 90, 20);
-		sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
-				sliderProgressDelegate.changeValue(progress);
-			}
-
-			@Override
-			public void onStartTrackingTouch(SeekBar arg0) {}
-
-			@Override
-			public void onStopTrackingTouch(SeekBar arg0) {}
-		});
 	}
 }
