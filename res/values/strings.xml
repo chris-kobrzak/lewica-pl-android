@@ -13,6 +13,7 @@
 	<color name="unread">#BF0000</color>
 	<color name="read">#136F80</color>
 	<color name="blue_light">#5CBBCD</color>
+	<color name="red_light">#F24949</color>
 	<string name="title_news">LewicaPL: informacje</string>
 	<string name="title_opinions">LewicaPL: publicystyka</string>
 	<string name="title_article">LewicaPL: artykuł</string>
