@@ -51,6 +51,9 @@ import pl.lewica.api.model.Article;
 import pl.lewica.api.url.ArticleURL;
 import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
+import pl.lewica.lewicapl.android.theme.ApplicationTheme;
+import pl.lewica.lewicapl.android.theme.DarkTheme;
+import pl.lewica.lewicapl.android.theme.LightTheme;
 
 
 /**
@@ -66,6 +69,7 @@ public class NewsListActivity extends Activity {
 	private ListAdapter listAdapter;
 	private ListView listView;
 	private BroadcastReceiver receiver;
+	private static ApplicationTheme appTheme;
 	// When users select a new article, navigate back to the list and start scrolling up and down, the cursor won't know this article should be marked as read.
 	// That results in articles still being marked as unread (titles in red rather than blue).
 	// That's why we need to cache the list of clicked articles.  Please note, it is down to ArcticleActivity to flag articles as read in the database.
@@ -109,7 +113,6 @@ public class NewsListActivity extends Activity {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				TextView tv;
 				Context context		= getApplicationContext();
-				Resources res			= context.getResources();
 
 				// Redirect to article details screen
 				Intent intent	= new Intent(context, ArticleActivity.class);
@@ -120,14 +123,13 @@ public class NewsListActivity extends Activity {
 				startActivity(intent);
 
 				// Mark current article as read by changing its colour...
-				int colour		= 0;
 				if (TextPreferencesManager.isDarkTheme(context) ) {
-					colour	= res.getColor(R.color.blue_light);
+					appTheme	= DarkTheme.getInstance(context);
 				} else {
-					colour	= res.getColor(R.color.read);
+					appTheme	= LightTheme.getInstance(context);
 				}
 				tv					= (TextView) view.findViewById(R.id.article_item_title);
-				tv.setTextColor(colour);
+				tv.setTextColor(appTheme.getListHeadingColour(true) );
 				// ... and flagging it in the database accordingly
 				clicked.add(id);
 
@@ -171,7 +173,6 @@ public class NewsListActivity extends Activity {
 		private static final int VIEW_TYPE_COUNT					= 2;
 		
 		public LayoutInflater inflater;
-		private static Resources res;
 
 		private int colIndex_ID;
 		private int colIndex_CategoryID;
@@ -191,8 +192,6 @@ public class NewsListActivity extends Activity {
 			// Get the layout inflater
 			inflater				= LayoutInflater.from(context);
 
-			res					= context.getResources();
-
 			// Get and cache column indices
 			colIndex_ID					= cursor.getColumnIndex(ArticleDAO.FIELD_ID);
 			colIndex_CategoryID		= cursor.getColumnIndex(ArticleDAO.FIELD_CATEGORY_ID);
@@ -209,31 +208,24 @@ public class NewsListActivity extends Activity {
 		 */
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
-			TextView tv;
-			ImageView iv;
-			int colour;
-			boolean isDarkTheme	= TextPreferencesManager.isDarkTheme(context);
+			if (TextPreferencesManager.isDarkTheme(context) ) {
+				appTheme	= DarkTheme.getInstance(context);
+			} else {
+				appTheme	= LightTheme.getInstance(context);
+			}
 
 			// Editor's comments icon
 			int hasComment	= cursor.getInt(colIndex_HasComment);
-			iv	= (ImageView) view.findViewById(R.id.ico_pencil);
+			ImageView iv	= (ImageView) view.findViewById(R.id.ico_pencil);
 			if (hasComment == 0) {
 				iv.setVisibility(View.INVISIBLE);
 			} else {
 				iv.setVisibility(View.VISIBLE);
 			}
 			// Title
+			boolean unread	= cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) );
 			TextView tvTitle	= (TextView) view.findViewById(R.id.article_item_title);
-			if (cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) ) ) {
-				colour	= res.getColor(R.color.unread);
-			} else {
-				if (isDarkTheme) {
-					colour	= res.getColor(R.color.blue_light);
-				} else {
-					colour	= res.getColor(R.color.read);
-				}
-			}
-			tvTitle.setTextColor(colour);
+			tvTitle.setTextColor(appTheme.getListHeadingColour(! unread) );
 			tvTitle.setText(cursor.getString(colIndex_Title) );
 			// Datetime
 			TextView tvDate	= (TextView) view.findViewById(R.id.article_item_date);
@@ -255,7 +247,7 @@ public class NewsListActivity extends Activity {
 			}
 
 			// If there is a group header, set their values
-			tv	= (TextView) view.findViewById(R.id.article_items_heading);
+			TextView tv	= (TextView) view.findViewById(R.id.article_items_heading);
 			if (tv != null) {
 				tv.setTypeface(categoryTypeface);
 
@@ -270,13 +262,8 @@ public class NewsListActivity extends Activity {
 				}
 			}
 
-			if (isDarkTheme) {
-				tvDate.setTextColor(res.getColor(R.color.grey) );
-				view.setBackgroundColor(res.getColor(R.color.black) );
-			} else {
-				tvDate.setTextColor(res.getColor(R.color.grey_darker) );
-				view.setBackgroundColor(res.getColor(android.R.color.transparent) );
-			}
+			tvDate.setTextColor(appTheme.getListTextColour() );
+			view.setBackgroundColor(appTheme.getBackgroundColour() );
 		}
 
 		@Override
