@@ -16,6 +16,8 @@ public class DialogManager {
 
 	public interface SliderEventHandler {
 		public void changeValue(int points);
+
+		public void finishSliding(int points);
 	}
 
 
@@ -39,12 +41,14 @@ public class DialogManager {
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
 				sliderProgressDelegate.changeValue(progress);
 			}
-			
+
 			@Override
-			public void onStartTrackingTouch(SeekBar arg0) {}
-			
+			public void onStartTrackingTouch(SeekBar seekBar) {}
+
 			@Override
-			public void onStopTrackingTouch(SeekBar arg0) {}
+			public void onStopTrackingTouch(SeekBar seekBar) {
+				sliderProgressDelegate.finishSliding(seekBar.getProgress() );
+			}
 		});
 	}
 
