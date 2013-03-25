@@ -26,7 +26,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Resources;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -34,6 +34,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -54,6 +55,7 @@ import pl.lewica.lewicapl.android.database.ArticleDAO;
 import pl.lewica.lewicapl.android.theme.ApplicationTheme;
 import pl.lewica.lewicapl.android.theme.DarkTheme;
 import pl.lewica.lewicapl.android.theme.LightTheme;
+import pl.lewica.lewicapl.android.theme.Theme;
 
 
 /**
@@ -74,6 +76,7 @@ public class NewsListActivity extends Activity {
 	// That results in articles still being marked as unread (titles in red rather than blue).
 	// That's why we need to cache the list of clicked articles.  Please note, it is down to ArcticleActivity to flag articles as read in the database.
 	private static Set<Long> clicked	= new HashSet<Long>();
+	private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
 
 
 	@Override
@@ -138,6 +141,29 @@ public class NewsListActivity extends Activity {
 		});
 
 		TextPreferencesManager.setListViewDividerColour(listView, this);
+
+		final Theme currentTheme	= Theme.getInstance(getApplicationContext() );
+		// It will not be gc-ed as long as this instance is kept referenced
+		prefsListener	= new SharedPreferences.OnSharedPreferenceChangeListener() {
+			public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+				// TODO handle textSizeStandard
+				// colourTheme
+				if (! key.equals(TextPreferencesManager.USER_SETTING_THEME) ) {
+					return;
+				}
+
+				// TODO Create a method in TextPreferencesManager that will return Theme.Themes
+				// to simplify the code below
+				int themeId	= prefs.getInt(TextPreferencesManager.USER_SETTING_THEME, TextPreferencesManager.THEME_BLACK_ON_WHITE);
+				if (themeId == TextPreferencesManager.THEME_BLACK_ON_WHITE) {
+					currentTheme.setCurrentTheme(Theme.Themes.LIGHT);
+				} else {
+					currentTheme.setCurrentTheme(Theme.Themes.DARK);
+				}
+			}
+		};
+		SharedPreferences prefsMgr	= PreferenceManager.getDefaultSharedPreferences(this);
+		prefsMgr.registerOnSharedPreferenceChangeListener(prefsListener);
 	}
 
 
