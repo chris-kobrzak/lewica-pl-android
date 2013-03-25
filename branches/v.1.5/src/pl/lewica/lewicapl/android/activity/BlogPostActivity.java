@@ -252,6 +252,8 @@ public class BlogPostActivity extends Activity {
 
 		startManagingCursor(cursor);
 
+		float userTextSize	= TextPreferencesManager.getUserTextSize(this);
+
 		// In order to capture a cell, you need to work what their index
 		int inxWasRead			= cursor.getColumnIndex(BlogPostDAO.FIELD_WAS_READ);
 		int inxTitle				= cursor.getColumnIndex(BlogPostDAO.FIELD_TITLE);
@@ -269,11 +271,10 @@ public class BlogPostActivity extends Activity {
 		blogID					= cursor.getInt(inxBlogID);
 		blogPostURL			= URLDictionary.buildURL_BlogPost(cursor.getInt(inxBlogID), ID);
 
-		float textSizeTitle	= TextPreferencesManager.getUserTextSizeHeading(this);
 		// Now start populating all views with data
 		TextView tv;
 		tvTitle					= (TextView) findViewById(R.id.blog_post_title);
-		tvTitle.setTextSize(textSizeTitle);
+		tvTitle.setTextSize(userTextSize + TextPreferencesManager.HEADING_TEXT_DIFF);
 		tvTitle.setText(cursor.getString(inxTitle) );
 
 		tv							= (TextView) findViewById(R.id.blog_post_category);
@@ -293,10 +294,8 @@ public class BlogPostActivity extends Activity {
 		Date d					= new Date(unixTime);
 		tv.setText(dateFormat.format(d) );
 
-		float textSizeStandard	= TextPreferencesManager.getUserTextSize(this);
-
 		tvContent					= (TextView) findViewById(R.id.blog_post_content);
-		tvContent.setTextSize(textSizeStandard);
+		tvContent.setTextSize(userTextSize);
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
 		tvContent.setText(cursor.getString(inxText).replace("\r", "") );
 
@@ -305,7 +304,7 @@ public class BlogPostActivity extends Activity {
 
 		if (author.length() > 0) {
 			tvAuthor.setText(author);
-			tvAuthor.setTextSize(textSizeStandard);
+			tvAuthor.setTextSize(userTextSize);
 			tvAuthor.setVisibility(View.VISIBLE);
 		} else {
 			tvAuthor.setText("");
@@ -344,14 +343,20 @@ public class BlogPostActivity extends Activity {
 		@Override
 		public void changeValue(int points) {
 			float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
-			float titleTextSize = textSize + 9.f;
 
-			tvTitle.setTextSize(titleTextSize);
+			tvTitle.setTextSize(textSize + TextPreferencesManager.HEADING_TEXT_DIFF);
 			tvContent.setTextSize(textSize);
 			tvAuthor.setTextSize(textSize);
 
 			TextPreferencesManager.setUserTextSize(textSize, mActivity);
-			TextPreferencesManager.setUserTextSizeHeading(titleTextSize, mActivity);
+		}
+
+
+		@Override
+		public void finishSliding(int points) {
+			float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
+
+			TextPreferencesManager.setUserTextSize(textSize, mActivity);
 		}
 	}
 

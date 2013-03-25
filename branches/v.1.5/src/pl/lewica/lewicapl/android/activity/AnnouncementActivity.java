@@ -252,7 +252,7 @@ public class AnnouncementActivity extends Activity {
 
 		// Now start populating all views with data
 		tvTitle					= (TextView) findViewById(R.id.announcement_title);
-		tvTitle.setTextSize(TextPreferencesManager.getUserTextSizeHeading(this) );
+		tvTitle.setTextSize(userTextSize + TextPreferencesManager.HEADING_TEXT_DIFF);
 		tvTitle.setText(cursor.getString(idxTitle) );
 
 		TextView tv;
@@ -364,9 +364,8 @@ public class AnnouncementActivity extends Activity {
 		@Override
 		public void changeValue(int points) {
 			float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
-			float titleTextSize = textSize + 9.f;
 
-			tvTitle.setTextSize(titleTextSize);
+			tvTitle.setTextSize(textSize + TextPreferencesManager.HEADING_TEXT_DIFF);
 			tvWhere.setTextSize(textSize);
 			tvWhereLbl.setTextSize(textSize);
 			tvWhen.setTextSize(textSize);
@@ -375,7 +374,14 @@ public class AnnouncementActivity extends Activity {
 			tvAuthor.setTextSize(textSize);
 
 			TextPreferencesManager.setUserTextSize(textSize, mActivity);
-			TextPreferencesManager.setUserTextSizeHeading(titleTextSize, mActivity);
+		}
+
+
+		@Override
+		public void finishSliding(int points) {
+			float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
+
+			TextPreferencesManager.setUserTextSize(textSize, mActivity);
 		}
 	}
 

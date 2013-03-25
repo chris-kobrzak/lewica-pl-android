@@ -270,6 +270,8 @@ public class ArticleActivity extends Activity {
 
 		startManagingCursor(cursor);
 
+		float userTextSize	= TextPreferencesManager.getUserTextSize(this);
+
 		// In order to capture a cell, you need to work what their index
 		int inxURL				= cursor.getColumnIndex(ArticleDAO.FIELD_URL);
 		int inxCategoryID	= cursor.getColumnIndex(ArticleDAO.FIELD_CATEGORY_ID);
@@ -294,10 +296,9 @@ public class ArticleActivity extends Activity {
 		// Save the URL in memory so the "share link" option in menu can access it easily
 		articleURL				= cursor.getString(inxURL);
 
-		float textSizeTitle	= TextPreferencesManager.getUserTextSizeHeading(this);
 		// Now start populating all views with data
 		tvTitle					= (TextView) findViewById(R.id.article_title);
-		tvTitle.setTextSize(textSizeTitle);
+		tvTitle.setTextSize(userTextSize + TextPreferencesManager.HEADING_TEXT_DIFF);
 		tvTitle.setText(cursor.getString(inxTitle) );
 
 		TextView tv;
@@ -332,10 +333,8 @@ public class ArticleActivity extends Activity {
 		Date d					= new Date(unixTime);
 		tv.setText(dateFormat.format(d) );
 
-		float textSizeStandard	= TextPreferencesManager.getUserTextSize(this);
-
 		tvContent	= (TextView) findViewById(R.id.article_content);
-		tvContent.setTextSize(textSizeStandard);
+		tvContent.setTextSize(userTextSize);
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
 		tvContent.setText(cursor.getString(inxContent).replace("\r", "") );
 
@@ -343,7 +342,7 @@ public class ArticleActivity extends Activity {
 		tv			= (TextView) findViewById(R.id.article_editor_comment_top);
 		String commentString		= cursor.getString(inxComment);
 		if (commentString != null && commentString.length() > 0) {
-			tvComment.setTextSize(textSizeStandard);
+			tvComment.setTextSize(userTextSize);
 			tvComment.setText(commentString.replace("\r", "") );
 			// Reset visibility, may be useful when users navigate between articles (previous-next facility to be added in the future)
 			tv.setVisibility(View.VISIBLE);
@@ -443,14 +442,18 @@ public class ArticleActivity extends Activity {
 		@Override
 		public void changeValue(int points) {
 			float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
-			float titleTextSize = textSize + 9.f;
 
-			tvTitle.setTextSize(titleTextSize);
+			tvTitle.setTextSize(textSize + TextPreferencesManager.HEADING_TEXT_DIFF);
 			tvContent.setTextSize(textSize);
 			tvComment.setTextSize(textSize);
+		}
+
+
+		@Override
+		public void finishSliding(int points) {
+			float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
 
 			TextPreferencesManager.setUserTextSize(textSize, mActivity);
-			TextPreferencesManager.setUserTextSizeHeading(titleTextSize, mActivity);
 		}
 	}
 

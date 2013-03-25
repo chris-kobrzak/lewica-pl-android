@@ -24,6 +24,8 @@ public class TextPreferencesManager {
 	public static final float MAX_TEXT_SIZE_HEADING			= 65.f;
 	public static final float TEXT_SIZE_INCREMENT				=  1.f;
 	public static final int TEXT_SIZES_TOTAL		= (int) ( (MAX_TEXT_SIZE - MIN_TEXT_SIZE) / TEXT_SIZE_INCREMENT) + 1;
+	public static final float HEADING_TEXT_DIFF		= DEFAULT_TEXT_SIZE_HEADING - DEFAULT_TEXT_SIZE;
+
 
 
 	public interface ThemeHandler {
@@ -98,6 +100,12 @@ public class TextPreferencesManager {
 	}
 
 
+	/**
+	 * Opens up the preferences file via PreferenceManager
+	 * and reads the user text size value
+	 * @param context
+	 * @return
+	 */
 	public static float getUserTextSize(Context context) {
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -105,28 +113,17 @@ public class TextPreferencesManager {
 	}
 
 
+	/**
+	 * Opens up the preferences file via PreferenceManager
+	 * and saves the new value on UI thread
+	 * @param size
+	 * @param context
+	 */
 	public static void setUserTextSize(float size, Context context) {
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(context);
 		Editor prefsEditor			= prefs.edit();
 		prefsEditor.putFloat(USER_SETTING_TEXT_SIZE, size);
-		prefsEditor.commit();
-	}
-
-
-	public static float getUserTextSizeHeading(Context context) {
-		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(context);
-
-		return prefs.getFloat(USER_SETTING_TEXT_SIZE_HEADING, DEFAULT_TEXT_SIZE_HEADING);
-	}
-
-
-	public static void setUserTextSizeHeading(float size, Context context) {
-		if (size < MIN_TEXT_SIZE_HEADING || size > MAX_TEXT_SIZE_HEADING) {
-			return;
-		}
-		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(context);
-		Editor prefsEditor			= prefs.edit();
-		prefsEditor.putFloat(USER_SETTING_TEXT_SIZE_HEADING, size);
+		prefsEditor.putFloat(USER_SETTING_TEXT_SIZE_HEADING, size + HEADING_TEXT_DIFF);
 		prefsEditor.commit();
 	}
 
