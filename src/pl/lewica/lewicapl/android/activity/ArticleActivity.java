@@ -57,7 +57,6 @@ import pl.lewica.lewicapl.android.DialogManager.SliderEventHandler;
 import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 import pl.lewica.lewicapl.android.theme.ApplicationTheme;
-import pl.lewica.lewicapl.android.theme.Theme;
 
 
 public class ArticleActivity extends Activity {
@@ -220,7 +219,7 @@ public class ArticleActivity extends Activity {
 				return true;
 
 			case R.id.menu_change_text_size:
-				int sizeInPoints	= UserPreferencesManager.convertTextSize(UserPreferencesManager.getUserTextSize(this) );
+				int sizeInPoints	= UserPreferencesManager.convertTextSize(UserPreferencesManager.getTextSize(this) );
 				SliderDialog sd		= new SliderDialog();
 				sd.setSliderValue(sizeInPoints);
 				sd.setSliderMax(UserPreferencesManager.TEXT_SIZES_TOTAL);
@@ -231,10 +230,8 @@ public class ArticleActivity extends Activity {
 				return true;
 
 			case R.id.menu_change_background:
-				// Read existing and write new theme to xml file (done by Android)
-				int newTheme	= UserPreferencesManager.switchUserTheme(getApplicationContext() );
-				// Save it in app's memory
-				Theme.setCurrentTheme(newTheme);
+				// Read existing and write new theme to xml file (done by Android) and store in memory
+				UserPreferencesManager.switchUserTheme(getApplicationContext() );
 				loadTheme(getApplicationContext() );
 				ApplicationRootActivity.reloadAllTabsInBackground(getApplicationContext() );
 
@@ -272,7 +269,7 @@ public class ArticleActivity extends Activity {
 
 		startManagingCursor(cursor);
 
-		float userTextSize	= UserPreferencesManager.getUserTextSize(this);
+		float userTextSize	= UserPreferencesManager.getTextSize(this);
 
 		// In order to capture a cell, you need to work what their index
 		int inxURL				= cursor.getColumnIndex(ArticleDAO.FIELD_URL);
@@ -394,7 +391,7 @@ public class ArticleActivity extends Activity {
 
 
 	public void loadTheme(Context context) {
-		ApplicationTheme theme	= Theme.getTheme(context);
+		ApplicationTheme theme	= UserPreferencesManager.getThemeInstance(context);
 		ScrollView layout		= (ScrollView) findViewById(R.id.article_scroll_view);
 
 		layout.setBackgroundColor(theme.getBackgroundColour() );
@@ -402,7 +399,7 @@ public class ArticleActivity extends Activity {
 		tvContent.setTextColor(theme.getTextColour() );
 		tvComment.setTextColor(theme.getEditorsCommentTextColour() );
 
-		if (Theme.getCurrentTheme(context) == Theme.THEME_LIGHT) {
+		if (UserPreferencesManager.getTheme(context) == UserPreferencesManager.THEME_LIGHT) {
 			tvComment.setBackgroundDrawable(theme.getEditorsCommentBackground() );
 		} else {
 			tvComment.setBackgroundColor(theme.getEditorsCommentBackgroundColour() );
@@ -472,7 +469,7 @@ public class ArticleActivity extends Activity {
 		public void finishSliding(int points) {
 			float textSize		= UserPreferencesManager.convertTextSize(points);
 
-			UserPreferencesManager.setUserTextSize(textSize, mActivity);
+			UserPreferencesManager.setTextSize(textSize, mActivity);
 		}
 	}
 

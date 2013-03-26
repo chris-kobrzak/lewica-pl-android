@@ -46,7 +46,6 @@ import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.DialogManager.SliderEventHandler;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
 import pl.lewica.lewicapl.android.theme.ApplicationTheme;
-import pl.lewica.lewicapl.android.theme.Theme;
 
 
 public class BlogPostActivity extends Activity {
@@ -201,7 +200,7 @@ public class BlogPostActivity extends Activity {
 				return true;
 
 			case R.id.menu_change_text_size:
-				int sizeInPoints	= UserPreferencesManager.convertTextSize(UserPreferencesManager.getUserTextSize(this) );
+				int sizeInPoints	= UserPreferencesManager.convertTextSize(UserPreferencesManager.getTextSize(this) );
 				SliderDialog sd		= new SliderDialog();
 				sd.setSliderValue(sizeInPoints);
 				sd.setSliderMax(UserPreferencesManager.TEXT_SIZES_TOTAL);
@@ -213,8 +212,7 @@ public class BlogPostActivity extends Activity {
 				return true;
 
 			case R.id.menu_change_background:
-				int newTheme	= UserPreferencesManager.switchUserTheme(getApplicationContext() );
-				Theme.setCurrentTheme(newTheme);
+				UserPreferencesManager.switchUserTheme(getApplicationContext() );
 				loadTheme(getApplicationContext() );
 				ApplicationRootActivity.reloadAllTabsInBackground(getApplicationContext() );
 
@@ -253,7 +251,7 @@ public class BlogPostActivity extends Activity {
 
 		startManagingCursor(cursor);
 
-		float userTextSize	= UserPreferencesManager.getUserTextSize(this);
+		float userTextSize	= UserPreferencesManager.getTextSize(this);
 
 		// In order to capture a cell, you need to work what their index
 		int inxWasRead			= cursor.getColumnIndex(BlogPostDAO.FIELD_WAS_READ);
@@ -333,7 +331,7 @@ public class BlogPostActivity extends Activity {
 
 
 	public void loadTheme(Context context) {
-		ApplicationTheme theme	= Theme.getTheme(context);
+		ApplicationTheme theme	= UserPreferencesManager.getThemeInstance(context);
 		ScrollView layout		= (ScrollView) findViewById(R.id.blog_post_scroll_view);
 
 		layout.setBackgroundColor(theme.getBackgroundColour() );
@@ -359,8 +357,6 @@ public class BlogPostActivity extends Activity {
 			tvTitle.setTextSize(textSize + UserPreferencesManager.HEADING_TEXT_DIFF);
 			tvContent.setTextSize(textSize);
 			tvAuthor.setTextSize(textSize);
-
-			UserPreferencesManager.setUserTextSize(textSize, mActivity);
 		}
 
 
@@ -368,7 +364,7 @@ public class BlogPostActivity extends Activity {
 		public void finishSliding(int points) {
 			float textSize		= UserPreferencesManager.convertTextSize(points);
 
-			UserPreferencesManager.setUserTextSize(textSize, mActivity);
+			UserPreferencesManager.setTextSize(textSize, mActivity);
 		}
 	}
 }

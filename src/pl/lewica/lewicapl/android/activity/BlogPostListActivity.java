@@ -40,9 +40,9 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
 import pl.lewica.lewicapl.android.theme.ApplicationTheme;
-import pl.lewica.lewicapl.android.theme.Theme;
 
 
 /**
@@ -110,7 +110,7 @@ public class BlogPostListActivity extends Activity {
 
 				// Mark current blog post as read by changing its colour...
 				TextView tv			= (TextView) view.findViewById(R.id.blog_post_item_title);
-				appTheme	= Theme.getTheme(context);
+				appTheme	= UserPreferencesManager.getThemeInstance(context);
 				tv.setTextColor(appTheme.getListHeadingColour(true) );
 				// ... and flagging it in local cache accordingly
 				clicked.add(id);
@@ -119,7 +119,7 @@ public class BlogPostListActivity extends Activity {
 			}
 		});
 
-		appTheme	= Theme.getTheme(getApplicationContext() );
+		appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
 		appTheme.setListViewDividerColour(listView, this);
 	}
 
@@ -144,7 +144,7 @@ public class BlogPostListActivity extends Activity {
 	private class BlogPostsUpdateBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			appTheme	= Theme.getTheme(getApplicationContext() );
+			appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
 			if (! intent.hasExtra(BlogPostListActivity.dataFilters.BLOG_ID.name() ) ) {
 				reloadRows();
 			} else {
@@ -200,7 +200,7 @@ public class BlogPostListActivity extends Activity {
 		 */
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
-			appTheme	= Theme.getTheme(context);
+			appTheme	= UserPreferencesManager.getThemeInstance(context);
 
 			boolean unread	= cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) );
 			TextView tvTitle	= (TextView) view.findViewById(R.id.blog_post_item_title);

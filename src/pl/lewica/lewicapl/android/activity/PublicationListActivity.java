@@ -49,9 +49,9 @@ import android.widget.TextView;
 import pl.lewica.lewicapl.R;
 import pl.lewica.api.model.Article;
 import pl.lewica.api.url.ArticleURL;
+import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 import pl.lewica.lewicapl.android.theme.ApplicationTheme;
-import pl.lewica.lewicapl.android.theme.Theme;
 
 
 /**
@@ -121,7 +121,7 @@ public class PublicationListActivity extends Activity {
 				startActivity(intent);
 
 				// Mark current article as read by changing its colour...
-				appTheme	= Theme.getTheme(context);
+				appTheme	= UserPreferencesManager.getThemeInstance(context);
 				TextView tv		= (TextView) view.findViewById(R.id.article_item_title);
 				tv.setTextColor(appTheme.getListHeadingColour(true) );
 				// ... and flagging it in local cache accordingly
@@ -131,7 +131,7 @@ public class PublicationListActivity extends Activity {
 			}
 		});
 
-		appTheme	= Theme.getTheme(getApplicationContext() );
+		appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
 		appTheme.setListViewDividerColour(listView, this);
 	}
 
@@ -148,7 +148,7 @@ public class PublicationListActivity extends Activity {
 	private class PublicationsUpdateBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			appTheme	= Theme.getTheme(getApplicationContext() );
+			appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
 			reloadRows();
 			appTheme.setListViewDividerColour(listView, context);
 		}
@@ -204,7 +204,7 @@ public class PublicationListActivity extends Activity {
 		 */
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
-			appTheme	= Theme.getTheme(context);
+			appTheme	= UserPreferencesManager.getThemeInstance(context);
 
 			// Title
 			boolean unread	= cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) );

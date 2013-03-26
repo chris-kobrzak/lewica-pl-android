@@ -35,9 +35,9 @@ import android.widget.TextView;
 
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ContentUpdateManager;
+import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.HistoryDAO;
 import pl.lewica.lewicapl.android.theme.ApplicationTheme;
-import pl.lewica.lewicapl.android.theme.Theme;
 
 
 /**
@@ -84,7 +84,7 @@ public class HistoryListActivity extends Activity {
 		startManagingCursor(cursor);
 
 		int layout;
-		if (Theme.getCurrentTheme(getApplicationContext() ) == Theme.THEME_DARK) {
+		if (UserPreferencesManager.getTheme(getApplicationContext() ) == UserPreferencesManager.THEME_DARK) {
 			layout	= R.layout.list_history_item_dark;
 		} else {
 			layout	= R.layout.list_history_item;
@@ -105,7 +105,7 @@ public class HistoryListActivity extends Activity {
 			} 
 		}; 
 		listView.setAdapter(listAdapter);
-		ApplicationTheme appTheme	= Theme.getTheme(getApplicationContext() );
+		ApplicationTheme appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
 		appTheme.setListViewDividerColour(listView, this);
 
 		// Register to receive content update messages
