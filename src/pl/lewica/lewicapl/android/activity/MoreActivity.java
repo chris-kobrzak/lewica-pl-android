@@ -17,7 +17,10 @@ package pl.lewica.lewicapl.android.activity;
 
 import pl.lewica.URLDictionary;
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.UserPreferencesManager;
+import pl.lewica.lewicapl.android.theme.Theme;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Typeface;
@@ -25,6 +28,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewParent;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 
@@ -35,6 +39,7 @@ import android.widget.TextView;
 public class MoreActivity extends Activity {
 
 	private static Typeface categoryTypeface;
+	private TextView tvIntro;
 
 
 	@Override
@@ -46,6 +51,7 @@ public class MoreActivity extends Activity {
 		categoryTypeface	= Typeface.createFromAsset(getAssets(), "Impact.ttf");
 
 		loadView();
+		loadTheme(getApplicationContext() );
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
 		Resources res		= getResources();
@@ -63,8 +69,8 @@ public class MoreActivity extends Activity {
 	private void loadView() {
 		TextView tv;
 		
-		tv	= (TextView) findViewById(R.id.more_introduction);
-		tv.setText(this.getString(R.string.paragraph_more_intro) );
+		tvIntro = (TextView) findViewById(R.id.more_introduction);
+		tvIntro.setText(this.getString(R.string.paragraph_more_intro) );
 
 		tv	= (TextView) findViewById(R.id.more_homepage);
 		tv.setTypeface(categoryTypeface);
@@ -96,6 +102,15 @@ public class MoreActivity extends Activity {
 		tv.setTypeface(categoryTypeface);
 		tv.setText(this.getString(R.string.heading_team) );
 		tv.setOnClickListener(new TextClickListener() );
+	}
+
+
+	private void loadTheme(Context context) {
+		Theme theme	= UserPreferencesManager.getThemeInstance(context);
+		ScrollView layout		= (ScrollView) findViewById(R.id.list_more_scroll_view);
+		layout.setBackgroundColor(theme.getBackgroundColour() );
+
+		tvIntro.setTextColor(theme.getTextColour() );
 	}
 
 
