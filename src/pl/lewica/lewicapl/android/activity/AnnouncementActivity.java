@@ -225,7 +225,7 @@ public class AnnouncementActivity extends Activity {
 	 * or navigating between announcements using the previous-next facility (not yet implemented).
 	 * @param id
 	 */
-	public void loadContent(long ID, Context context) {
+	private void loadContent(long ID, Context context) {
 		// Save it in this object's field
 		annID	= ID;
 		// Fetch database record
@@ -270,10 +270,12 @@ public class AnnouncementActivity extends Activity {
 		String where			= cursor.getString(idxWhere);
 		if (where != null && where.length() > 0) {
 			tvWhere.setText(where);
+			tvWhere.setTextSize(userTextSize);
 			// Reset visibility, may be useful when users navigate between announcements (previous-next facility to be added in the future)
 			tvWhere.setVisibility(View.VISIBLE);
 			
 			tvWhereLbl.setText(getString(R.string.label_where) );
+			tvWhereLbl.setTextSize(userTextSize);
 			tvWhereLbl.setVisibility(View.VISIBLE);
 		} else {
 			tvWhere.setText("");
@@ -287,11 +289,13 @@ public class AnnouncementActivity extends Activity {
 		tvWhenLbl				= (TextView) findViewById(R.id.announcement_when_label);
 		String when			= cursor.getString(idxWhen);
 		if (when != null && when.length() > 0) {
+			tvWhen.setTextSize(userTextSize);
 			tvWhen.setText(when);
 			// Reset visibility, may be useful when users navigate between announcements (previous-next facility to be added in the future)
 			tvWhen.setVisibility(View.VISIBLE);
 			
 			tvWhenLbl.setText(getString(R.string.label_when) );
+			tvWhenLbl.setTextSize(userTextSize);
 			tvWhenLbl.setVisibility(View.VISIBLE);
 		} else {
 			tvWhen.setText("");
@@ -333,18 +337,18 @@ public class AnnouncementActivity extends Activity {
 	}
 
 
-	public void loadTheme(Context context) {
+	private void loadTheme(Context context) {
 		Theme theme	= UserPreferencesManager.getThemeInstance(context);
 		ScrollView layout		= (ScrollView) findViewById(R.id.announcement_scroll_view);
 
 		layout.setBackgroundColor(theme.getBackgroundColour() );
 		tvTitle.setTextColor(theme.getHeadingColour() );
-		tvWhere.setTextColor(theme.getTextColour());
-		tvWhereLbl.setTextColor(theme.getTextColour());
-		tvWhen.setTextColor(theme.getTextColour());
-		tvWhenLbl.setTextColor(theme.getTextColour());
+		tvWhere.setTextColor(theme.getTextColour() );
+		tvWhereLbl.setTextColor(theme.getHeadingColour() );
+		tvWhen.setTextColor(theme.getTextColour() );
+		tvWhenLbl.setTextColor(theme.getHeadingColour() );
 		tvContent.setTextColor(theme.getTextColour() );
-		tvAuthor.setTextColor(theme.getTextColour());
+		tvAuthor.setTextColor(theme.getTextColour() );
 	}
 
 
