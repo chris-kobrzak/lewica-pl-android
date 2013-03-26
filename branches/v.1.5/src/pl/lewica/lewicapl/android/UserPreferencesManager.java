@@ -91,14 +91,18 @@ public class UserPreferencesManager {
 
 	/**
 	 * Saves new theme ID in the class variable (local cache)
-	 * and saves it in the Android preferences file
+	 * and saves it in the Android preferences file in a separate thread
 	 * @param theme
 	 * @param context
 	 */
-	public static void setTheme(int theme, Context context) {
+	public static void setTheme(final int theme, final Context context) {
 		sCurrentTheme	= theme;
 
-		setUserTheme(theme, context);
+		new Thread(new Runnable() {
+			public void run() {
+				setUserTheme(theme, context);
+			}
+		}).start();
 	}
 
 
@@ -139,10 +143,14 @@ public class UserPreferencesManager {
 	 * @param textSize
 	 * @param context
 	 */
-	public static void setTextSize(float textSize, Context context) {
+	public static void setTextSize(final float textSize, final Context context) {
 		sTextSize = textSize;
-		// TODO This operation should be run on UI thread
-		setUserTextSize(textSize, context);
+
+		new Thread(new Runnable() {
+			public void run() {
+				setUserTextSize(textSize, context);
+			}
+		}).start();
 	}
 
 
