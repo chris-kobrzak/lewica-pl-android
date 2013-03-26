@@ -115,6 +115,7 @@ public class ArticleActivity extends Activity {
 		}
 		// Fill views with data
 		loadContent(articleID, this);
+		loadTextSize(UserPreferencesManager.getTextSize(this) );
 		loadTheme(getApplicationContext() );
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
@@ -261,15 +262,13 @@ public class ArticleActivity extends Activity {
 	 * TODO Break this method down into smaller parts
 	 * @param id
 	 */
-	public void loadContent(long ID, Context context) {
+	private void loadContent(long ID, Context context) {
 		// Save it in this object's field
 		articleID	= ID;
 		// Fetch database record
 		Cursor cursor				= articleDAO.selectOne(ID);
 
 		startManagingCursor(cursor);
-
-		float userTextSize	= UserPreferencesManager.getTextSize(this);
 
 		// In order to capture a cell, you need to work what their index
 		int inxURL				= cursor.getColumnIndex(ArticleDAO.FIELD_URL);
@@ -297,7 +296,6 @@ public class ArticleActivity extends Activity {
 
 		// Now start populating all views with data
 		tvTitle					= (TextView) findViewById(R.id.article_title);
-		tvTitle.setTextSize(userTextSize + UserPreferencesManager.HEADING_TEXT_DIFF);
 		tvTitle.setText(cursor.getString(inxTitle) );
 
 		TextView tv;
@@ -333,7 +331,6 @@ public class ArticleActivity extends Activity {
 		tv.setText(dateFormat.format(d) );
 
 		tvContent	= (TextView) findViewById(R.id.article_content);
-		tvContent.setTextSize(userTextSize);
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
 		tvContent.setText(cursor.getString(inxContent).replace("\r", "") );
 
@@ -341,7 +338,6 @@ public class ArticleActivity extends Activity {
 		tv			= (TextView) findViewById(R.id.article_editor_comment_top);
 		String commentString		= cursor.getString(inxComment);
 		if (commentString != null && commentString.length() > 0) {
-			tvComment.setTextSize(userTextSize);
 			tvComment.setText(commentString.replace("\r", "") );
 			// Reset visibility, may be useful when users navigate between articles (previous-next facility to be added in the future)
 			tv.setVisibility(View.VISIBLE);
@@ -390,7 +386,14 @@ public class ArticleActivity extends Activity {
 	}
 
 
-	public void loadTheme(Context context) {
+	private void loadTextSize(float textSize) {
+		tvTitle.setTextSize(textSize + UserPreferencesManager.HEADING_TEXT_DIFF);
+		tvContent.setTextSize(textSize);
+		tvComment.setTextSize(textSize);
+	}
+
+
+	private void loadTheme(Context context) {
 		Theme theme	= UserPreferencesManager.getThemeInstance(context);
 		ScrollView layout		= (ScrollView) findViewById(R.id.article_scroll_view);
 
@@ -411,7 +414,7 @@ public class ArticleActivity extends Activity {
 	 * Puts a bitmap in the image view.  Adds the bitmap to the local cache.
 	 * @param bm
 	 */
-	public void loadImage(Bitmap bm) {
+	private void loadImage(Bitmap bm) {
 		ImageView iv			= (ImageView) findViewById(R.id.article_image);
 
 		iv.setImageBitmap(bm);
@@ -459,9 +462,7 @@ public class ArticleActivity extends Activity {
 		public void changeValue(int points) {
 			float textSize		= UserPreferencesManager.convertTextSize(points);
 
-			tvTitle.setTextSize(textSize + UserPreferencesManager.HEADING_TEXT_DIFF);
-			tvContent.setTextSize(textSize);
-			tvComment.setTextSize(textSize);
+			loadTextSize(textSize);
 		}
 
 
