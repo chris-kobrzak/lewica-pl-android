@@ -96,6 +96,7 @@ public class AnnouncementActivity extends Activity {
 
 		// Fill views with data
 		loadContent(annID, this);
+		loadTextSize(UserPreferencesManager.getTextSize(this) );
 		loadTheme(getApplicationContext() );
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
@@ -233,8 +234,6 @@ public class AnnouncementActivity extends Activity {
 
 		startManagingCursor(cursor);
 
-		float userTextSize	= UserPreferencesManager.getTextSize(this);
-
 		// In order to capture a cell, you need to work what their index
 		int idxWasRead				= cursor.getColumnIndex(AnnouncementDAO.FIELD_WAS_READ);
 		int idxTitle					= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHAT);
@@ -251,7 +250,6 @@ public class AnnouncementActivity extends Activity {
 
 		// Now start populating all views with data
 		tvTitle					= (TextView) findViewById(R.id.announcement_title);
-		tvTitle.setTextSize(userTextSize + UserPreferencesManager.HEADING_TEXT_DIFF);
 		tvTitle.setText(cursor.getString(idxTitle) );
 
 		TextView tv;
@@ -260,7 +258,6 @@ public class AnnouncementActivity extends Activity {
 		tv.setText(context.getString(R.string.heading_announcements) );
 
 		tvContent				= (TextView) findViewById(R.id.announcement_content);
-		tvContent.setTextSize(userTextSize);
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
 		tvContent.setText(cursor.getString(idxContent).replace("\r", "") );
 
@@ -270,12 +267,10 @@ public class AnnouncementActivity extends Activity {
 		String where			= cursor.getString(idxWhere);
 		if (where != null && where.length() > 0) {
 			tvWhere.setText(where);
-			tvWhere.setTextSize(userTextSize);
 			// Reset visibility, may be useful when users navigate between announcements (previous-next facility to be added in the future)
 			tvWhere.setVisibility(View.VISIBLE);
 			
 			tvWhereLbl.setText(getString(R.string.label_where) );
-			tvWhereLbl.setTextSize(userTextSize);
 			tvWhereLbl.setVisibility(View.VISIBLE);
 		} else {
 			tvWhere.setText("");
@@ -289,13 +284,11 @@ public class AnnouncementActivity extends Activity {
 		tvWhenLbl				= (TextView) findViewById(R.id.announcement_when_label);
 		String when			= cursor.getString(idxWhen);
 		if (when != null && when.length() > 0) {
-			tvWhen.setTextSize(userTextSize);
 			tvWhen.setText(when);
 			// Reset visibility, may be useful when users navigate between announcements (previous-next facility to be added in the future)
 			tvWhen.setVisibility(View.VISIBLE);
 			
 			tvWhenLbl.setText(getString(R.string.label_when) );
-			tvWhenLbl.setTextSize(userTextSize);
 			tvWhenLbl.setVisibility(View.VISIBLE);
 		} else {
 			tvWhen.setText("");
@@ -306,7 +299,6 @@ public class AnnouncementActivity extends Activity {
 		}
 
 		tvAuthor				= (TextView) findViewById(R.id.announcement_author);
-		tvAuthor.setTextSize(userTextSize);
 		String author			= cursor.getString(idxPublishedBy);
 		String authorEmail	= cursor.getString(idxPublishedByEmail);
 
@@ -325,6 +317,7 @@ public class AnnouncementActivity extends Activity {
 			tvAuthor.setText("");
 			tvAuthor.setVisibility(View.INVISIBLE);
 		}
+
 		// Only mark the announcement as read once.  If it's already marked as such - just stop here.
 		if (cursor.getInt(idxWasRead) == 1) {
 			cursor.close();
@@ -349,6 +342,17 @@ public class AnnouncementActivity extends Activity {
 		tvWhenLbl.setTextColor(theme.getHeadingColour() );
 		tvContent.setTextColor(theme.getTextColour() );
 		tvAuthor.setTextColor(theme.getTextColour() );
+	}
+
+
+	private void loadTextSize(float textSize) {
+		tvTitle.setTextSize(textSize + UserPreferencesManager.HEADING_TEXT_DIFF);
+		tvWhere.setTextSize(textSize);
+		tvWhereLbl.setTextSize(textSize);
+		tvWhen.setTextSize(textSize);
+		tvWhenLbl.setTextSize(textSize);
+		tvContent.setTextSize(textSize);
+		tvAuthor.setTextSize(textSize);
 	}
 
 
@@ -383,13 +387,7 @@ public class AnnouncementActivity extends Activity {
 		public void changeValue(int points) {
 			float textSize		= UserPreferencesManager.convertTextSize(points);
 
-			tvTitle.setTextSize(textSize + UserPreferencesManager.HEADING_TEXT_DIFF);
-			tvWhere.setTextSize(textSize);
-			tvWhereLbl.setTextSize(textSize);
-			tvWhen.setTextSize(textSize);
-			tvWhenLbl.setTextSize(textSize);
-			tvContent.setTextSize(textSize);
-			tvAuthor.setTextSize(textSize);
+			loadTextSize(textSize);
 		}
 
 
