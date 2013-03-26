@@ -60,7 +60,7 @@ public class MoreActivity extends Activity {
 	}
 
 
-	public void loadView() {
+	private void loadView() {
 		TextView tv;
 		
 		tv	= (TextView) findViewById(R.id.more_introduction);

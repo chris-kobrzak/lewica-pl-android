@@ -117,7 +117,7 @@ public class AnnouncementListActivity extends Activity {
 	}
 
 
-	public void reloadRows() {
+	private void reloadRows() {
 		CursorAdapter ca	= (CursorAdapter) listAdapter;
 		// Reload rows
 		Cursor newCursor	= annDAO.selectLatest(limitRows);

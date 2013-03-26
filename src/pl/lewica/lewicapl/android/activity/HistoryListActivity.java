@@ -161,7 +161,7 @@ public class HistoryListActivity extends Activity {
 	}
 
 
-	public void reloadRows() {
+	private void reloadRows() {
 		Calendar cal			= Calendar.getInstance();
 		CursorAdapter ca	= (CursorAdapter) listAdapter;
 		// Reload rows
