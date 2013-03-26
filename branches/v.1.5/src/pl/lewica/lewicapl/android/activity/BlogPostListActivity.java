@@ -98,7 +98,6 @@ public class BlogPostListActivity extends Activity {
 		listView.setOnItemClickListener(new OnItemClickListener() {
 //			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				TextView tv;
 				Context context		= getApplicationContext();
 
 				// Redirect to article details screen
@@ -110,7 +109,7 @@ public class BlogPostListActivity extends Activity {
 				startActivity(intent);
 
 				// Mark current blog post as read by changing its colour...
-				tv					= (TextView) view.findViewById(R.id.blog_post_item_title);
+				TextView tv			= (TextView) view.findViewById(R.id.blog_post_item_title);
 				appTheme	= Theme.getTheme(context);
 				tv.setTextColor(appTheme.getListHeadingColour(true) );
 				// ... and flagging it in local cache accordingly
@@ -202,29 +201,22 @@ public class BlogPostListActivity extends Activity {
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
 			appTheme	= Theme.getTheme(context);
-			// Title
-			TextView tv	= (TextView) view.findViewById(R.id.blog_post_item_title);
-			int colour;
-			if (cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) ) ) {
-				colour	= appTheme.getListHeadingColour(true);
-			} else {
-				colour	= appTheme.getListHeadingColour(false);
-			}
-			tv.setTextColor(colour);
-			tv.setText(cursor.getString(colIndex_Author) + ": " + cursor.getString(colIndex_Title) );
-			// Datetime
+
+			boolean unread	= cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) );
+			TextView tvTitle	= (TextView) view.findViewById(R.id.blog_post_item_title);
+			tvTitle.setTextColor(appTheme.getListHeadingColour(! unread) );
+			tvTitle.setText(cursor.getString(colIndex_Author) + ": " + cursor.getString(colIndex_Title) );
+
 			TextView tvDate	= (TextView) view.findViewById(R.id.blog_post_item_date);
-			long unixTime	= cursor.getLong(colIndex_DatePub);	// Dates are stored as Unix timestamps
+			long unixTime	= cursor.getLong(colIndex_DatePub);
 			Date d				= new Date(unixTime);
 			tvDate.setText(dateFormat.format(d) );
 
-			// Blog title
 			TextView tvBlog	= (TextView) view.findViewById(R.id.blog_post_item_blog_title);
 			String blogTitle	= cursor.getString(colIndex_Blog);
-			tvBlog.setVisibility(View.VISIBLE);
-
 			if (blogTitle.length() > 0) {
 				tvBlog.setText(blogTitle);
+				tvBlog.setVisibility(View.VISIBLE);
 			} else {
 				tvBlog.setText("");
 				tvBlog.setVisibility(View.GONE);
@@ -233,15 +225,6 @@ public class BlogPostListActivity extends Activity {
 			tvDate.setTextColor(appTheme.getListTextColour() );
 			tvBlog.setTextColor(appTheme.getListTextColour() );
 			view.setBackgroundColor(appTheme.getBackgroundColour() );
-			/*if (isDarkTheme) {
-				tvDate.setTextColor(res.getColor(R.color.grey) );
-				tvBlog.setTextColor(res.getColor(R.color.grey) );
-				view.setBackgroundColor(res.getColor(R.color.black) );
-			} else {
-				tvDate.setTextColor(res.getColor(R.color.grey_darker) );
-				tvBlog.setTextColor(res.getColor(R.color.grey_darker) );
-				view.setBackgroundColor(res.getColor(android.R.color.transparent) );
-			}*/
 		}
 
 

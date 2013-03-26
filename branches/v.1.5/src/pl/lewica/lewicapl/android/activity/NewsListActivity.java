@@ -213,18 +213,17 @@ public class NewsListActivity extends Activity {
 			} else {
 				iv.setVisibility(View.VISIBLE);
 			}
-			// Title
+
 			boolean unread	= cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) );
 			TextView tvTitle	= (TextView) view.findViewById(R.id.article_item_title);
 			tvTitle.setTextColor(appTheme.getListHeadingColour(! unread) );
 			tvTitle.setText(cursor.getString(colIndex_Title) );
-			// Datetime
+
 			TextView tvDate	= (TextView) view.findViewById(R.id.article_item_date);
 			long unixTime	= cursor.getLong(colIndex_DatePub);	// Dates are stored as Unix timestamps
 			Date d				= new Date(unixTime);
 			tvDate.setText(dateFormat.format(d) );
 
-			// Thumbnail
 			iv	= (ImageView) view.findViewById(R.id.article_item_icon);
 			iv.setImageBitmap(null);
 			if (cursor.getInt(colIndex_HasThumb) == 0) {
