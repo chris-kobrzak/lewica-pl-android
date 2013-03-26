@@ -2,7 +2,9 @@ package pl.lewica.lewicapl.android.theme;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.widget.ListView;
 import pl.lewica.lewicapl.R;
 
 
@@ -46,9 +48,14 @@ public class DarkTheme implements ApplicationTheme {
 		return res.getColor(R.color.grey);
 	}
 
-	@Override
-	public int getListViewDividerColour() {
+	private int getListViewDividerColour() {
 		return res.getColor(R.color.grey_darker);
+	}
+
+	@Override
+	public void setListViewDividerColour(ListView listView, Context context) {
+		listView.setDivider(new ColorDrawable(getListViewDividerColour() ) );
+		listView.setDividerHeight(1);
 	}
 
 	@Override

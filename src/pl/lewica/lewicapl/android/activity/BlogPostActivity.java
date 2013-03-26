@@ -42,10 +42,11 @@ import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.DialogManager;
 import pl.lewica.lewicapl.android.SliderDialog;
-import pl.lewica.lewicapl.android.TextPreferencesManager;
+import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.DialogManager.SliderEventHandler;
-import pl.lewica.lewicapl.android.TextPreferencesManager.ThemeHandler;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
+import pl.lewica.lewicapl.android.theme.ApplicationTheme;
+import pl.lewica.lewicapl.android.theme.Theme;
 
 
 public class BlogPostActivity extends Activity {
@@ -60,7 +61,6 @@ public class BlogPostActivity extends Activity {
 	private Map<String,Long> nextPrevID;
 	private String blogPostURL;
 	private SliderEventHandler mTextSizeHandler;
-	private ThemeHandler mThemeHandler;
 
 	private TextView tvTitle;
 	private TextView tvContent;
@@ -85,7 +85,6 @@ public class BlogPostActivity extends Activity {
 		blogPostDAO.open();
 
 		mTextSizeHandler	= new TextSizeHandler(this);
-		mThemeHandler	= new ApplicationThemeHandler();
 
 		// When user changes the orientation, Android restarts the activity.  Say, users navigated through articles using
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
@@ -100,7 +99,7 @@ public class BlogPostActivity extends Activity {
 
 		// Fill views with data
 		loadContent(blogPostID, this);
-		TextPreferencesManager.loadTheme(mThemeHandler, this);
+		loadTheme(getApplicationContext() );
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
 		View titleView = getWindow().findViewById(android.R.id.title);
@@ -202,10 +201,10 @@ public class BlogPostActivity extends Activity {
 				return true;
 
 			case R.id.menu_change_text_size:
-				int sizeInPoints	= TextPreferencesManager.convertTextSizeToPoint(TextPreferencesManager.getUserTextSize(this) );
+				int sizeInPoints	= UserPreferencesManager.convertTextSize(UserPreferencesManager.getUserTextSize(this) );
 				SliderDialog sd		= new SliderDialog();
 				sd.setSliderValue(sizeInPoints);
-				sd.setSliderMax(TextPreferencesManager.TEXT_SIZES_TOTAL);
+				sd.setSliderMax(UserPreferencesManager.TEXT_SIZES_TOTAL);
 				sd.setTitleResource(R.string.heading_change_text_size);
 				sd.setOkButtonResource(R.string.ok);
 
@@ -214,8 +213,10 @@ public class BlogPostActivity extends Activity {
 				return true;
 
 			case R.id.menu_change_background:
-				TextPreferencesManager.switchTheme(mThemeHandler, this);
-				ApplicationRootActivity.reloadAllTabsInBackground(this);
+				int newTheme	= UserPreferencesManager.switchUserTheme(getApplicationContext() );
+				Theme.setCurrentTheme(newTheme);
+				loadTheme(getApplicationContext() );
+				ApplicationRootActivity.reloadAllTabsInBackground(getApplicationContext() );
 
 				return true;
 
@@ -252,7 +253,7 @@ public class BlogPostActivity extends Activity {
 
 		startManagingCursor(cursor);
 
-		float userTextSize	= TextPreferencesManager.getUserTextSize(this);
+		float userTextSize	= UserPreferencesManager.getUserTextSize(this);
 
 		// In order to capture a cell, you need to work what their index
 		int inxWasRead			= cursor.getColumnIndex(BlogPostDAO.FIELD_WAS_READ);
@@ -274,7 +275,7 @@ public class BlogPostActivity extends Activity {
 		// Now start populating all views with data
 		TextView tv;
 		tvTitle					= (TextView) findViewById(R.id.blog_post_title);
-		tvTitle.setTextSize(userTextSize + TextPreferencesManager.HEADING_TEXT_DIFF);
+		tvTitle.setTextSize(userTextSize + UserPreferencesManager.HEADING_TEXT_DIFF);
 		tvTitle.setText(cursor.getString(inxTitle) );
 
 		tv							= (TextView) findViewById(R.id.blog_post_category);
@@ -331,6 +332,17 @@ public class BlogPostActivity extends Activity {
 	}
 
 
+	public void loadTheme(Context context) {
+		ApplicationTheme theme	= Theme.getTheme(context);
+		ScrollView layout		= (ScrollView) findViewById(R.id.blog_post_scroll_view);
+
+		layout.setBackgroundColor(theme.getBackgroundColour() );
+		tvTitle.setTextColor(theme.getHeadingColour() );
+		tvContent.setTextColor(theme.getTextColour() );
+		tvAuthor.setTextColor(theme.getTextColour() );
+	}
+
+
 	private class TextSizeHandler implements DialogManager.SliderEventHandler {
 
 		private Activity mActivity;
@@ -342,52 +354,21 @@ public class BlogPostActivity extends Activity {
 
 		@Override
 		public void changeValue(int points) {
-			float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
+			float textSize		= UserPreferencesManager.convertTextSize(points);
 
-			tvTitle.setTextSize(textSize + TextPreferencesManager.HEADING_TEXT_DIFF);
+			tvTitle.setTextSize(textSize + UserPreferencesManager.HEADING_TEXT_DIFF);
 			tvContent.setTextSize(textSize);
 			tvAuthor.setTextSize(textSize);
 
-			TextPreferencesManager.setUserTextSize(textSize, mActivity);
+			UserPreferencesManager.setUserTextSize(textSize, mActivity);
 		}
 
 
 		@Override
 		public void finishSliding(int points) {
-			float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
+			float textSize		= UserPreferencesManager.convertTextSize(points);
 
-			TextPreferencesManager.setUserTextSize(textSize, mActivity);
-		}
-	}
-
-
-	private class ApplicationThemeHandler implements TextPreferencesManager.ThemeHandler {
-
-		@Override
-		public void setThemeDark() {
-			ScrollView layout		= (ScrollView) findViewById(R.id.blog_post_scroll_view);
-			int black			= getResources().getColor(R.color.black);
-			int light		= getResources().getColor(R.color.grey_light);
-			int lightBlue	= getResources().getColor(R.color.blue_light);
-
-			layout.setBackgroundColor(black);
-			tvTitle.setTextColor(lightBlue);
-			tvContent.setTextColor(light);
-			tvAuthor.setTextColor(light);
-		}
-
-
-		@Override
-		public void setThemeLight() {
-			ScrollView layout		= (ScrollView) findViewById(R.id.blog_post_scroll_view);
-			int dark			= getResources().getColor(R.color.grey_darker);
-			int white		= getResources().getColor(R.color.white);
-			int blue			= getResources().getColor(R.color.read);
-
-			layout.setBackgroundColor(white);
-			tvTitle.setTextColor(blue);
-			tvContent.setTextColor(dark);
-			tvAuthor.setTextColor(dark);
+			UserPreferencesManager.setUserTextSize(textSize, mActivity);
 		}
 	}
 }

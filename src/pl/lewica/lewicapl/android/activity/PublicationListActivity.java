@@ -49,8 +49,9 @@ import android.widget.TextView;
 import pl.lewica.lewicapl.R;
 import pl.lewica.api.model.Article;
 import pl.lewica.api.url.ArticleURL;
-import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
+import pl.lewica.lewicapl.android.theme.ApplicationTheme;
+import pl.lewica.lewicapl.android.theme.Theme;
 
 
 /**
@@ -66,6 +67,7 @@ public class PublicationListActivity extends Activity {
 	private ListAdapter listAdapter;
 	private ListView listView;
 	private PublicationsUpdateBroadcastReceiver receiver;
+	private static ApplicationTheme appTheme;
 	// When users select a new article, navigate back to the list and start scrolling up and down, the cursor won't know this article should be marked as read.
 	// That results in articles still being marked as unread (titles in red rather than blue).
 	// That's why we need to cache the list of clicked articles.  Please note, it is down to ArcticleActivity to flag articles as read in the database.
@@ -108,9 +110,7 @@ public class PublicationListActivity extends Activity {
 		listView.setOnItemClickListener(new OnItemClickListener() {
 //			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				TextView tv;
 				Context context		= getApplicationContext();
-				Resources res			= context.getResources();
 
 				// Redirect to article details screen
 				Intent intent	= new Intent(context, ArticleActivity.class);
@@ -121,14 +121,9 @@ public class PublicationListActivity extends Activity {
 				startActivity(intent);
 
 				// Mark current article as read by changing its colour...
-				int colour		= 0;
-				if (TextPreferencesManager.isDarkTheme(context) ) {
-					colour	= res.getColor(R.color.blue_light);
-				} else {
-					colour	= res.getColor(R.color.read);
-				}
-				tv					= (TextView) view.findViewById(R.id.article_item_title);
-				tv.setTextColor(colour);
+				appTheme	= Theme.getTheme(context);
+				TextView tv		= (TextView) view.findViewById(R.id.article_item_title);
+				tv.setTextColor(appTheme.getListHeadingColour(true) );
 				// ... and flagging it in local cache accordingly
 				clicked.add(id);
 
@@ -136,7 +131,8 @@ public class PublicationListActivity extends Activity {
 			}
 		});
 
-		TextPreferencesManager.setListViewDividerColour(listView, this);
+		appTheme	= Theme.getTheme(getApplicationContext() );
+		appTheme.setListViewDividerColour(listView, this);
 	}
 
 
@@ -152,8 +148,9 @@ public class PublicationListActivity extends Activity {
 	private class PublicationsUpdateBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			appTheme	= Theme.getTheme(getApplicationContext() );
 			reloadRows();
-			TextPreferencesManager.setListViewDividerColour(listView, context);
+			appTheme.setListViewDividerColour(listView, context);
 		}
 	}
 
@@ -207,26 +204,15 @@ public class PublicationListActivity extends Activity {
 		 */
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
-			TextView tv;
-			ImageView iv;
-			int colour;
-			boolean isDarkTheme	= TextPreferencesManager.getUserTheme(context) == TextPreferencesManager.THEME_WHITE_ON_BLACK;
+			appTheme	= Theme.getTheme(context);
 
 			// Title
-			tv	= (TextView) view.findViewById(R.id.article_item_title);
-			if (cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) ) ) {
-				colour	= res.getColor(R.color.unread);
-			} else {
-				if (isDarkTheme) {
-					colour	= res.getColor(R.color.blue_light);
-				} else {
-					colour	= res.getColor(R.color.read);
-				}
-			}
-			tv.setTextColor(colour);
+			boolean unread	= cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) );
+			TextView tv	= (TextView) view.findViewById(R.id.article_item_title);
+			tv.setTextColor(appTheme.getListHeadingColour(! unread) );
 			tv.setText(cursor.getString(colIndex_Title) );
 			// Publications do not have editor's comments so no need for the pencil icon here
-			iv	= (ImageView) view.findViewById(R.id.ico_pencil);
+			ImageView iv	= (ImageView) view.findViewById(R.id.ico_pencil);
 			iv.setVisibility(View.GONE);
 			// Datetime
 			TextView tvDate	= (TextView) view.findViewById(R.id.article_item_date);
@@ -267,13 +253,8 @@ public class PublicationListActivity extends Activity {
 				}
 			}
 
-			if (isDarkTheme) {
-				tvDate.setTextColor(res.getColor(R.color.grey) );
-				view.setBackgroundColor(res.getColor(R.color.black) );
-			} else {
-				tvDate.setTextColor(res.getColor(R.color.grey_darker) );
-				view.setBackgroundColor(res.getColor(android.R.color.transparent) );
-			}
+			tvDate.setTextColor(appTheme.getListTextColour() );
+			view.setBackgroundColor(appTheme.getBackgroundColour() );
 		}
 
 		@Override

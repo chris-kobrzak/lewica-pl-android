@@ -1,48 +1,47 @@
 package pl.lewica.lewicapl.android.theme;
 
+import pl.lewica.lewicapl.android.UserPreferencesManager;
 import android.content.Context;
 
 
 public class Theme {
 
-	public static enum Themes {
-		LIGHT,
-		DARK
-	}
+	public static final int THEME_LIGHT		= 1;
+	public static final int THEME_DARK		= 2;
 
-	private static Theme themeInstance;
-	private static Context mContext;
-	private ApplicationTheme currentTheme;
+	private static int currentTheme	= -1;
 
 
-	public static Theme getInstance(Context context) {
-		if (themeInstance != null) {
-			return themeInstance;
+	/**
+	 * Factory method that returns an instance of a class that implements the ApplicationTheme interface
+	 * @param context
+	 * @return
+	 */
+	public static ApplicationTheme getTheme(Context context) {
+		if (currentTheme == -1) {
+			setCurrentTheme(UserPreferencesManager.getUserTheme(context) );
 		}
+		switch (currentTheme) {
+			case THEME_LIGHT:
+				return LightTheme.getInstance(context);
 
-		themeInstance	= new Theme(context);
-		mContext		= context;
-		return themeInstance;
+			case THEME_DARK:
+				return DarkTheme.getInstance(context);
+		}
+		return null;
 	}
 
 
-	private Theme(Context context) {}
-
-
-	public ApplicationTheme getCurrentTheme() {
+	public static int getCurrentTheme(Context context) {
+		if (currentTheme > -1) {
+			return currentTheme;
+		}
+		setCurrentTheme(UserPreferencesManager.getUserTheme(context) );
 		return currentTheme;
 	}
 
 
-	public void setCurrentTheme(Themes theme) {
-		switch (theme) {
-			case LIGHT:
-				currentTheme	= LightTheme.getInstance(mContext);
-				break;
-
-			case DARK:
-				currentTheme	= DarkTheme.getInstance(mContext);
-				break;
-		}
+	public static void setCurrentTheme(int theme) {
+		currentTheme	= theme;
 	}
 }

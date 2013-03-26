@@ -40,8 +40,9 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import pl.lewica.lewicapl.R;
-import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
+import pl.lewica.lewicapl.android.theme.ApplicationTheme;
+import pl.lewica.lewicapl.android.theme.Theme;
 
 
 /**
@@ -65,6 +66,7 @@ public class BlogPostListActivity extends Activity {
 	private ListAdapter listAdapter;
 	private ListView listView;
 	private BroadcastReceiver receiver;
+	private static ApplicationTheme appTheme;
 
 	private int limitRows		= 15;
 
@@ -98,7 +100,6 @@ public class BlogPostListActivity extends Activity {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				TextView tv;
 				Context context		= getApplicationContext();
-				Resources res			= context.getResources();
 
 				// Redirect to article details screen
 				Intent intent	= new Intent(context, BlogPostActivity.class);
@@ -109,14 +110,9 @@ public class BlogPostListActivity extends Activity {
 				startActivity(intent);
 
 				// Mark current blog post as read by changing its colour...
-				int colour		= 0;
-				if (TextPreferencesManager.isDarkTheme(context) ) {
-					colour	= res.getColor(R.color.blue_light);
-				} else {
-					colour	= res.getColor(R.color.read);
-				}
 				tv					= (TextView) view.findViewById(R.id.blog_post_item_title);
-				tv.setTextColor(colour);
+				appTheme	= Theme.getTheme(context);
+				tv.setTextColor(appTheme.getListHeadingColour(true) );
 				// ... and flagging it in local cache accordingly
 				clicked.add(id);
 
@@ -124,7 +120,8 @@ public class BlogPostListActivity extends Activity {
 			}
 		});
 
-		TextPreferencesManager.setListViewDividerColour(listView, this);
+		appTheme	= Theme.getTheme(getApplicationContext() );
+		appTheme.setListViewDividerColour(listView, this);
 	}
 
 
@@ -148,13 +145,14 @@ public class BlogPostListActivity extends Activity {
 	private class BlogPostsUpdateBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			appTheme	= Theme.getTheme(getApplicationContext() );
 			if (! intent.hasExtra(BlogPostListActivity.dataFilters.BLOG_ID.name() ) ) {
 				reloadRows();
 			} else {
 				int blogID		= intent.getIntExtra(BlogPostListActivity.dataFilters.BLOG_ID.name(), 0);
 				reloadRowsFilterByBlogID(blogID);
 			}
-			TextPreferencesManager.setListViewDividerColour(listView, context);
+			appTheme.setListViewDividerColour(listView, context);
 		}
 	}
 
@@ -203,18 +201,14 @@ public class BlogPostListActivity extends Activity {
 		 */
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
-			int colour;
-			boolean isDarkTheme	= TextPreferencesManager.getUserTheme(context) == TextPreferencesManager.THEME_WHITE_ON_BLACK;
+			appTheme	= Theme.getTheme(context);
 			// Title
 			TextView tv	= (TextView) view.findViewById(R.id.blog_post_item_title);
+			int colour;
 			if (cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) ) ) {
-				colour	= res.getColor(R.color.unread);
+				colour	= appTheme.getListHeadingColour(true);
 			} else {
-				if (isDarkTheme) {
-					colour	= res.getColor(R.color.blue_light);
-				} else {
-					colour	= res.getColor(R.color.read);
-				}
+				colour	= appTheme.getListHeadingColour(false);
 			}
 			tv.setTextColor(colour);
 			tv.setText(cursor.getString(colIndex_Author) + ": " + cursor.getString(colIndex_Title) );
@@ -236,7 +230,10 @@ public class BlogPostListActivity extends Activity {
 				tvBlog.setVisibility(View.GONE);
 			}
 
-			if (isDarkTheme) {
+			tvDate.setTextColor(appTheme.getListTextColour() );
+			tvBlog.setTextColor(appTheme.getListTextColour() );
+			view.setBackgroundColor(appTheme.getBackgroundColour() );
+			/*if (isDarkTheme) {
 				tvDate.setTextColor(res.getColor(R.color.grey) );
 				tvBlog.setTextColor(res.getColor(R.color.grey) );
 				view.setBackgroundColor(res.getColor(R.color.black) );
@@ -244,7 +241,7 @@ public class BlogPostListActivity extends Activity {
 				tvDate.setTextColor(res.getColor(R.color.grey_darker) );
 				tvBlog.setTextColor(res.getColor(R.color.grey_darker) );
 				view.setBackgroundColor(res.getColor(android.R.color.transparent) );
-			}
+			}*/
 		}
 
 

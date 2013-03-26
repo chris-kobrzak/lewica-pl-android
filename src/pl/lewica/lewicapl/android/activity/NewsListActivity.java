@@ -15,7 +15,7 @@
 */
 package pl.lewica.lewicapl.android.activity;
 
-import java.io.File;
+import java.io.File; 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -26,7 +26,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -34,7 +33,6 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -50,11 +48,8 @@ import android.widget.TextView;
 import pl.lewica.lewicapl.R;
 import pl.lewica.api.model.Article;
 import pl.lewica.api.url.ArticleURL;
-import pl.lewica.lewicapl.android.TextPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 import pl.lewica.lewicapl.android.theme.ApplicationTheme;
-import pl.lewica.lewicapl.android.theme.DarkTheme;
-import pl.lewica.lewicapl.android.theme.LightTheme;
 import pl.lewica.lewicapl.android.theme.Theme;
 
 
@@ -76,7 +71,7 @@ public class NewsListActivity extends Activity {
 	// That results in articles still being marked as unread (titles in red rather than blue).
 	// That's why we need to cache the list of clicked articles.  Please note, it is down to ArcticleActivity to flag articles as read in the database.
 	private static Set<Long> clicked	= new HashSet<Long>();
-	private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
+//	private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
 
 
 	@Override
@@ -114,7 +109,6 @@ public class NewsListActivity extends Activity {
 		listView.setOnItemClickListener(new OnItemClickListener() {
 //			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				TextView tv;
 				Context context		= getApplicationContext();
 
 				// Redirect to article details screen
@@ -126,12 +120,8 @@ public class NewsListActivity extends Activity {
 				startActivity(intent);
 
 				// Mark current article as read by changing its colour...
-				if (TextPreferencesManager.isDarkTheme(context) ) {
-					appTheme	= DarkTheme.getInstance(context);
-				} else {
-					appTheme	= LightTheme.getInstance(context);
-				}
-				tv					= (TextView) view.findViewById(R.id.article_item_title);
+				TextView tv		= (TextView) view.findViewById(R.id.article_item_title);
+				appTheme	= Theme.getTheme(context);
 				tv.setTextColor(appTheme.getListHeadingColour(true) );
 				// ... and flagging it in the database accordingly
 				clicked.add(id);
@@ -140,30 +130,8 @@ public class NewsListActivity extends Activity {
 			}
 		});
 
-		TextPreferencesManager.setListViewDividerColour(listView, this);
-
-		final Theme currentTheme	= Theme.getInstance(getApplicationContext() );
-		// It will not be gc-ed as long as this instance is kept referenced
-		prefsListener	= new SharedPreferences.OnSharedPreferenceChangeListener() {
-			public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-				// TODO handle textSizeStandard
-				// colourTheme
-				if (! key.equals(TextPreferencesManager.USER_SETTING_THEME) ) {
-					return;
-				}
-
-				// TODO Create a method in TextPreferencesManager that will return Theme.Themes
-				// to simplify the code below
-				int themeId	= prefs.getInt(TextPreferencesManager.USER_SETTING_THEME, TextPreferencesManager.THEME_BLACK_ON_WHITE);
-				if (themeId == TextPreferencesManager.THEME_BLACK_ON_WHITE) {
-					currentTheme.setCurrentTheme(Theme.Themes.LIGHT);
-				} else {
-					currentTheme.setCurrentTheme(Theme.Themes.DARK);
-				}
-			}
-		};
-		SharedPreferences prefsMgr	= PreferenceManager.getDefaultSharedPreferences(this);
-		prefsMgr.registerOnSharedPreferenceChangeListener(prefsListener);
+		appTheme	= Theme.getTheme(getApplicationContext() );
+		appTheme.setListViewDividerColour(listView, this);
 	}
 
 
@@ -179,8 +147,9 @@ public class NewsListActivity extends Activity {
 	public class NewsUpdateBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			appTheme	= Theme.getTheme(getApplicationContext() );
 			reloadRows();
-			TextPreferencesManager.setListViewDividerColour(listView, context);
+			appTheme.setListViewDividerColour(listView, context);
 		}
 	}
 
@@ -234,11 +203,7 @@ public class NewsListActivity extends Activity {
 		 */
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
-			if (TextPreferencesManager.isDarkTheme(context) ) {
-				appTheme	= DarkTheme.getInstance(context);
-			} else {
-				appTheme	= LightTheme.getInstance(context);
-			}
+			appTheme	= Theme.getTheme(context);
 
 			// Editor's comments icon
 			int hasComment	= cursor.getInt(colIndex_HasComment);

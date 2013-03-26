@@ -33,7 +33,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -55,9 +54,10 @@ import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.DialogManager;
 import pl.lewica.lewicapl.android.SliderDialog;
 import pl.lewica.lewicapl.android.DialogManager.SliderEventHandler;
-import pl.lewica.lewicapl.android.TextPreferencesManager;
-import pl.lewica.lewicapl.android.TextPreferencesManager.ThemeHandler;
+import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
+import pl.lewica.lewicapl.android.theme.ApplicationTheme;
+import pl.lewica.lewicapl.android.theme.Theme;
 
 
 public class ArticleActivity extends Activity {
@@ -76,7 +76,6 @@ public class ArticleActivity extends Activity {
 	private ImageLoadTask imageTask;
 	private ImageCache imageCache;
 	private SliderEventHandler mTextSizeHandler;
-	private ThemeHandler mThemeHandler;
 
 	private TextView tvTitle;
 	private TextView tvContent;
@@ -104,7 +103,6 @@ public class ArticleActivity extends Activity {
 		articleDAO.open();
 
 		mTextSizeHandler	= new TextSizeHandler(this);
-		mThemeHandler	= new ApplicationThemeHandler();
 
 		// When user changes the orientation, Android restarts the activity.  Say, users navigated through articles using
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
@@ -118,7 +116,7 @@ public class ArticleActivity extends Activity {
 		}
 		// Fill views with data
 		loadContent(articleID, this);
-		TextPreferencesManager.loadTheme(mThemeHandler, this);
+		loadTheme(getApplicationContext() );
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
 		View titleView = getWindow().findViewById(android.R.id.title);
@@ -222,10 +220,10 @@ public class ArticleActivity extends Activity {
 				return true;
 
 			case R.id.menu_change_text_size:
-				int sizeInPoints	= TextPreferencesManager.convertTextSizeToPoint(TextPreferencesManager.getUserTextSize(this) );
+				int sizeInPoints	= UserPreferencesManager.convertTextSize(UserPreferencesManager.getUserTextSize(this) );
 				SliderDialog sd		= new SliderDialog();
 				sd.setSliderValue(sizeInPoints);
-				sd.setSliderMax(TextPreferencesManager.TEXT_SIZES_TOTAL);
+				sd.setSliderMax(UserPreferencesManager.TEXT_SIZES_TOTAL);
 				sd.setTitleResource(R.string.heading_change_text_size);
 				sd.setOkButtonResource(R.string.ok);
 
@@ -233,8 +231,12 @@ public class ArticleActivity extends Activity {
 				return true;
 
 			case R.id.menu_change_background:
-				TextPreferencesManager.switchTheme(mThemeHandler, this);
-				ApplicationRootActivity.reloadAllTabsInBackground(this);
+				// Read existing and write new theme to xml file (done by Android)
+				int newTheme	= UserPreferencesManager.switchUserTheme(getApplicationContext() );
+				// Save it in app's memory
+				Theme.setCurrentTheme(newTheme);
+				loadTheme(getApplicationContext() );
+				ApplicationRootActivity.reloadAllTabsInBackground(getApplicationContext() );
 
 				return true;
 
@@ -270,7 +272,7 @@ public class ArticleActivity extends Activity {
 
 		startManagingCursor(cursor);
 
-		float userTextSize	= TextPreferencesManager.getUserTextSize(this);
+		float userTextSize	= UserPreferencesManager.getUserTextSize(this);
 
 		// In order to capture a cell, you need to work what their index
 		int inxURL				= cursor.getColumnIndex(ArticleDAO.FIELD_URL);
@@ -298,7 +300,7 @@ public class ArticleActivity extends Activity {
 
 		// Now start populating all views with data
 		tvTitle					= (TextView) findViewById(R.id.article_title);
-		tvTitle.setTextSize(userTextSize + TextPreferencesManager.HEADING_TEXT_DIFF);
+		tvTitle.setTextSize(userTextSize + UserPreferencesManager.HEADING_TEXT_DIFF);
 		tvTitle.setText(cursor.getString(inxTitle) );
 
 		TextView tv;
@@ -391,6 +393,23 @@ public class ArticleActivity extends Activity {
 	}
 
 
+	public void loadTheme(Context context) {
+		ApplicationTheme theme	= Theme.getTheme(context);
+		ScrollView layout		= (ScrollView) findViewById(R.id.article_scroll_view);
+
+		layout.setBackgroundColor(theme.getBackgroundColour() );
+		tvTitle.setTextColor(theme.getHeadingColour() );
+		tvContent.setTextColor(theme.getTextColour() );
+		tvComment.setTextColor(theme.getEditorsCommentTextColour() );
+
+		if (Theme.getCurrentTheme(context) == Theme.THEME_LIGHT) {
+			tvComment.setBackgroundDrawable(theme.getEditorsCommentBackground() );
+		} else {
+			tvComment.setBackgroundColor(theme.getEditorsCommentBackgroundColour() );
+		}
+	}
+
+
 	/**
 	 * Puts a bitmap in the image view.  Adds the bitmap to the local cache.
 	 * @param bm
@@ -441,9 +460,9 @@ public class ArticleActivity extends Activity {
 
 		@Override
 		public void changeValue(int points) {
-			float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
+			float textSize		= UserPreferencesManager.convertTextSize(points);
 
-			tvTitle.setTextSize(textSize + TextPreferencesManager.HEADING_TEXT_DIFF);
+			tvTitle.setTextSize(textSize + UserPreferencesManager.HEADING_TEXT_DIFF);
 			tvContent.setTextSize(textSize);
 			tvComment.setTextSize(textSize);
 		}
@@ -451,44 +470,9 @@ public class ArticleActivity extends Activity {
 
 		@Override
 		public void finishSliding(int points) {
-			float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
+			float textSize		= UserPreferencesManager.convertTextSize(points);
 
-			TextPreferencesManager.setUserTextSize(textSize, mActivity);
-		}
-	}
-
-
-	private class ApplicationThemeHandler implements TextPreferencesManager.ThemeHandler {
-
-		@Override
-		public void setThemeDark() {
-			ScrollView layout		= (ScrollView) findViewById(R.id.article_scroll_view);
-			int black			= getResources().getColor(R.color.black);
-			int dark			= getResources().getColor(R.color.grey_darker);
-			int light		= getResources().getColor(R.color.grey_light);
-			int lightBlue	= getResources().getColor(R.color.blue_light);
-
-			layout.setBackgroundColor(black);
-			tvTitle.setTextColor(lightBlue);
-			tvContent.setTextColor(light);
-			tvComment.setBackgroundColor(dark);
-			tvComment.setTextColor(light);
-		}
-
-
-		@Override
-		public void setThemeLight() {
-			ScrollView layout		= (ScrollView) findViewById(R.id.article_scroll_view);
-			int dark			= getResources().getColor(R.color.grey_darker);
-			int white		= getResources().getColor(R.color.white);
-			int blue			= getResources().getColor(R.color.read);
-			Drawable darkFrame	= getResources().getDrawable(R.drawable.background_comment);
-
-			layout.setBackgroundColor(white);
-			tvTitle.setTextColor(blue);
-			tvContent.setTextColor(dark);
-			tvComment.setBackgroundDrawable(darkFrame);
-			tvComment.setTextColor(dark);
+			UserPreferencesManager.setUserTextSize(textSize, mActivity);
 		}
 	}
 
