@@ -45,7 +45,6 @@ import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.BaseTextDAO;
 import pl.lewica.lewicapl.android.theme.ApplicationTheme;
-import pl.lewica.lewicapl.android.theme.Theme;
 
 
 public class AnnouncementActivity extends Activity {
@@ -183,7 +182,7 @@ public class AnnouncementActivity extends Activity {
 				return true;
 
 			case R.id.menu_change_text_size:
-				int sizeInPoints	= UserPreferencesManager.convertTextSize(UserPreferencesManager.getUserTextSize(this) );
+				int sizeInPoints	= UserPreferencesManager.convertTextSize(UserPreferencesManager.getTextSize(this) );
 				SliderDialog sd		= new SliderDialog();
 				sd.setSliderValue(sizeInPoints);
 				sd.setSliderMax(UserPreferencesManager.TEXT_SIZES_TOTAL);
@@ -195,8 +194,7 @@ public class AnnouncementActivity extends Activity {
 				return true;
 
 			case R.id.menu_change_background:
-				int newTheme	= UserPreferencesManager.switchUserTheme(getApplicationContext() );
-				Theme.setCurrentTheme(newTheme);
+				UserPreferencesManager.switchUserTheme(getApplicationContext() );
 				loadTheme(getApplicationContext() );
 				ApplicationRootActivity.reloadAllTabsInBackground(getApplicationContext() );
 
@@ -235,7 +233,7 @@ public class AnnouncementActivity extends Activity {
 
 		startManagingCursor(cursor);
 
-		float userTextSize	= UserPreferencesManager.getUserTextSize(this);
+		float userTextSize	= UserPreferencesManager.getTextSize(this);
 
 		// In order to capture a cell, you need to work what their index
 		int idxWasRead				= cursor.getColumnIndex(AnnouncementDAO.FIELD_WAS_READ);
@@ -336,7 +334,7 @@ public class AnnouncementActivity extends Activity {
 
 
 	public void loadTheme(Context context) {
-		ApplicationTheme theme	= Theme.getTheme(context);
+		ApplicationTheme theme	= UserPreferencesManager.getThemeInstance(context);
 		ScrollView layout		= (ScrollView) findViewById(R.id.announcement_scroll_view);
 
 		layout.setBackgroundColor(theme.getBackgroundColour() );
@@ -388,8 +386,6 @@ public class AnnouncementActivity extends Activity {
 			tvWhenLbl.setTextSize(textSize);
 			tvContent.setTextSize(textSize);
 			tvAuthor.setTextSize(textSize);
-
-			UserPreferencesManager.setUserTextSize(textSize, mActivity);
 		}
 
 
@@ -397,7 +393,7 @@ public class AnnouncementActivity extends Activity {
 		public void finishSliding(int points) {
 			float textSize		= UserPreferencesManager.convertTextSize(points);
 
-			UserPreferencesManager.setUserTextSize(textSize, mActivity);
+			UserPreferencesManager.setTextSize(textSize, mActivity);
 		}
 	}
 }

@@ -48,9 +48,9 @@ import android.widget.TextView;
 import pl.lewica.lewicapl.R;
 import pl.lewica.api.model.Article;
 import pl.lewica.api.url.ArticleURL;
+import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 import pl.lewica.lewicapl.android.theme.ApplicationTheme;
-import pl.lewica.lewicapl.android.theme.Theme;
 
 
 /**
@@ -121,7 +121,7 @@ public class NewsListActivity extends Activity {
 
 				// Mark current article as read by changing its colour...
 				TextView tv		= (TextView) view.findViewById(R.id.article_item_title);
-				appTheme	= Theme.getTheme(context);
+				appTheme	= UserPreferencesManager.getThemeInstance(context);
 				tv.setTextColor(appTheme.getListHeadingColour(true) );
 				// ... and flagging it in the database accordingly
 				clicked.add(id);
@@ -130,7 +130,7 @@ public class NewsListActivity extends Activity {
 			}
 		});
 
-		appTheme	= Theme.getTheme(getApplicationContext() );
+		appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
 		appTheme.setListViewDividerColour(listView, this);
 	}
 
@@ -147,7 +147,7 @@ public class NewsListActivity extends Activity {
 	public class NewsUpdateBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			appTheme	= Theme.getTheme(getApplicationContext() );
+			appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
 			reloadRows();
 			appTheme.setListViewDividerColour(listView, context);
 		}
@@ -203,7 +203,7 @@ public class NewsListActivity extends Activity {
 		 */
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
-			appTheme	= Theme.getTheme(context);
+			appTheme	= UserPreferencesManager.getThemeInstance(context);
 
 			// Editor's comments icon
 			int hasComment	= cursor.getInt(colIndex_HasComment);
