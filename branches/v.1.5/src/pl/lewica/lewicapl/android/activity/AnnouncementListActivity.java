@@ -40,7 +40,7 @@ import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.BaseTextDAO;
-import pl.lewica.lewicapl.android.theme.ApplicationTheme;
+import pl.lewica.lewicapl.android.theme.Theme;
 
 
 /**
@@ -59,7 +59,7 @@ public class AnnouncementListActivity extends Activity {
 	private ListAdapter listAdapter;
 	private ListView listView;
 	private AnnouncementsUpdateBroadcastReceiver receiver;
-	private static ApplicationTheme appTheme;
+	private static Theme appTheme;
 
 	private int limitRows		= 15;
 
