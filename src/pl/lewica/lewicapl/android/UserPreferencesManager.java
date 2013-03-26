@@ -1,6 +1,6 @@
 package pl.lewica.lewicapl.android;
 
-import pl.lewica.lewicapl.android.theme.ApplicationTheme;
+import pl.lewica.lewicapl.android.theme.Theme;
 import pl.lewica.lewicapl.android.theme.DarkTheme;
 import pl.lewica.lewicapl.android.theme.LightTheme;
 import android.content.Context;
@@ -61,7 +61,7 @@ public class UserPreferencesManager {
 	 * @param context
 	 * @return
 	 */
-	public static ApplicationTheme getThemeInstance(Context context) {
+	public static Theme getThemeInstance(Context context) {
 		switch (getTheme(context) ) {
 			case THEME_LIGHT:
 				return LightTheme.getInstance(context);

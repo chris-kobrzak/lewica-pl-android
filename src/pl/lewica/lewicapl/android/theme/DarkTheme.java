@@ -8,13 +8,13 @@ import android.widget.ListView;
 import pl.lewica.lewicapl.R;
 
 
-public class DarkTheme implements ApplicationTheme {
+public class DarkTheme implements Theme {
 
-	private static DarkTheme instance;
+	private static Theme instance;
 	private Resources res;
 
 
-	public static DarkTheme getInstance(Context context) {
+	public static Theme getInstance(Context context) {
 		if (instance != null) {
 			return instance;
 		}

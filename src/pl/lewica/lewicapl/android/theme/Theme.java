@@ -5,7 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.widget.ListView;
 
 
-public interface ApplicationTheme {
+public interface Theme {
 
 	public int getBackgroundColour();
 
