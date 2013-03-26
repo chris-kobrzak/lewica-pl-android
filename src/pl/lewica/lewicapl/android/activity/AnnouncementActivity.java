@@ -44,7 +44,7 @@ import pl.lewica.lewicapl.android.DialogManager.SliderEventHandler;
 import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.BaseTextDAO;
-import pl.lewica.lewicapl.android.theme.ApplicationTheme;
+import pl.lewica.lewicapl.android.theme.Theme;
 
 
 public class AnnouncementActivity extends Activity {
@@ -334,7 +334,7 @@ public class AnnouncementActivity extends Activity {
 
 
 	public void loadTheme(Context context) {
-		ApplicationTheme theme	= UserPreferencesManager.getThemeInstance(context);
+		Theme theme	= UserPreferencesManager.getThemeInstance(context);
 		ScrollView layout		= (ScrollView) findViewById(R.id.announcement_scroll_view);
 
 		layout.setBackgroundColor(theme.getBackgroundColour() );

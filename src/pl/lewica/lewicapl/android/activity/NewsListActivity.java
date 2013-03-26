@@ -50,7 +50,7 @@ import pl.lewica.api.model.Article;
 import pl.lewica.api.url.ArticleURL;
 import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
-import pl.lewica.lewicapl.android.theme.ApplicationTheme;
+import pl.lewica.lewicapl.android.theme.Theme;
 
 
 /**
@@ -66,7 +66,7 @@ public class NewsListActivity extends Activity {
 	private ListAdapter listAdapter;
 	private ListView listView;
 	private BroadcastReceiver receiver;
-	private static ApplicationTheme appTheme;
+	private static Theme appTheme;
 	// When users select a new article, navigate back to the list and start scrolling up and down, the cursor won't know this article should be marked as read.
 	// That results in articles still being marked as unread (titles in red rather than blue).
 	// That's why we need to cache the list of clicked articles.  Please note, it is down to ArcticleActivity to flag articles as read in the database.

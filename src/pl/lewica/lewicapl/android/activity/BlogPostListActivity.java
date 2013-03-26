@@ -42,7 +42,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
-import pl.lewica.lewicapl.android.theme.ApplicationTheme;
+import pl.lewica.lewicapl.android.theme.Theme;
 
 
 /**
@@ -66,7 +66,7 @@ public class BlogPostListActivity extends Activity {
 	private ListAdapter listAdapter;
 	private ListView listView;
 	private BroadcastReceiver receiver;
-	private static ApplicationTheme appTheme;
+	private static Theme appTheme;
 
 	private int limitRows		= 15;
 

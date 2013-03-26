@@ -37,7 +37,7 @@ import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ContentUpdateManager;
 import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.HistoryDAO;
-import pl.lewica.lewicapl.android.theme.ApplicationTheme;
+import pl.lewica.lewicapl.android.theme.Theme;
 
 
 /**
@@ -105,7 +105,7 @@ public class HistoryListActivity extends Activity {
 			} 
 		}; 
 		listView.setAdapter(listAdapter);
-		ApplicationTheme appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
+		Theme appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
 		appTheme.setListViewDividerColour(listView, this);
 
 		// Register to receive content update messages
