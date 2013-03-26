@@ -11,9 +11,11 @@ import android.preference.PreferenceManager;
 
 public class UserPreferencesManager {
 
-	// TODO Consider converting these constants into enum types
 	public static final int THEME_LIGHT		= 1;
 	public static final int THEME_DARK		= 2;
+	public static enum ThemeType {
+		LIGHT, DARK
+	}
 
 	public static final String USER_SETTING_THEME		= "colourTheme";
 	public static final String USER_SETTING_TEXT_SIZE		= "textSize";
@@ -29,6 +31,7 @@ public class UserPreferencesManager {
 
 	private static float sTextSize	= -1.f;
 	private static int sCurrentTheme	= -1;
+	private static ThemeType sCurrentThemeType	= null;
 
 
 	/**
@@ -59,10 +62,7 @@ public class UserPreferencesManager {
 	 * @return
 	 */
 	public static ApplicationTheme getThemeInstance(Context context) {
-		if (sCurrentTheme == -1) {
-			setTheme(getUserTheme(context), context);
-		}
-		switch (sCurrentTheme) {
+		switch (getTheme(context) ) {
 			case THEME_LIGHT:
 				return LightTheme.getInstance(context);
 
