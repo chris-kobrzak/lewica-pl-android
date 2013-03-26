@@ -67,7 +67,7 @@ public class ApplicationRootActivity extends TabActivity {
 	private ContentUpdateManager updateManager;
 
 
-	public void init() {
+	private void init() {
 		// This allows to show and hide the progress indicator in the top bar and needs to be done before content view set-up
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
@@ -231,6 +231,13 @@ public class ApplicationRootActivity extends TabActivity {
 
 				// Don't call runUpdate() here as this is an action triggered by the user.
 				updateManager.run();
+				return true;
+
+			case R.id.menu_change_background:
+				// Read existing and write new theme to xml file (done by Android) and store in memory
+				UserPreferencesManager.switchUserTheme(getApplicationContext() );
+				ApplicationRootActivity.reloadAllTabsInBackground(getApplicationContext() );
+
 				return true;
 
 			case R.id.menu_mark_as_read:
