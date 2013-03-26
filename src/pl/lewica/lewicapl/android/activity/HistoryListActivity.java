@@ -84,10 +84,10 @@ public class HistoryListActivity extends Activity {
 		startManagingCursor(cursor);
 
 		int layout;
-		if (UserPreferencesManager.getTheme(getApplicationContext() ) == UserPreferencesManager.THEME_DARK) {
-			layout	= R.layout.list_history_item_dark;
-		} else {
+		if (UserPreferencesManager.isLightTheme() ) {
 			layout	= R.layout.list_history_item;
+		} else {
+			layout	= R.layout.list_history_item_dark;
 		}
 		// Set list view adapter - this links the view with the data
 		listAdapter				= new SimpleCursorAdapter(

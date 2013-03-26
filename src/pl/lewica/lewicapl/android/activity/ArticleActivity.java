@@ -399,7 +399,7 @@ public class ArticleActivity extends Activity {
 		tvContent.setTextColor(theme.getTextColour() );
 		tvComment.setTextColor(theme.getEditorsCommentTextColour() );
 
-		if (UserPreferencesManager.getTheme(context) == UserPreferencesManager.THEME_LIGHT) {
+		if (UserPreferencesManager.isLightTheme() ) {
 			tvComment.setBackgroundDrawable(theme.getEditorsCommentBackground() );
 		} else {
 			tvComment.setBackgroundColor(theme.getEditorsCommentBackgroundColour() );

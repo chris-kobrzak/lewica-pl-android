@@ -11,49 +11,23 @@ import android.preference.PreferenceManager;
 
 public class UserPreferencesManager {
 
-	public static final int THEME_LIGHT		= 1;
-	public static final int THEME_DARK		= 2;
 	public static enum ThemeType {
 		LIGHT, DARK
 	}
 
-	public static final String USER_SETTING_THEME		= "colourTheme";
-	public static final String USER_SETTING_TEXT_SIZE		= "textSize";
-	public static final float DEFAULT_TEXT_SIZE					= 16.f;
-	public static final float MIN_TEXT_SIZE							=  8.f;
-	public static final float MAX_TEXT_SIZE							= 52.f;
-	public static final float DEFAULT_TEXT_SIZE_HEADING	= 25.f;
-	public static final float MIN_TEXT_SIZE_HEADING			= 17.f;
-	public static final float MAX_TEXT_SIZE_HEADING			= 65.f;
-	public static final float TEXT_SIZE_INCREMENT				=  1.f;
-	public static final int TEXT_SIZES_TOTAL		= (int) ( (MAX_TEXT_SIZE - MIN_TEXT_SIZE) / TEXT_SIZE_INCREMENT) + 1;
-	public static final float HEADING_TEXT_DIFF		= DEFAULT_TEXT_SIZE_HEADING - DEFAULT_TEXT_SIZE;
+	private static String sSettingTheme					= "colourTheme";
+	private static String sSettingTextSize					= "textSize";
+	private static float sDefaultTextSize					= 16.f;
+	private static float sMinTextSize						=  8.f;
+	private static float sMaxTextSize						= 52.f;
+	private static float sTextSizeIncrement				=  1.f;
 
-	private static float sTextSize	= -1.f;
-	private static int sCurrentTheme	= -1;
-	private static ThemeType sCurrentThemeType	= null;
+	// This is utilised by the text size slider widget
+	public static final int TEXT_SIZES_TOTAL			= (int) ( (sMaxTextSize - sMinTextSize) / sTextSizeIncrement) + 1;
+	public static final float HEADING_TEXT_DIFF		= 9.f;	// Difference between text and heading sizes
 
-
-	/**
-	 * Checks the current theme in the cache,
-	 * caches the other theme (we only have two of them at the moment)
-	 * and calls a method that caches it using Android routines.
-	 * @param context
-	 * @return
-	 */
-	public static int switchUserTheme(Context context) {
-		switch (getTheme(context) ) {
-			case THEME_LIGHT:
-				setTheme(THEME_DARK, context);
-				return THEME_DARK;
-
-			case THEME_DARK:
-				setTheme(THEME_LIGHT, context);
-				return THEME_LIGHT;
-		}
-
-		return -1;
-	}
+	private static float sTextSize			= -1.f;
+	private static ThemeType sTheme	= null;
 
 
 	/**
@@ -63,13 +37,39 @@ public class UserPreferencesManager {
 	 */
 	public static Theme getThemeInstance(Context context) {
 		switch (getTheme(context) ) {
-			case THEME_LIGHT:
+			case LIGHT:
 				return LightTheme.getInstance(context);
 
-			case THEME_DARK:
+			case DARK:
 				return DarkTheme.getInstance(context);
 		}
 		return null;
+	}
+
+
+	/**
+	 * Checks the current theme in the cache,
+	 * caches the other theme (we only have two of them at the moment)
+	 * and calls a method that caches it using Android routines.
+	 * @param context
+	 * @return
+	 */
+	public static ThemeType switchUserTheme(Context context) {
+		switch (getTheme(context) ) {
+			case LIGHT:
+				setTheme(ThemeType.DARK, context);
+				break;
+			case DARK:
+				setTheme(ThemeType.LIGHT, context);
+				break;
+		}
+
+		return getTheme(context);
+	}
+
+
+	public static boolean isLightTheme() {
+		return sTheme == ThemeType.LIGHT;
 	}
 
 
@@ -80,12 +80,12 @@ public class UserPreferencesManager {
 	 * @param context
 	 * @return
 	 */
-	public static int getTheme(Context context) {
-		if (sCurrentTheme > -1) {
-			return sCurrentTheme;
+	public static ThemeType getTheme(Context context) {
+		if (sTheme != null) {
+			return sTheme;
 		}
-		sCurrentTheme	= getUserTheme(context); 
-		return sCurrentTheme;
+		sTheme	= convertThemeId(getUserTheme(context) );
+		return sTheme;
 	}
 
 
@@ -95,12 +95,12 @@ public class UserPreferencesManager {
 	 * @param theme
 	 * @param context
 	 */
-	public static void setTheme(final int theme, final Context context) {
-		sCurrentTheme	= theme;
+	public static void setTheme(final ThemeType theme, final Context context) {
+		sTheme	= theme;
 
 		new Thread(new Runnable() {
 			public void run() {
-				setUserTheme(theme, context);
+				setUserTheme(convertThemeId(theme), context);
 			}
 		}).start();
 	}
@@ -109,14 +109,14 @@ public class UserPreferencesManager {
 	private static int getUserTheme(Context context) {
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(context);
 
-		return prefs.getInt(USER_SETTING_THEME, THEME_LIGHT);
+		return prefs.getInt(sSettingTheme, ThemeType.LIGHT.ordinal() );
 	}
 
 
 	private static void setUserTheme(int theme, Context context) {
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(context);
 		Editor prefsEditor			= prefs.edit();
-		prefsEditor.putInt(USER_SETTING_THEME, theme);
+		prefsEditor.putInt(sSettingTheme, theme);
 		prefsEditor.commit();
 	}
 
@@ -163,36 +163,52 @@ public class UserPreferencesManager {
 	private static float getUserTextSize(Context context) {
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(context);
 
-		return prefs.getFloat(USER_SETTING_TEXT_SIZE, DEFAULT_TEXT_SIZE);
+		return prefs.getFloat(sSettingTextSize, sDefaultTextSize);
 	}
 
 
 	/**
 	 * Opens up the preferences file via PreferenceManager
-	 * and saves the new values on UI thread
+	 * and saves the new values on main thread
 	 * @param size
 	 * @param context
 	 */
 	private static void setUserTextSize(float size, Context context) {
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(context);
 		Editor prefsEditor			= prefs.edit();
-		prefsEditor.putFloat(USER_SETTING_TEXT_SIZE, size);
+		prefsEditor.putFloat(sSettingTextSize, size);
 		prefsEditor.commit();
 	}
 
 
 	public static int convertTextSize(float textSize) {
 		int textSizeInt	= Math.round(textSize);
-		int minSize		= Math.round(MIN_TEXT_SIZE);
-		int increment		= Math.round(TEXT_SIZE_INCREMENT);
+		int minSize		= Math.round(sMinTextSize);
+		int increment		= Math.round(sTextSizeIncrement);
 
 		return (textSizeInt - minSize) / increment;
 	}
 
 
 	public static float convertTextSize(int textSize) {
-		int increment	= Math.round(TEXT_SIZE_INCREMENT);
-		int minSize	= Math.round(MIN_TEXT_SIZE);
+		int increment	= Math.round(sTextSizeIncrement);
+		int minSize	= Math.round(sMinTextSize);
 		return (float) (textSize * increment) + minSize;
+	}
+
+
+	private static int convertThemeId(ThemeType theme) {
+		return theme.ordinal();
+	}
+
+
+	private static ThemeType convertThemeId(int theme) {
+		for (ThemeType type: ThemeType.values() ) {
+			if (type.ordinal() == theme) {
+				return type;
+			}
+		}
+		// Default value
+		return ThemeType.LIGHT;
 	}
 }
