@@ -98,6 +98,7 @@ public class BlogPostActivity extends Activity {
 
 		// Fill views with data
 		loadContent(blogPostID, this);
+		loadTextSize(UserPreferencesManager.getTextSize(this) );
 		loadTheme(getApplicationContext() );
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
@@ -243,15 +244,13 @@ public class BlogPostActivity extends Activity {
 	 * or navigating between blog posts using the previous-next facility (not yet implemented).
 	 * @param id
 	 */
-	public void loadContent(long ID, Context context) {
+	private void loadContent(long ID, Context context) {
 		// Save it in this object's field
 		blogPostID	= ID;
 		// Fetch database record
 		Cursor cursor				= blogPostDAO.selectOne(ID);
 
 		startManagingCursor(cursor);
-
-		float userTextSize	= UserPreferencesManager.getTextSize(this);
 
 		// In order to capture a cell, you need to work what their index
 		int inxWasRead			= cursor.getColumnIndex(BlogPostDAO.FIELD_WAS_READ);
@@ -273,7 +272,6 @@ public class BlogPostActivity extends Activity {
 		// Now start populating all views with data
 		TextView tv;
 		tvTitle					= (TextView) findViewById(R.id.blog_post_title);
-		tvTitle.setTextSize(userTextSize + UserPreferencesManager.HEADING_TEXT_DIFF);
 		tvTitle.setText(cursor.getString(inxTitle) );
 
 		tv							= (TextView) findViewById(R.id.blog_post_category);
@@ -294,7 +292,6 @@ public class BlogPostActivity extends Activity {
 		tv.setText(dateFormat.format(d) );
 
 		tvContent					= (TextView) findViewById(R.id.blog_post_content);
-		tvContent.setTextSize(userTextSize);
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
 		tvContent.setText(cursor.getString(inxText).replace("\r", "") );
 
@@ -303,7 +300,6 @@ public class BlogPostActivity extends Activity {
 
 		if (author.length() > 0) {
 			tvAuthor.setText(author);
-			tvAuthor.setTextSize(userTextSize);
 			tvAuthor.setVisibility(View.VISIBLE);
 		} else {
 			tvAuthor.setText("");
@@ -330,7 +326,14 @@ public class BlogPostActivity extends Activity {
 	}
 
 
-	public void loadTheme(Context context) {
+	private void loadTextSize(float textSize) {
+		tvTitle.setTextSize(textSize + UserPreferencesManager.HEADING_TEXT_DIFF);
+		tvContent.setTextSize(textSize);
+		tvAuthor.setTextSize(textSize);
+	}
+
+
+	private void loadTheme(Context context) {
 		Theme theme	= UserPreferencesManager.getThemeInstance(context);
 		ScrollView layout		= (ScrollView) findViewById(R.id.blog_post_scroll_view);
 
@@ -354,9 +357,7 @@ public class BlogPostActivity extends Activity {
 		public void changeValue(int points) {
 			float textSize		= UserPreferencesManager.convertTextSize(points);
 
-			tvTitle.setTextSize(textSize + UserPreferencesManager.HEADING_TEXT_DIFF);
-			tvContent.setTextSize(textSize);
-			tvAuthor.setTextSize(textSize);
+			loadTextSize(textSize);
 		}
 
 
