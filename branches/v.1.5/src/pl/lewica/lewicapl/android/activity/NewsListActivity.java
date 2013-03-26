@@ -135,7 +135,7 @@ public class NewsListActivity extends Activity {
 	}
 
 
-	public void reloadRows() {
+	private void reloadRows() {
 		CursorAdapter ca	= (CursorAdapter) listAdapter;
 		// Reload rows
 		Cursor newCursor	= articleDAO.selectLatestNews();
