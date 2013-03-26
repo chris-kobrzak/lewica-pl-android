@@ -1,18 +1,14 @@
 package pl.lewica.lewicapl.android;
 
-import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.theme.Theme;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.graphics.drawable.ColorDrawable;
 import android.preference.PreferenceManager;
-import android.widget.ListView;
 
-public class TextPreferencesManager {
+public class UserPreferencesManager {
 
 	public static final String USER_SETTING_THEME		= "colourTheme";
-	public static final int THEME_WHITE_ON_BLACK		= 1;
-	public static final int THEME_BLACK_ON_WHITE		= 2;
 
 	public static final String USER_SETTING_TEXT_SIZE		= "textSizeStandard";
 	public static final String USER_SETTING_TEXT_SIZE_HEADING		= "textSizeHeading";
@@ -27,48 +23,25 @@ public class TextPreferencesManager {
 	public static final float HEADING_TEXT_DIFF		= DEFAULT_TEXT_SIZE_HEADING - DEFAULT_TEXT_SIZE;
 
 
-
-	public interface ThemeHandler {
-		public void setThemeDark();
-
-		public void setThemeLight();
-	}
-
-
-	public static void switchTheme(ThemeHandler themeHandler, Context context) {
+	public static int switchUserTheme(Context context) {
 		switch (getUserTheme(context) ) {
-			case THEME_BLACK_ON_WHITE:
-				themeHandler.setThemeDark();
+			case Theme.THEME_LIGHT:
+				setUserTheme(Theme.THEME_DARK, context);
+				return Theme.THEME_DARK;
 
-				setUserTheme(THEME_WHITE_ON_BLACK, context);
-				break;
-
-			case THEME_WHITE_ON_BLACK:
-				themeHandler.setThemeLight();
-
-				setUserTheme(THEME_BLACK_ON_WHITE, context);
-				break;
+			case Theme.THEME_DARK:
+				setUserTheme(Theme.THEME_LIGHT, context);
+				return Theme.THEME_LIGHT;
 		}
-	}
 
-
-	public static void loadTheme(ThemeHandler themeHandler, Context context) {
-		switch (getUserTheme(context) ) {
-			case THEME_BLACK_ON_WHITE:
-				themeHandler.setThemeLight();
-				break;
-
-			case THEME_WHITE_ON_BLACK:
-				themeHandler.setThemeDark();
-				break;
-		}
+		return -1;
 	}
 
 
 	public static int getUserTheme(Context context) {
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(context);
 
-		return prefs.getInt(USER_SETTING_THEME, THEME_BLACK_ON_WHITE);
+		return prefs.getInt(USER_SETTING_THEME, Theme.THEME_LIGHT);
 	}
 
 
@@ -80,11 +53,7 @@ public class TextPreferencesManager {
 	}
 
 
-	public static boolean isDarkTheme(Context context) {
-		return getUserTheme(context) == THEME_WHITE_ON_BLACK;
-	}
-
-	public static int convertTextSizeToPoint(float textSize) {
+	public static int convertTextSize(float textSize) {
 		int textSizeInt	= Math.round(textSize);
 		int minSize		= Math.round(MIN_TEXT_SIZE);
 		int increment		= Math.round(TEXT_SIZE_INCREMENT);
@@ -93,7 +62,7 @@ public class TextPreferencesManager {
 	}
 
 
-	public static float convertTextSizeToFloat(int textSize) {
+	public static float convertTextSize(int textSize) {
 		int increment	= Math.round(TEXT_SIZE_INCREMENT);
 		int minSize	= Math.round(MIN_TEXT_SIZE);
 		return (float) (textSize * increment) + minSize;
@@ -103,10 +72,13 @@ public class TextPreferencesManager {
 	/**
 	 * Opens up the preferences file via PreferenceManager
 	 * and reads the user text size value
+	 * TODO Make sure this method is not invoked too often as it reads XML
+	 *   consider caching its result in a similar way to how we cache theme info 
 	 * @param context
 	 * @return
 	 */
 	public static float getUserTextSize(Context context) {
+//android.util.Log.i("prefs", "read");
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(context);
 
 		return prefs.getFloat(USER_SETTING_TEXT_SIZE, DEFAULT_TEXT_SIZE);
@@ -115,7 +87,7 @@ public class TextPreferencesManager {
 
 	/**
 	 * Opens up the preferences file via PreferenceManager
-	 * and saves the new value on UI thread
+	 * and saves the new values on UI thread
 	 * @param size
 	 * @param context
 	 */
@@ -123,23 +95,6 @@ public class TextPreferencesManager {
 		SharedPreferences prefs	= PreferenceManager.getDefaultSharedPreferences(context);
 		Editor prefsEditor			= prefs.edit();
 		prefsEditor.putFloat(USER_SETTING_TEXT_SIZE, size);
-		prefsEditor.putFloat(USER_SETTING_TEXT_SIZE_HEADING, size + HEADING_TEXT_DIFF);
 		prefsEditor.commit();
-	}
-
-
-	public static void setListViewDividerColour(ListView listView, Context context) {
-		int colour	= 0;
-		switch (getUserTheme(context) ) {
-			case THEME_BLACK_ON_WHITE:
-				colour	= R.color.grey;
-				break;
-
-			case THEME_WHITE_ON_BLACK:
-				colour	= R.color.grey_darker;
-				break;
-		}
-		listView.setDivider(new ColorDrawable(context.getResources().getColor(colour) ) );
-		listView.setDividerHeight(1);
 	}
 }

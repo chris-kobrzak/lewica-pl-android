@@ -41,10 +41,11 @@ import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.DialogManager;
 import pl.lewica.lewicapl.android.SliderDialog;
 import pl.lewica.lewicapl.android.DialogManager.SliderEventHandler;
-import pl.lewica.lewicapl.android.TextPreferencesManager;
-import pl.lewica.lewicapl.android.TextPreferencesManager.ThemeHandler;
+import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.BaseTextDAO;
+import pl.lewica.lewicapl.android.theme.ApplicationTheme;
+import pl.lewica.lewicapl.android.theme.Theme;
 
 
 public class AnnouncementActivity extends Activity {
@@ -57,7 +58,6 @@ public class AnnouncementActivity extends Activity {
 	private BaseTextDAO annDAO;
 	private Map<String,Long> nextPrevID;
 	private SliderEventHandler mTextSizeHandler;
-	private ThemeHandler mThemeHandler;
 
 	private TextView tvTitle;
 	private TextView tvWhereLbl;
@@ -83,7 +83,6 @@ public class AnnouncementActivity extends Activity {
 		annDAO.open();
 
 		mTextSizeHandler	= new TextSizeHandler(this);
-		mThemeHandler	= new ApplicationThemeHandler();
 
 		// When user changes the orientation, Android restarts the activity.  Say, users navigated through articles using
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
@@ -98,7 +97,7 @@ public class AnnouncementActivity extends Activity {
 
 		// Fill views with data
 		loadContent(annID, this);
-		TextPreferencesManager.loadTheme(mThemeHandler, this);
+		loadTheme(getApplicationContext() );
 
 		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
 		View titleView = getWindow().findViewById(android.R.id.title);
@@ -184,10 +183,10 @@ public class AnnouncementActivity extends Activity {
 				return true;
 
 			case R.id.menu_change_text_size:
-				int sizeInPoints	= TextPreferencesManager.convertTextSizeToPoint(TextPreferencesManager.getUserTextSize(this) );
+				int sizeInPoints	= UserPreferencesManager.convertTextSize(UserPreferencesManager.getUserTextSize(this) );
 				SliderDialog sd		= new SliderDialog();
 				sd.setSliderValue(sizeInPoints);
-				sd.setSliderMax(TextPreferencesManager.TEXT_SIZES_TOTAL);
+				sd.setSliderMax(UserPreferencesManager.TEXT_SIZES_TOTAL);
 				sd.setTitleResource(R.string.heading_change_text_size);
 				sd.setOkButtonResource(R.string.ok);
 
@@ -196,8 +195,10 @@ public class AnnouncementActivity extends Activity {
 				return true;
 
 			case R.id.menu_change_background:
-				TextPreferencesManager.switchTheme(mThemeHandler, this);
-				ApplicationRootActivity.reloadAllTabsInBackground(this);
+				int newTheme	= UserPreferencesManager.switchUserTheme(getApplicationContext() );
+				Theme.setCurrentTheme(newTheme);
+				loadTheme(getApplicationContext() );
+				ApplicationRootActivity.reloadAllTabsInBackground(getApplicationContext() );
 
 				return true;
 
@@ -234,7 +235,7 @@ public class AnnouncementActivity extends Activity {
 
 		startManagingCursor(cursor);
 
-		float userTextSize	= TextPreferencesManager.getUserTextSize(this);
+		float userTextSize	= UserPreferencesManager.getUserTextSize(this);
 
 		// In order to capture a cell, you need to work what their index
 		int idxWasRead				= cursor.getColumnIndex(AnnouncementDAO.FIELD_WAS_READ);
@@ -252,7 +253,7 @@ public class AnnouncementActivity extends Activity {
 
 		// Now start populating all views with data
 		tvTitle					= (TextView) findViewById(R.id.announcement_title);
-		tvTitle.setTextSize(userTextSize + TextPreferencesManager.HEADING_TEXT_DIFF);
+		tvTitle.setTextSize(userTextSize + UserPreferencesManager.HEADING_TEXT_DIFF);
 		tvTitle.setText(cursor.getString(idxTitle) );
 
 		TextView tv;
@@ -334,6 +335,21 @@ public class AnnouncementActivity extends Activity {
 	}
 
 
+	public void loadTheme(Context context) {
+		ApplicationTheme theme	= Theme.getTheme(context);
+		ScrollView layout		= (ScrollView) findViewById(R.id.announcement_scroll_view);
+
+		layout.setBackgroundColor(theme.getBackgroundColour() );
+		tvTitle.setTextColor(theme.getHeadingColour() );
+		tvWhere.setTextColor(theme.getTextColour());
+		tvWhereLbl.setTextColor(theme.getTextColour());
+		tvWhen.setTextColor(theme.getTextColour());
+		tvWhenLbl.setTextColor(theme.getTextColour());
+		tvContent.setTextColor(theme.getTextColour() );
+		tvAuthor.setTextColor(theme.getTextColour());
+	}
+
+
 	/**
 	 * 1. Marks this article as read without blocking the UI thread (Java threads require variables to be declared as final)
 	 * 2. Asks listing screens to refresh
@@ -363,9 +379,9 @@ public class AnnouncementActivity extends Activity {
 
 		@Override
 		public void changeValue(int points) {
-			float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
+			float textSize		= UserPreferencesManager.convertTextSize(points);
 
-			tvTitle.setTextSize(textSize + TextPreferencesManager.HEADING_TEXT_DIFF);
+			tvTitle.setTextSize(textSize + UserPreferencesManager.HEADING_TEXT_DIFF);
 			tvWhere.setTextSize(textSize);
 			tvWhereLbl.setTextSize(textSize);
 			tvWhen.setTextSize(textSize);
@@ -373,54 +389,15 @@ public class AnnouncementActivity extends Activity {
 			tvContent.setTextSize(textSize);
 			tvAuthor.setTextSize(textSize);
 
-			TextPreferencesManager.setUserTextSize(textSize, mActivity);
+			UserPreferencesManager.setUserTextSize(textSize, mActivity);
 		}
 
 
 		@Override
 		public void finishSliding(int points) {
-			float textSize		= TextPreferencesManager.convertTextSizeToFloat(points);
+			float textSize		= UserPreferencesManager.convertTextSize(points);
 
-			TextPreferencesManager.setUserTextSize(textSize, mActivity);
-		}
-	}
-
-
-	private class ApplicationThemeHandler implements TextPreferencesManager.ThemeHandler {
-
-		@Override
-		public void setThemeDark() {
-			ScrollView layout		= (ScrollView) findViewById(R.id.announcement_scroll_view);
-			int black			= getResources().getColor(R.color.black);
-			int light		= getResources().getColor(R.color.grey_light);
-			int lightBlue	= getResources().getColor(R.color.blue_light);
-
-			layout.setBackgroundColor(black);
-			tvTitle.setTextColor(lightBlue);
-			tvWhere.setTextColor(light);
-			tvWhereLbl.setTextColor(light);
-			tvWhen.setTextColor(light);
-			tvWhenLbl.setTextColor(light);
-			tvContent.setTextColor(light);
-			tvAuthor.setTextColor(light);
-		}
-
-
-		@Override
-		public void setThemeLight() {
-			ScrollView layout		= (ScrollView) findViewById(R.id.announcement_scroll_view);
-			int dark			= getResources().getColor(R.color.grey_darker);
-			int white		= getResources().getColor(R.color.white);
-			int blue			= getResources().getColor(R.color.read);
-
-			layout.setBackgroundColor(white);
-			tvTitle.setTextColor(blue);
-			tvWhere.setTextColor(dark);
-			tvWhereLbl.setTextColor(dark);
-			tvWhen.setTextColor(dark);
-			tvWhenLbl.setTextColor(dark);
-			tvContent.setTextColor(dark);
-			tvAuthor.setTextColor(dark);
+			UserPreferencesManager.setUserTextSize(textSize, mActivity);
 		}
 	}
 }
