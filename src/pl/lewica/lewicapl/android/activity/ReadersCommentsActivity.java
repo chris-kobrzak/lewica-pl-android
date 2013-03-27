@@ -36,13 +36,14 @@ public class ReadersCommentsActivity extends Activity {
 
 		setContentView(R.layout.web_readers_comments);
 
-		int themeId	= UserPreferencesManager.ThemeType.LIGHT.ordinal();
+		long articleId	= AndroidUtil.filterIDFromUri(getIntent().getData() );
+		float textSize	= UserPreferencesManager.getTextSize(getApplicationContext() );
+		int themeId		= UserPreferencesManager.ThemeType.LIGHT.ordinal();
 		if (! UserPreferencesManager.isLightTheme() ) {
 			themeId		= UserPreferencesManager.ThemeType.DARK.ordinal();
 		}
 
-		long articleId			= AndroidUtil.filterIDFromUri(getIntent().getData() );
-		WebView wv			= (WebView) findViewById(R.id.web_comments);
-		wv.loadUrl(URLDictionary.buildURL_ReadersComments(articleId, themeId) );
+		WebView wv		= (WebView) findViewById(R.id.web_comments);
+		wv.loadUrl(URLDictionary.buildURL_ReadersComments(articleId, (int) textSize, themeId) );
 	}
 }
