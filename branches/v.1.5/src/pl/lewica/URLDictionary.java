@@ -51,7 +51,7 @@ public class URLDictionary {
 		sb.append(Integer.toString(textSize) );
 		sb.append("&theme=");
 		sb.append(Integer.toString(theme) );
-android.util.Log.i("util", sb.toString() );
+
 		return sb.toString();
 	}
 
