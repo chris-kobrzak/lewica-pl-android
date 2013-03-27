@@ -242,7 +242,7 @@ public class ApplicationRootActivity extends TabActivity {
 
 			case R.id.menu_mark_as_read:
 				int tab	= getTabHost().getCurrentTab();
-				
+
 				ArticleDAO articleDAO;
 
 				// Switching over an integer representing the ordinal of the current tab
@@ -280,7 +280,7 @@ public class ApplicationRootActivity extends TabActivity {
 						annDAO.updateMarkAllAsRead();
 						annDAO.close();
 
-						broadcastSender.reloadTab(Tab.HISTORY);
+						broadcastSender.reloadTab(Tab.ANNOUNCEMENTS);
 						break;
 
 					case HISTORY:
