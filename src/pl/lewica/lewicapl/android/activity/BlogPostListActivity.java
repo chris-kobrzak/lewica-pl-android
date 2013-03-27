@@ -40,7 +40,9 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
+import pl.lewica.lewicapl.android.theme.Theme;
 
 
 /**
@@ -64,6 +66,7 @@ public class BlogPostListActivity extends Activity {
 	private ListAdapter listAdapter;
 	private ListView listView;
 	private BroadcastReceiver receiver;
+	private static Theme appTheme;
 
 	private int limitRows		= 15;
 
@@ -95,9 +98,7 @@ public class BlogPostListActivity extends Activity {
 		listView.setOnItemClickListener(new OnItemClickListener() {
 //			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				TextView tv;
 				Context context		= getApplicationContext();
-				Resources res			= context.getResources();
 
 				// Redirect to article details screen
 				Intent intent	= new Intent(context, BlogPostActivity.class);
@@ -108,15 +109,18 @@ public class BlogPostListActivity extends Activity {
 				startActivity(intent);
 
 				// Mark current blog post as read by changing its colour...
-				int colour		= res.getColor(R.color.read);
-				tv					= (TextView) view.findViewById(R.id.blog_post_item_title);
-				tv.setTextColor(colour);
+				TextView tv			= (TextView) view.findViewById(R.id.blog_post_item_title);
+				appTheme	= UserPreferencesManager.getThemeInstance(context);
+				tv.setTextColor(appTheme.getListHeadingColour(true) );
 				// ... and flagging it in local cache accordingly
 				clicked.add(id);
 
 				return;
 			}
 		});
+
+		appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
+		appTheme.setListViewDividerColour(listView, this);
 	}
 
 
@@ -140,12 +144,14 @@ public class BlogPostListActivity extends Activity {
 	private class BlogPostsUpdateBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
 			if (! intent.hasExtra(BlogPostListActivity.dataFilters.BLOG_ID.name() ) ) {
 				reloadRows();
 			} else {
 				int blogID		= intent.getIntExtra(BlogPostListActivity.dataFilters.BLOG_ID.name(), 0);
 				reloadRowsFilterByBlogID(blogID);
 			}
+			appTheme.setListViewDividerColour(listView, context);
 		}
 	}
 
@@ -194,35 +200,31 @@ public class BlogPostListActivity extends Activity {
 		 */
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
-			TextView tv, dtv;
-			int colour;
-			// Title
-			tv	= (TextView) view.findViewById(R.id.blog_post_item_title);
-			if (cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) ) ) {
-				colour	= res.getColor(R.color.unread);
-			} else {
-				colour	= res.getColor(R.color.read);
-			}
-			tv.setTextColor(colour);
-			tv.setText(cursor.getString(colIndex_Author) + ": " + cursor.getString(colIndex_Title) );
-			// Datetime
-			dtv	= (TextView) view.findViewById(R.id.blog_post_item_date);
-			long unixTime	= cursor.getLong(colIndex_DatePub);	// Dates are stored as Unix timestamps
+			appTheme	= UserPreferencesManager.getThemeInstance(context);
+
+			boolean unread	= cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) );
+			TextView tvTitle	= (TextView) view.findViewById(R.id.blog_post_item_title);
+			tvTitle.setTextColor(appTheme.getListHeadingColour(! unread) );
+			tvTitle.setText(cursor.getString(colIndex_Author) + ": " + cursor.getString(colIndex_Title) );
+
+			TextView tvDate	= (TextView) view.findViewById(R.id.blog_post_item_date);
+			long unixTime	= cursor.getLong(colIndex_DatePub);
 			Date d				= new Date(unixTime);
-			dtv.setText(dateFormat.format(d) );
+			tvDate.setText(dateFormat.format(d) );
 
-			// Blog title
-			tv	= (TextView) view.findViewById(R.id.blog_post_item_blog_title);
+			TextView tvBlog	= (TextView) view.findViewById(R.id.blog_post_item_blog_title);
 			String blogTitle	= cursor.getString(colIndex_Blog);
-			tv.setVisibility(View.VISIBLE);
-
 			if (blogTitle.length() > 0) {
-				tv.setText(blogTitle);
-				return;
+				tvBlog.setText(blogTitle);
+				tvBlog.setVisibility(View.VISIBLE);
+			} else {
+				tvBlog.setText("");
+				tvBlog.setVisibility(View.GONE);
 			}
-			// We are still here - that means both text fields are empty (very unlikely!).
-			tv.setText("");
-			tv.setVisibility(View.GONE);
+
+			tvDate.setTextColor(appTheme.getListTextColour() );
+			tvBlog.setTextColor(appTheme.getListTextColour() );
+			view.setBackgroundColor(appTheme.getBackgroundColour() );
 		}
 
 

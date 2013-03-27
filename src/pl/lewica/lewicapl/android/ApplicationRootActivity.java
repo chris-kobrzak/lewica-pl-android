@@ -29,8 +29,6 @@ import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewParent;
 import android.view.Window;
 import android.widget.TabHost;
 
@@ -59,17 +57,15 @@ public class ApplicationRootActivity extends TabActivity {
 		NEWS, ARTICLES, BLOGS, ANNOUNCEMENTS, HISTORY
 	}
 	// This is to be able switch by enum ordinal
-	public static final Tab[] tabs	= Tab.values();
+	public static final Tab[] TABS	= Tab.values();
 
 	private IntentFilter filter;
 	private BroadcastReceiver receiver;
 	private BroadcastSender broadcastSender;
 	private ContentUpdateManager updateManager;
-	// Number of seconds after which the application will attempt to run an update. 
-	private int updateInterval	= 5 * 60;
 
 
-	public void init() {
+	private void init() {
 		// This allows to show and hide the progress indicator in the top bar and needs to be done before content view set-up
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
@@ -82,6 +78,8 @@ public class ApplicationRootActivity extends TabActivity {
 		try {
 			AndroidUtil.setUpResourcesHiddenFromAndroidGallery(storageDir);
 		} catch (IOException err) {}
+
+		AndroidUtil.setApplicationTitleBackgroundColour(getResources().getColor(R.color.red), this);
 
 		filter		= new IntentFilter();
 		filter.addAction(START_INDETERMINATE_PROGRESS);
@@ -138,16 +136,6 @@ public class ApplicationRootActivity extends TabActivity {
 		spec		= tabHost.newTabSpec(tag).setIndicator(res.getString(R.string.tab_history), res.getDrawable(R.drawable.ic_tab_calendar) ).setContent(intent);
 		tabHost.addTab(spec);
 
-		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
-		View titleView = getWindow().findViewById(android.R.id.title);
-		if (titleView != null) {
-			ViewParent parent	= titleView.getParent();
-			if (parent != null && (parent instanceof View) ) {
-				View parentView	= (View)parent;
-				parentView.setBackgroundColor(res.getColor(R.color.red) );
-			}
-		}
-
 		tabHost.setCurrentTab(Tab.NEWS.ordinal() );
 	}
 
@@ -197,11 +185,13 @@ public class ApplicationRootActivity extends TabActivity {
 	public boolean onPrepareOptionsMenu (Menu menu) {
 		super.onPrepareOptionsMenu(menu);
 
-		// Don't let them run the refresh if it's already running.
-		menu.getItem(0).setEnabled(true);
+		MenuItem requestUpdate	= menu.getItem(0);
 
+		requestUpdate.setEnabled(true);
+
+		// Don't let them run the refresh if the process is already running
 		if (updateManager.isRunning() ) {
-			menu.getItem(0).setEnabled(false);
+			requestUpdate.setEnabled(false);
 		}
 
 		return true;
@@ -228,13 +218,20 @@ public class ApplicationRootActivity extends TabActivity {
 				updateManager.run();
 				return true;
 
+			case R.id.menu_change_background:
+				// Read existing and write new theme to xml file (done by Android) and store in memory
+				UserPreferencesManager.switchUserTheme(getApplicationContext() );
+				ApplicationRootActivity.reloadAllTabsInBackground(getApplicationContext() );
+
+				return true;
+
 			case R.id.menu_mark_as_read:
 				int tab	= getTabHost().getCurrentTab();
-				
+
 				ArticleDAO articleDAO;
 
 				// Switching over an integer representing the ordinal of the current tab
-				switch (tabs[tab]) {
+				switch (TABS[tab]) {
 					case NEWS:
 						articleDAO		= new ArticleDAO(this);
 						articleDAO.open();
@@ -268,7 +265,7 @@ public class ApplicationRootActivity extends TabActivity {
 						annDAO.updateMarkAllAsRead();
 						annDAO.close();
 
-						broadcastSender.reloadTab(Tab.HISTORY);
+						broadcastSender.reloadTab(Tab.ANNOUNCEMENTS);
 						break;
 
 					case HISTORY:
@@ -291,7 +288,8 @@ public class ApplicationRootActivity extends TabActivity {
 		if (updateManager.isRunning() ) {
 			return;
 		}
-
+		// Number of seconds after which the application will attempt to run an update. 
+		int updateInterval	= 5 * 60;
 		if (updateManager.getIntervalSinceLastUpdate() < updateInterval) {
 			return;
 		}
@@ -314,5 +312,14 @@ public class ApplicationRootActivity extends TabActivity {
 				setProgressBarIndeterminateVisibility(false);
 			}
 		}
+	}
+
+
+	public static void reloadAllTabsInBackground(final Context context) {
+		new Thread(new Runnable() {
+			public void run() {
+				BroadcastSender.getInstance(context).reloadAllTabs();
+			}
+		}).start();
 	}
 }

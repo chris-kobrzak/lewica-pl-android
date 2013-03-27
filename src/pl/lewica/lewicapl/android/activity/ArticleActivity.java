@@ -5,7 +5,7 @@
  you may not use this file except in compliance with the Licence.
  You may obtain a copy of the Licence at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
  Unless required by applicable law or agreed to in writing, software
  distributed under the Licence is distributed on an "AS IS" BASIS,
@@ -28,7 +28,6 @@ import java.util.Map;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -40,7 +39,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -48,9 +46,15 @@ import android.widget.TextView;
 import pl.lewica.api.model.Article;
 import pl.lewica.api.url.ArticleURL;
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.AndroidUtil;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
+import pl.lewica.lewicapl.android.DialogManager;
+import pl.lewica.lewicapl.android.SliderDialog;
+import pl.lewica.lewicapl.android.DialogManager.SliderEventHandler;
+import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
+import pl.lewica.lewicapl.android.theme.Theme;
 
 
 public class ArticleActivity extends Activity {
@@ -61,23 +65,18 @@ public class ArticleActivity extends Activity {
 	private static Typeface categoryTypeface;
 	private static Map<Long, SoftReference<Bitmap>> images	= new HashMap<Long,SoftReference<Bitmap>>();
 
-	private ImageCache imageCache;
 	private long articleID;
 	private int categoryID;
 	private String articleURL;
 	private ArticleDAO articleDAO;
 	private Map<String,Long> nextPrevID;
 	private ImageLoadTask imageTask;
+	private ImageCache imageCache;
+	private SliderEventHandler mTextSizeHandler;
 
-	private int colIndex_CategoryID;
-	private int colIndex_WasRead;
-	private int colIndex_Title;
-	private int colIndex_DatePub;
-	private int colIndex_URL;
-	private int colIndex_Content;
-	private int colIndex_Comment;
-	private int colIndex_HasThumb;
-	private int colIndex_ThumbExt;
+	private TextView tvTitle;
+	private TextView tvContent;
+	private TextView tvComment;
 
 	private static SimpleDateFormat dateFormat	= new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
@@ -88,8 +87,6 @@ public class ArticleActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.detail_article);
 
-		Resources res			= getResources();
-		
 		// Custom font used by the category headings
 		categoryTypeface	= Typeface.createFromAsset(getAssets(), "Impact.ttf");
 
@@ -100,28 +97,24 @@ public class ArticleActivity extends Activity {
 		articleDAO				= new ArticleDAO(this);
 		articleDAO.open();
 
+		mTextSizeHandler	= new TextSizeHandler(this);
+
 		// When user changes the orientation, Android restarts the activity.  Say, users navigated through articles using
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
 		// article that was loaded through the intent.  In other words, changing the orientation would change the article displayed...
 		// The logic below fixes this issue and it's using the ID set by onRetainNonConfigurationInstance (see docs for details).
 		final Long ID	= (Long) getLastNonConfigurationInstance();
 		if (ID == null) {
-			articleID				= filterIDFromUri(getIntent() );
+			articleID				= AndroidUtil.filterIDFromUri(getIntent().getData() );
 		} else {
 			articleID				= ID;
 		}
 		// Fill views with data
 		loadContent(articleID, this);
+		loadTextSize(UserPreferencesManager.getTextSize(this) );
+		loadTheme(getApplicationContext() );
 
-		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
-		View titleView = getWindow().findViewById(android.R.id.title);
-		if (titleView != null) {
-			ViewParent parent	= titleView.getParent();
-			if (parent != null && (parent instanceof View) ) {
-				View parentView	= (View)parent;
-				parentView.setBackgroundColor(res.getColor(R.color.red) );
-			}
-		}
+		AndroidUtil.setApplicationTitleBackgroundColour(getResources().getColor(R.color.red), this);
 	}
 
 
@@ -152,19 +145,21 @@ public class ArticleActivity extends Activity {
 
 	@Override
 	public boolean onPrepareOptionsMenu (Menu menu) {
-		long id;
+		MenuItem showPrevious	= menu.getItem(0);
+		MenuItem showNext		= menu.getItem(1);
+
+		showPrevious.setEnabled(true);
+		showNext.setEnabled(true);
+
 		nextPrevID		= articleDAO.fetchPreviousNextID(articleID, categoryID);
 
-		menu.getItem(0).setEnabled(true);
-		menu.getItem(1).setEnabled(true);
-
-		id	= nextPrevID.get(ArticleDAO.MAP_KEY_PREVIOUS);
+		long id	= nextPrevID.get(ArticleDAO.MAP_KEY_PREVIOUS);
 		if (id == 0) {
-			menu.getItem(0).setEnabled(false);
+			showPrevious.setEnabled(false);
 		}
 		id	= nextPrevID.get(ArticleDAO.MAP_KEY_NEXT);
 		if (id == 0) {
-			menu.getItem(1).setEnabled(false);
+			showNext.setEnabled(false);
 		}
 
 		return true;
@@ -214,6 +209,25 @@ public class ArticleActivity extends Activity {
 				startActivity(intent);
 				return true;
 
+			case R.id.menu_change_text_size:
+				int sizeInPoints	= UserPreferencesManager.convertTextSize(UserPreferencesManager.getTextSize(this) );
+				SliderDialog sd		= new SliderDialog();
+				sd.setSliderValue(sizeInPoints);
+				sd.setSliderMax(UserPreferencesManager.TEXT_SIZES_TOTAL);
+				sd.setTitleResource(R.string.heading_change_text_size);
+				sd.setOkButtonResource(R.string.ok);
+
+				DialogManager.showDialogWithSlider(sd, this, mTextSizeHandler);
+				return true;
+
+			case R.id.menu_change_background:
+				// Read existing and write new theme to xml file (done by Android) and store in memory
+				UserPreferencesManager.switchUserTheme(getApplicationContext() );
+				loadTheme(getApplicationContext() );
+				ApplicationRootActivity.reloadAllTabsInBackground(getApplicationContext() );
+
+				return true;
+
 			default :
 				return super.onOptionsItemSelected(item);
 		}
@@ -231,14 +245,14 @@ public class ArticleActivity extends Activity {
 	}
 
 
-
 	/**
 	 * Responsible for loading content to the views and marking the current article as read.
 	 * It is meant to be called every time user accesses this activity, either by selecting an article from the list
 	 * or navigating between articles using the previous-next facility (not yet implemented).
+	 * TODO Break this method down into smaller parts
 	 * @param id
 	 */
-	public void loadContent(long ID, Context context) {
+	private void loadContent(long ID, Context context) {
 		// Save it in this object's field
 		articleID	= ID;
 		// Fetch database record
@@ -247,15 +261,15 @@ public class ArticleActivity extends Activity {
 		startManagingCursor(cursor);
 
 		// In order to capture a cell, you need to work what their index
-		colIndex_URL				= cursor.getColumnIndex(ArticleDAO.FIELD_URL);
-		colIndex_CategoryID	= cursor.getColumnIndex(ArticleDAO.FIELD_CATEGORY_ID);
-		colIndex_Title			= cursor.getColumnIndex(ArticleDAO.FIELD_TITLE);
-		colIndex_DatePub		= cursor.getColumnIndex(ArticleDAO.FIELD_DATE_PUBLISHED);
-		colIndex_Content		= cursor.getColumnIndex(ArticleDAO.FIELD_TEXT);
-		colIndex_Comment	= cursor.getColumnIndex(ArticleDAO.FIELD_EDITOR_COMMENT);
-		colIndex_WasRead		= cursor.getColumnIndex(ArticleDAO.FIELD_WAS_READ);
-		colIndex_HasThumb	= cursor.getColumnIndex(ArticleDAO.FIELD_HAS_IMAGE);
-		colIndex_ThumbExt	= cursor.getColumnIndex(ArticleDAO.FIELD_IMAGE_EXTENSION);
+		int inxURL				= cursor.getColumnIndex(ArticleDAO.FIELD_URL);
+		int inxCategoryID	= cursor.getColumnIndex(ArticleDAO.FIELD_CATEGORY_ID);
+		int inxTitle			= cursor.getColumnIndex(ArticleDAO.FIELD_TITLE);
+		int inxDatePub		= cursor.getColumnIndex(ArticleDAO.FIELD_DATE_PUBLISHED);
+		int inxContent		= cursor.getColumnIndex(ArticleDAO.FIELD_TEXT);
+		int inxComment		= cursor.getColumnIndex(ArticleDAO.FIELD_EDITOR_COMMENT);
+		int inxWasRead		= cursor.getColumnIndex(ArticleDAO.FIELD_WAS_READ);
+		int inxHasThumb	= cursor.getColumnIndex(ArticleDAO.FIELD_HAS_IMAGE);
+		int inxThumbExt	= cursor.getColumnIndex(ArticleDAO.FIELD_IMAGE_EXTENSION);
 
 		// When using previous-next facility you need to make sure the scroll view's position is at the top of the screen
 		ScrollView sv	= (ScrollView) findViewById(R.id.article_scroll_view);
@@ -268,58 +282,37 @@ public class ArticleActivity extends Activity {
 		}
 
 		// Save the URL in memory so the "share link" option in menu can access it easily
-		articleURL				= cursor.getString(colIndex_URL);
+		articleURL				= cursor.getString(inxURL);
 
 		// Now start populating all views with data
-		TextView tv, tvComment;
-		tv							= (TextView) findViewById(R.id.article_title);
-		tv.setText(cursor.getString(colIndex_Title) );
+		tvTitle					= (TextView) findViewById(R.id.article_title);
+		tvTitle.setText(cursor.getString(inxTitle) );
 
+		TextView tv;
 		tv							= (TextView) findViewById(R.id.article_category);
-		categoryID				= cursor.getInt(colIndex_CategoryID);
 		tv.setTypeface(categoryTypeface);
-		switch (categoryID) {
-			case Article.SECTION_POLAND:
-				tv.setText(context.getString(R.string.heading_poland) );
-				break;
-
-			case Article.SECTION_WORLD:
-				tv.setText(context.getString(R.string.heading_world) );
-				break;
-
-			// TODO Confirm we need the case statements below
-			case Article.SECTION_OPINIONS:
-				tv.setText(context.getString(R.string.heading_texts) );
-				break;
-
-			case Article.SECTION_REVIEWS:
-				tv.setText(context.getString(R.string.heading_reviews) );
-				break;
-
-			case Article.SECTION_CULTURE:
-				tv.setText(context.getString(R.string.heading_culture) );
-				break;
-		}
+		categoryID				= cursor.getInt(inxCategoryID);
+		tv.setText(getCategoryLabel(categoryID, context) );
 
 		tv							= (TextView) findViewById(R.id.article_date);
-		long unixTime		= cursor.getLong(colIndex_DatePub);	// Dates are stored as Unix timestamps
+		long unixTime		= cursor.getLong(inxDatePub);	// Dates are stored as Unix timestamps
 		Date d					= new Date(unixTime);
 		tv.setText(dateFormat.format(d) );
 
-		tv							= (TextView) findViewById(R.id.article_content);
+		tvContent	= (TextView) findViewById(R.id.article_content);
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
-		tv.setText(cursor.getString(colIndex_Content).replace("\r", "") );
+		tvContent.setText(cursor.getString(inxContent).replace("\r", "") );
 
-		tv							= (TextView) findViewById(R.id.article_editor_comment);
-		tvComment			= (TextView) findViewById(R.id.article_editor_comment_top);
-		String commentString		= cursor.getString(colIndex_Comment);
+		tvComment				= (TextView) findViewById(R.id.article_editor_comment);
+		tv			= (TextView) findViewById(R.id.article_editor_comment_top);
+		String commentString		= cursor.getString(inxComment);
 		if (commentString != null && commentString.length() > 0) {
-			tv.setText(commentString.replace("\r", "") );
+			tvComment.setText(commentString.replace("\r", "") );
 			// Reset visibility, may be useful when users navigate between articles (previous-next facility to be added in the future)
 			tv.setVisibility(View.VISIBLE);
 			tvComment.setVisibility(View.VISIBLE);
 		} else {
-			tv.setText("");
+			tvComment.setText("");
 			tv.setVisibility(View.GONE);
 			// Hide top, dark grey bar
 			tvComment.setVisibility(View.GONE);
@@ -328,57 +321,43 @@ public class ArticleActivity extends Activity {
 		// Reset image to avoid issues when navigating between previous and next articles
 		ImageView iv			= (ImageView) findViewById(R.id.article_image);
 		iv.setImageBitmap(null);
-		if (cursor.getInt(colIndex_HasThumb) == 1) {
-			boolean downloadImage		= true;
-			// Checking if this image is available in our local cache.
-			if (imageCache.isCached(articleID) ) {
-				Bitmap bitmap	= imageCache.get(articleID);
-				if (bitmap != null) {
-					loadImage(bitmap);
-					downloadImage		= false;
-				}
-			}
-			// Image needs to downloaded from the server
-			if (downloadImage) {
-				String imageUrl		= ArticleURL.buildURLImage(ID, cursor.getString(colIndex_ThumbExt) );
-	
-				// Images need to be downloaded in a separate thread as we cannot block the UI thread.
-				// Note: we do not currently cache images on this screen and they are downloaded from the Internet on every request.
-				imageTask	= new ImageLoadTask();
-				imageTask.execute(imageUrl);
-			}
+		if (cursor.getInt(inxHasThumb) == 1) {
+			loadImageFromCacheOrServer(ID, cursor.getString(inxThumbExt) );
 		}
-		
 
 		// Only mark the article as read once.  If it's already marked as such - just stop here.
-		if (cursor.getInt(colIndex_WasRead) == 1) {
+		if (cursor.getInt(inxWasRead) == 1) {
 			cursor.close();
 			return;
 		}
 		// Tidy up
 		cursor.close();
 
-		// Mark this article as read without blocking the UI thread
-		// Java threads require variables to be declared as final
-		final long articleIDThread		= ID;
-		final int categoryIDThread		= categoryID;
-		final Context contextThread	= context;
-		new Thread(new Runnable() {
-			public void run() {
-				articleDAO.updateMarkAsRead(articleIDThread);
-				switch (categoryIDThread) {
-					case Article.SECTION_POLAND:
-					case Article.SECTION_WORLD:
-						BroadcastSender.getInstance(contextThread).reloadTab(ApplicationRootActivity.Tab.NEWS);
-					break;
-					case Article.SECTION_OPINIONS:
-					case Article.SECTION_REVIEWS:
-					case Article.SECTION_CULTURE:
-						BroadcastSender.getInstance(contextThread).reloadTab(ApplicationRootActivity.Tab.ARTICLES);
-					break;
-				}
-			}
-		}).start();
+		reloadListingTabAndMarkAsRead(ID, context);
+	}
+
+
+	private void loadTextSize(float textSize) {
+		tvTitle.setTextSize(textSize + UserPreferencesManager.HEADING_TEXT_DIFF);
+		tvContent.setTextSize(textSize);
+		tvComment.setTextSize(textSize);
+	}
+
+
+	private void loadTheme(Context context) {
+		Theme theme	= UserPreferencesManager.getThemeInstance(context);
+		ScrollView layout		= (ScrollView) findViewById(R.id.article_scroll_view);
+
+		layout.setBackgroundColor(theme.getBackgroundColour() );
+		tvTitle.setTextColor(theme.getHeadingColour() );
+		tvContent.setTextColor(theme.getTextColour() );
+		tvComment.setTextColor(theme.getEditorsCommentTextColour() );
+
+		if (UserPreferencesManager.isLightTheme() ) {
+			tvComment.setBackgroundDrawable(theme.getEditorsCommentBackground() );
+		} else {
+			tvComment.setBackgroundColor(theme.getEditorsCommentBackgroundColour() );
+		}
 	}
 
 
@@ -386,30 +365,111 @@ public class ArticleActivity extends Activity {
 	 * Puts a bitmap in the image view.  Adds the bitmap to the local cache.
 	 * @param bm
 	 */
-	public void loadImage(Bitmap bm) {
+	private void loadImage(Bitmap bm) {
 		ImageView iv			= (ImageView) findViewById(R.id.article_image);
 
 		iv.setImageBitmap(bm);
 	}
 
 
-	/**
-	 * Activities on Android are invoked with a Uri string.  This method captures and returns the last bit of this Uri
-	 * which it assumes to be a numeric ID of the current article.
-	 * @param intent
-	 * @return
-	 */
-	public long filterIDFromUri(Intent intent) {
-		Uri uri						= intent.getData();
-		String articleIDString	= uri.getLastPathSegment();
-		
-		// TODO Make sure articleID is a number
-		Long articleID			= Long.valueOf(articleIDString);
-		return articleID;
+	private void loadImageFromCacheOrServer(long articleId, String extension) {
+		boolean downloadImage		= true;
+		// Checking if this image is available in our local cache.
+		if (imageCache.isCached(articleID) ) {
+			Bitmap bitmap	= imageCache.get(articleID);
+			if (bitmap != null) {
+				loadImage(bitmap);
+				downloadImage		= false;
+			}
+		}
+		// Image needs to downloaded from the server
+		if (downloadImage) {
+			String imageUrl		= ArticleURL.buildURLImage(articleId, extension);
+
+			// Images need to be downloaded in a separate thread as we cannot block the UI thread.
+			// Note: we do not currently cache images on this screen and they are downloaded from the Internet on every request.
+			imageTask	= new ImageLoadTask();
+			imageTask.execute(imageUrl);
+		}
 	}
 
 
-	
+	private String getCategoryLabel(int categoryId, Context context) {
+		switch (categoryId) {
+			case Article.SECTION_POLAND:
+				return context.getString(R.string.heading_poland);
+
+			case Article.SECTION_WORLD:
+				return context.getString(R.string.heading_world);
+
+			// TODO Confirm we need the case statements below
+			case Article.SECTION_OPINIONS:
+				return context.getString(R.string.heading_texts);
+
+			case Article.SECTION_REVIEWS:
+				return context.getString(R.string.heading_reviews);
+
+			case Article.SECTION_CULTURE:
+				return context.getString(R.string.heading_culture);
+		}
+		return null;
+	}
+
+
+	/**
+	 * 1. Marks this article as read without blocking the UI thread (Java threads require variables to be declared as final)
+	 * 2. Asks listing screens to refresh
+	 * @param articleId
+	 * @param context
+	 */
+	private void reloadListingTabAndMarkAsRead(final long articleId, final Context context) {
+		final int categoryIdFinal		= categoryID;
+
+		new Thread(new Runnable() {
+			public void run() {
+				articleDAO.updateMarkAsRead(articleId);
+				switch (categoryIdFinal) {
+					case Article.SECTION_POLAND:
+					case Article.SECTION_WORLD:
+						BroadcastSender.getInstance(context).reloadTab(ApplicationRootActivity.Tab.NEWS);
+					break;
+					case Article.SECTION_OPINIONS:
+					case Article.SECTION_REVIEWS:
+					case Article.SECTION_CULTURE:
+						BroadcastSender.getInstance(context).reloadTab(ApplicationRootActivity.Tab.ARTICLES);
+					break;
+				}
+			}
+		}).start();
+	}
+
+
+	private class TextSizeHandler implements DialogManager.SliderEventHandler {
+
+		private Activity mActivity;
+
+		public TextSizeHandler(Activity activity) {
+			mActivity	= activity;
+		}
+
+
+		@Override
+		public void changeValue(int points) {
+			float textSize		= UserPreferencesManager.convertTextSize(points);
+
+			loadTextSize(textSize);
+		}
+
+
+		@Override
+		public void finishSliding(int points) {
+			float textSize		= UserPreferencesManager.convertTextSize(points);
+
+			UserPreferencesManager.setTextSize(textSize, mActivity);
+		}
+	}
+
+
 	/**
 	 * Inner class that abstracts out the publication image attachment caching.
 	 * Images are cached in a parent class member called images.

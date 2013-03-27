@@ -23,24 +23,27 @@ import java.util.Map;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewParent;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import pl.lewica.URLDictionary;
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.AndroidUtil;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
+import pl.lewica.lewicapl.android.DialogManager;
+import pl.lewica.lewicapl.android.SliderDialog;
+import pl.lewica.lewicapl.android.UserPreferencesManager;
+import pl.lewica.lewicapl.android.DialogManager.SliderEventHandler;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
+import pl.lewica.lewicapl.android.theme.Theme;
 
 
 public class BlogPostActivity extends Activity {
@@ -54,17 +57,14 @@ public class BlogPostActivity extends Activity {
 	private BlogPostDAO blogPostDAO;
 	private Map<String,Long> nextPrevID;
 	private String blogPostURL;
+	private SliderEventHandler mTextSizeHandler;
 
-//	private int colIndex_ID;
-	private int colIndex_WasRead;
-	private int colIndex_DatePub;
-	private int colIndex_BlogID;
-	private int colIndex_Blog;
-	private int colIndex_PublishedBy;
-	private int colIndex_Title;
-	private int colIndex_Text;
+	private TextView tvTitle;
+	private TextView tvContent;
+	private TextView tvAuthor;
 
 	private static SimpleDateFormat dateFormat	= new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
 
 
 	@Override
@@ -72,8 +72,6 @@ public class BlogPostActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.detail_blog_post);
 
-		Resources res		= getResources();
-		
 		// Custom font used by the category headings
 		categoryTypeface	= Typeface.createFromAsset(getAssets(), "Impact.ttf");
 
@@ -81,31 +79,25 @@ public class BlogPostActivity extends Activity {
 		blogPostDAO				= new BlogPostDAO(this);
 		blogPostDAO.open();
 
+		mTextSizeHandler	= new TextSizeHandler(this);
+
 		// When user changes the orientation, Android restarts the activity.  Say, users navigated through articles using
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
 		// article that was loaded through the intent.  In other words, changing the orientation would change the article displayed...
 		// The logic below fixes this issue and it's using the ID set by onRetainNonConfigurationInstance (see docs for details).
 		final Long ID	= (Long) getLastNonConfigurationInstance();
 		if (ID == null) {
-			blogPostID			= filterIDFromUri(getIntent() );
+			blogPostID			= AndroidUtil.filterIDFromUri(getIntent().getData() );
 		} else {
 			blogPostID			= ID;
 		}
 
 		// Fill views with data
 		loadContent(blogPostID, this);
+		loadTextSize(UserPreferencesManager.getTextSize(this) );
+		loadTheme(getApplicationContext() );
 
-		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
-		View titleView = getWindow().findViewById(android.R.id.title);
-		if (titleView == null) {
-			return;
-		}
-		ViewParent parent	= titleView.getParent();
-		if (parent == null || ! (parent instanceof View) ) {
-			return;
-		}
-		View parentView	= (View)parent;
-		parentView.setBackgroundColor(res.getColor(R.color.red) );
+		AndroidUtil.setApplicationTitleBackgroundColour(getResources().getColor(R.color.red), this);
 	}
 
 
@@ -136,19 +128,21 @@ public class BlogPostActivity extends Activity {
 
 	@Override
 	public boolean onPrepareOptionsMenu (Menu menu) {
-		long id;
+		MenuItem showPrevious	= menu.getItem(0);
+		MenuItem showNext		= menu.getItem(1);
+
+		showPrevious.setEnabled(true);
+		showNext.setEnabled(true);
+
 		nextPrevID		= blogPostDAO.fetchPreviousNextID(blogPostID);
 
-		menu.getItem(0).setEnabled(true);
-		menu.getItem(1).setEnabled(true);
-
-		id	= nextPrevID.get(BlogPostDAO.MAP_KEY_PREVIOUS);
+		long id	= nextPrevID.get(BlogPostDAO.MAP_KEY_PREVIOUS);
 		if (id == 0) {
-			menu.getItem(0).setEnabled(false);
+			showPrevious.setEnabled(false);
 		}
 		id	= nextPrevID.get(BlogPostDAO.MAP_KEY_NEXT);
 		if (id == 0) {
-			menu.getItem(1).setEnabled(false);
+			showNext.setEnabled(false);
 		}
 
 		return true;
@@ -194,6 +188,25 @@ public class BlogPostActivity extends Activity {
 				finish();
 				return true;
 
+			case R.id.menu_change_text_size:
+				int sizeInPoints	= UserPreferencesManager.convertTextSize(UserPreferencesManager.getTextSize(this) );
+				SliderDialog sd		= new SliderDialog();
+				sd.setSliderValue(sizeInPoints);
+				sd.setSliderMax(UserPreferencesManager.TEXT_SIZES_TOTAL);
+				sd.setTitleResource(R.string.heading_change_text_size);
+				sd.setOkButtonResource(R.string.ok);
+
+				DialogManager.showDialogWithSlider(sd, this, mTextSizeHandler);
+
+				return true;
+
+			case R.id.menu_change_background:
+				UserPreferencesManager.switchUserTheme(getApplicationContext() );
+				loadTheme(getApplicationContext() );
+				ApplicationRootActivity.reloadAllTabsInBackground(getApplicationContext() );
+
+				return true;
+
 			default :
 				return super.onOptionsItemSelected(item);
 		}
@@ -219,7 +232,7 @@ public class BlogPostActivity extends Activity {
 	 * or navigating between blog posts using the previous-next facility (not yet implemented).
 	 * @param id
 	 */
-	public void loadContent(long ID, Context context) {
+	private void loadContent(long ID, Context context) {
 		// Save it in this object's field
 		blogPostID	= ID;
 		// Fetch database record
@@ -228,59 +241,60 @@ public class BlogPostActivity extends Activity {
 		startManagingCursor(cursor);
 
 		// In order to capture a cell, you need to work what their index
-		colIndex_Title				= cursor.getColumnIndex(BlogPostDAO.FIELD_TITLE);
-		colIndex_Text				= cursor.getColumnIndex(BlogPostDAO.FIELD_TEXT);
-		colIndex_BlogID				= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_ID);
-		colIndex_Blog				= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_TITLE);
-		colIndex_DatePub			= cursor.getColumnIndex(BlogPostDAO.FIELD_DATE_PUBLISHED);
-		colIndex_PublishedBy		= cursor.getColumnIndex(BlogPostDAO.FIELD_AUTHOR);
+		int inxWasRead			= cursor.getColumnIndex(BlogPostDAO.FIELD_WAS_READ);
+		int inxTitle				= cursor.getColumnIndex(BlogPostDAO.FIELD_TITLE);
+		int inxText				= cursor.getColumnIndex(BlogPostDAO.FIELD_TEXT);
+		int inxBlogID				= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_ID);
+		int inxBlog				= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_TITLE);
+		int inxDatePub			= cursor.getColumnIndex(BlogPostDAO.FIELD_DATE_PUBLISHED);
+		int inxPublishedBy		= cursor.getColumnIndex(BlogPostDAO.FIELD_AUTHOR);
 
 		// When using previous-next facility you need to make sure the scroll view's position is at the top of the screen
 		ScrollView sv	= (ScrollView) findViewById(R.id.blog_post_scroll_view);
 		sv.fullScroll(View.FOCUS_UP);
 		sv.setSmoothScrollingEnabled(true);
 
-		blogID					= cursor.getInt(colIndex_BlogID);
-		blogPostURL			= URLDictionary.buildURL_BlogPost(cursor.getInt(colIndex_BlogID), ID);
+		blogID					= cursor.getInt(inxBlogID);
+		blogPostURL			= URLDictionary.buildURL_BlogPost(cursor.getInt(inxBlogID), ID);
 
 		// Now start populating all views with data
 		TextView tv;
-		tv							= (TextView) findViewById(R.id.blog_post_title);
-		tv.setText(cursor.getString(colIndex_Title) );
+		tvTitle					= (TextView) findViewById(R.id.blog_post_title);
+		tvTitle.setText(cursor.getString(inxTitle) );
 
 		tv							= (TextView) findViewById(R.id.blog_post_category);
 		StringBuilder sb	= new StringBuilder(context.getString(R.string.heading_blog) );
 		sb.append(": ");
 		// By default we want to show blog title but if it's empty, blogger's name will do
-		if (cursor.getString(colIndex_Blog).length() > 0) {
-			sb.append(cursor.getString(colIndex_Blog).toLowerCase() );
-		} else if (cursor.getString(colIndex_PublishedBy).length() > 0) {
-			sb.append(cursor.getString(colIndex_PublishedBy).toLowerCase() );
+		if (cursor.getString(inxBlog).length() > 0) {
+			sb.append(cursor.getString(inxBlog).toLowerCase() );
+		} else if (cursor.getString(inxPublishedBy).length() > 0) {
+			sb.append(cursor.getString(inxPublishedBy).toLowerCase() );
 		}
 		tv.setTypeface(categoryTypeface);
 		tv.setText(sb.toString() );
 
 		tv							= (TextView) findViewById(R.id.blog_post_date);
-		long unixTime		= cursor.getLong(colIndex_DatePub);	// Dates are stored as Unix timestamps
+		long unixTime		= cursor.getLong(inxDatePub);	// Dates are stored as Unix timestamps
 		Date d					= new Date(unixTime);
 		tv.setText(dateFormat.format(d) );
 
-		tv							= (TextView) findViewById(R.id.blog_post_content);
+		tvContent					= (TextView) findViewById(R.id.blog_post_content);
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
-		tv.setText(cursor.getString(colIndex_Text).replace("\r", "") );
+		tvContent.setText(cursor.getString(inxText).replace("\r", "") );
 
-		tv							= (TextView) findViewById(R.id.blog_post_author);
-		String author			= cursor.getString(colIndex_PublishedBy);
+		tvAuthor = (TextView) findViewById(R.id.blog_post_author);
+		String author			= cursor.getString(inxPublishedBy);
 
 		if (author.length() > 0) {
-			tv.setText(author);
-			tv.setVisibility(View.VISIBLE);
+			tvAuthor.setText(author);
+			tvAuthor.setVisibility(View.VISIBLE);
 		} else {
-			tv.setText("");
-			tv.setVisibility(View.INVISIBLE);
+			tvAuthor.setText("");
+			tvAuthor.setVisibility(View.INVISIBLE);
 		}
 		// Only mark the blog_post as read once.  If it's already marked as such - just stop here.
-		if (cursor.getInt(colIndex_WasRead) == 1) {
+		if (cursor.getInt(inxWasRead) == 1) {
 			cursor.close();
 			return;
 		}
@@ -300,18 +314,46 @@ public class BlogPostActivity extends Activity {
 	}
 
 
-	/**
-	 * Activities on Android are invoked with a Uri string.  This method captures and returns the last bit of this Uri
-	 * which it assumes to be a numeric ID of the current blog post.
-	 * @param intent
-	 * @return
-	 */
-	public long filterIDFromUri(Intent intent) {
-		Uri uri						= intent.getData();
-		String blogPostIDString	= uri.getLastPathSegment();
-		
-		// TODO Make sure blogPostID is a number
-		Long blogPostID			= Long.valueOf(blogPostIDString);
-		return blogPostID;
+	private void loadTextSize(float textSize) {
+		tvTitle.setTextSize(textSize + UserPreferencesManager.HEADING_TEXT_DIFF);
+		tvContent.setTextSize(textSize);
+		tvAuthor.setTextSize(textSize);
+	}
+
+
+	private void loadTheme(Context context) {
+		Theme theme	= UserPreferencesManager.getThemeInstance(context);
+		ScrollView layout		= (ScrollView) findViewById(R.id.blog_post_scroll_view);
+
+		layout.setBackgroundColor(theme.getBackgroundColour() );
+		tvTitle.setTextColor(theme.getHeadingColour() );
+		tvContent.setTextColor(theme.getTextColour() );
+		tvAuthor.setTextColor(theme.getTextColour() );
+	}
+
+
+	private class TextSizeHandler implements DialogManager.SliderEventHandler {
+
+		private Activity mActivity;
+
+		public TextSizeHandler(Activity activity) {
+			mActivity	= activity;
+		}
+
+
+		@Override
+		public void changeValue(int points) {
+			float textSize		= UserPreferencesManager.convertTextSize(points);
+
+			loadTextSize(textSize);
+		}
+
+
+		@Override
+		public void finishSliding(int points) {
+			float textSize		= UserPreferencesManager.convertTextSize(points);
+
+			UserPreferencesManager.setTextSize(textSize, mActivity);
+		}
 	}
 }

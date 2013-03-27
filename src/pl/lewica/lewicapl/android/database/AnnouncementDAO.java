@@ -38,7 +38,7 @@ public class AnnouncementDAO extends BaseTextDAO {
 	public static final String FIELD_PUBLISHED_EMAIL	= "ZPublishedByEmail";
 	public static final String FIELD_TEXT						= "ZText";
 
-	protected static String[] fieldsForSingleRecord		= new String[] {FIELD_ID, FIELD_DATE_EXPIRY, FIELD_WHAT, FIELD_WHERE,  FIELD_WHEN, FIELD_PUBLISHED_BY, FIELD_PUBLISHED_EMAIL, FIELD_TEXT };
+	protected static String[] fieldsForSingleRecord		= new String[] {FIELD_ID, FIELD_DATE_EXPIRY, FIELD_WHAT, FIELD_WHERE,  FIELD_WHEN, FIELD_WAS_READ, FIELD_PUBLISHED_BY, FIELD_PUBLISHED_EMAIL, FIELD_TEXT };
 	protected static String[] fieldsForRecordSet				= new String[] {FIELD_ID, FIELD_DATE_EXPIRY, FIELD_WHAT, FIELD_WHERE, FIELD_WHEN, FIELD_WAS_READ };
 
 

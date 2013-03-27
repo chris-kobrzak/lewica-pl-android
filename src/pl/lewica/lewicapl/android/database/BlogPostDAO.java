@@ -39,7 +39,7 @@ public class BlogPostDAO extends BaseTextDAO {
 	public static final String FIELD_TITLE						= "ZTitle";
 	public static final String FIELD_TEXT						= "ZText";
 
-	private static String[] fieldsForSingleRecord		= new String[] {FIELD_ID, FIELD_DATE_PUBLISHED, FIELD_BLOG_TITLE,  FIELD_AUTHOR, FIELD_TITLE, FIELD_BLOG_ID, FIELD_TEXT };
+	private static String[] fieldsForSingleRecord		= new String[] {FIELD_ID, FIELD_DATE_PUBLISHED, FIELD_BLOG_TITLE,  FIELD_AUTHOR, FIELD_TITLE, FIELD_WAS_READ, FIELD_BLOG_ID, FIELD_TEXT };
 	private static String[] fieldsForRecordSet				= new String[] {FIELD_ID, FIELD_DATE_PUBLISHED, FIELD_BLOG_TITLE, FIELD_AUTHOR, FIELD_TITLE, FIELD_WAS_READ };
 
 

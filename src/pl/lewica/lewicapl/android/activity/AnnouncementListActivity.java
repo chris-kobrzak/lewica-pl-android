@@ -23,7 +23,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -38,8 +37,10 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.BaseTextDAO;
+import pl.lewica.lewicapl.android.theme.Theme;
 
 
 /**
@@ -58,6 +59,7 @@ public class AnnouncementListActivity extends Activity {
 	private ListAdapter listAdapter;
 	private ListView listView;
 	private AnnouncementsUpdateBroadcastReceiver receiver;
+	private static Theme appTheme;
 
 	private int limitRows		= 15;
 
@@ -89,9 +91,7 @@ public class AnnouncementListActivity extends Activity {
 		listView.setOnItemClickListener(new OnItemClickListener() {
 //			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				TextView tv;
 				Context context		= getApplicationContext();
-				Resources res			= context.getResources();
 
 				// Redirect to article details screen
 				Intent intent	= new Intent(context, AnnouncementActivity.class);
@@ -102,19 +102,22 @@ public class AnnouncementListActivity extends Activity {
 				startActivity(intent);
 
 				// Mark current announcement as read by changing its colour...
-				int colour		= res.getColor(R.color.read);
-				tv					= (TextView) view.findViewById(R.id.announcement_item_title);
-				tv.setTextColor(colour);
+				TextView tv					= (TextView) view.findViewById(R.id.announcement_item_title);
+				appTheme	= UserPreferencesManager.getThemeInstance(context);
+				tv.setTextColor(appTheme.getListHeadingColour(true) );
 				// ... and flagging it in local cache accordingly
 				clicked.add(id);
 
 				return;
 			}
 		});
+
+		appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
+		appTheme.setListViewDividerColour(listView, this);
 	}
 
 
-	public void reloadRows() {
+	private void reloadRows() {
 		CursorAdapter ca	= (CursorAdapter) listAdapter;
 		// Reload rows
 		Cursor newCursor	= annDAO.selectLatest(limitRows);
@@ -126,7 +129,9 @@ public class AnnouncementListActivity extends Activity {
 	private class AnnouncementsUpdateBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
 			reloadRows();
+			appTheme.setListViewDividerColour(listView, context);
 		}
 	}
 
@@ -140,7 +145,6 @@ public class AnnouncementListActivity extends Activity {
 	private static final class AnnouncementsCursorAdapter extends CursorAdapter {
 
 		public LayoutInflater inflater;
-		private static Resources res;
 
 		private int colIndex_ID;
 		private int colIndex_WasRead;
@@ -155,8 +159,6 @@ public class AnnouncementListActivity extends Activity {
 			// Get the layout inflater
 			inflater				= LayoutInflater.from(context);
 
-			res					= context.getResources();
-
 			// Get and cache column indices
 			colIndex_ID					= cursor.getColumnIndex(AnnouncementDAO.FIELD_ID);
 			colIndex_WasRead			= cursor.getColumnIndex(AnnouncementDAO.FIELD_WAS_READ);
@@ -170,22 +172,18 @@ public class AnnouncementListActivity extends Activity {
 		 */
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
-			TextView tv;
-			int colour;
+			appTheme	= UserPreferencesManager.getThemeInstance(context);
+
 			// Title
-			tv	= (TextView) view.findViewById(R.id.announcement_item_title);
-			if (cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) ) ) {
-				colour	= res.getColor(R.color.unread);
-			} else {
-				colour	= res.getColor(R.color.read);
-			}
-			tv.setTextColor(colour);
+			boolean unread	= cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) );
+			TextView tv	= (TextView) view.findViewById(R.id.announcement_item_title);
+			tv.setTextColor(appTheme.getListHeadingColour(! unread) );
 			tv.setText(cursor.getString(colIndex_Title) );
 			// Where and when?
-			tv	= (TextView) view.findViewById(R.id.announcement_item_details);
+			TextView tvWhereWhen	= (TextView) view.findViewById(R.id.announcement_item_details);
 			String where	= cursor.getString(colIndex_Where);
 			String when	= cursor.getString(colIndex_When);
-			tv.setVisibility(View.VISIBLE);
+			tvWhereWhen.setVisibility(View.VISIBLE);
 
 			if (where.length() > 0 && when.length() > 0) {
 				StringBuilder sb	= new StringBuilder();
@@ -193,21 +191,19 @@ public class AnnouncementListActivity extends Activity {
 				sb.append(" | ");
 				sb.append(when);
 
-				tv.setText(sb.toString() );
-				return;
+				tvWhereWhen.setText(sb.toString() );
+			} else if (where.length() > 0) {
+				tvWhereWhen.setText(where);
+			} else if (when.length() > 0) {
+				tvWhereWhen.setText(when);
+			} else {
+				// We are still here - that means both where and when info is empty.
+				tvWhereWhen.setText("");
+				tvWhereWhen.setVisibility(View.GONE);
 			}
 
-			if (where.length() > 0) {
-				tv.setText(where);
-				return;
-			}
-			if (when.length() > 0) {
-				tv.setText(when);
-				return;
-			}
-			// We are still here - that means both where and when info is empty.
-			tv.setText("");
-			tv.setVisibility(View.GONE);
+			tvWhereWhen.setTextColor(appTheme.getListTextColour() );
+			view.setBackgroundColor(appTheme.getBackgroundColour() );
 		}
 
 
