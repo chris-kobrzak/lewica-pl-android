@@ -192,11 +192,13 @@ public class ApplicationRootActivity extends TabActivity {
 	public boolean onPrepareOptionsMenu (Menu menu) {
 		super.onPrepareOptionsMenu(menu);
 
-		// Don't let them run the refresh if it's already running.
-		menu.getItem(0).setEnabled(true);
+		MenuItem requestUpdate	= menu.getItem(0);
 
+		requestUpdate.setEnabled(true);
+
+		// Don't let them run the refresh if the process is already running
 		if (updateManager.isRunning() ) {
-			menu.getItem(0).setEnabled(false);
+			requestUpdate.setEnabled(false);
 		}
 
 		return true;

@@ -128,19 +128,21 @@ public class BlogPostActivity extends Activity {
 
 	@Override
 	public boolean onPrepareOptionsMenu (Menu menu) {
-		long id;
+		MenuItem showPrevious	= menu.getItem(0);
+		MenuItem showNext		= menu.getItem(1);
+
+		showPrevious.setEnabled(true);
+		showNext.setEnabled(true);
+
 		nextPrevID		= blogPostDAO.fetchPreviousNextID(blogPostID);
 
-		menu.getItem(0).setEnabled(true);
-		menu.getItem(1).setEnabled(true);
-
-		id	= nextPrevID.get(BlogPostDAO.MAP_KEY_PREVIOUS);
+		long id	= nextPrevID.get(BlogPostDAO.MAP_KEY_PREVIOUS);
 		if (id == 0) {
-			menu.getItem(0).setEnabled(false);
+			showPrevious.setEnabled(false);
 		}
 		id	= nextPrevID.get(BlogPostDAO.MAP_KEY_NEXT);
 		if (id == 0) {
-			menu.getItem(1).setEnabled(false);
+			showNext.setEnabled(false);
 		}
 
 		return true;
