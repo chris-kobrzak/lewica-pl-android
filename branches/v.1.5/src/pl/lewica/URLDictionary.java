@@ -30,7 +30,7 @@ public class URLDictionary {
 	public static final String SEARCH		= "http://lewica.pl/index.php?s=szukaj";
 	public static final String TEAM			= "http://lewica.pl/index.php?s=redakcja";
 
-	private static String sBaseReadersComments	= "http://lewica.pl/forum/index.php?format=minimal&fuse=messages.";
+	public static final String sBaseReadersComments	= "http://lewica.pl/forum/index.php?format=minimal&fuse=messages.";
 
 
 	public static String buildURL_BlogPost(int blogID, Long ID) {
@@ -44,12 +44,22 @@ public class URLDictionary {
 	}
 
 
-	public static String buildURL_ReadersComments(Long id, int theme) {
+	public static String buildURL_ReadersComments(Long id, int textSize, int theme) {
 		StringBuilder sb	= new StringBuilder(sBaseReadersComments);
 		sb.append(Long.toString(id) );
+		sb.append("&textSize=");
+		sb.append(Integer.toString(textSize) );
 		sb.append("&theme=");
 		sb.append(Integer.toString(theme) );
-
+android.util.Log.i("util", sb.toString() );
 		return sb.toString();
+	}
+
+
+	public static class API {
+		public static final String PUBLICATIONS		= "http://lewica.pl/api/publikacje.php";
+		public static final String ANNOUNCEMENTS	= "http://lewica.pl/api/ogloszenia.php";
+		public static final String BLOG_POSTS		= "http://lewica.pl/api/blog-posty.php";
+		public static final String HISTORY			= "http://lewica.pl/api/kalendarium.php";
 	}
 }
