@@ -30,7 +30,7 @@ public class URLDictionary {
 	public static final String SEARCH		= "http://lewica.pl/index.php?s=szukaj";
 	public static final String TEAM			= "http://lewica.pl/index.php?s=redakcja";
 
-	public static final String BASE_READERS_COMMENTS	= "http://lewica.pl/forum/index.php?format=minimal&fuse=messages.";
+	private static String sBaseReadersComments	= "http://lewica.pl/forum/index.php?format=minimal&fuse=messages.";
 
 
 	public static String buildURL_BlogPost(int blogID, Long ID) {
@@ -39,6 +39,16 @@ public class URLDictionary {
 		sb.append(Integer.toString(blogID) );
 		sb.append("&id=");
 		sb.append(Long.toString(ID) );
+
+		return sb.toString();
+	}
+
+
+	public static String buildURL_ReadersComments(Long id, int theme) {
+		StringBuilder sb	= new StringBuilder(sBaseReadersComments);
+		sb.append(Long.toString(id) );
+		sb.append("&theme=");
+		sb.append(Integer.toString(theme) );
 
 		return sb.toString();
 	}

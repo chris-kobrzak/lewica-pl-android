@@ -18,6 +18,7 @@ package pl.lewica.lewicapl.android.activity;
 import pl.lewica.URLDictionary;
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.AndroidUtil;
+import pl.lewica.lewicapl.android.UserPreferencesManager;
 import android.app.Activity;
 import android.os.Bundle;
 import android.webkit.WebView;
@@ -28,8 +29,6 @@ import android.webkit.WebView;
  */
 public class ReadersCommentsActivity extends Activity {
 
-	private long articleID;
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -37,9 +36,13 @@ public class ReadersCommentsActivity extends Activity {
 
 		setContentView(R.layout.web_readers_comments);
 
-		articleID					= AndroidUtil.filterIDFromUri(getIntent().getData() );
+		int themeId	= UserPreferencesManager.ThemeType.LIGHT.ordinal();
+		if (! UserPreferencesManager.isLightTheme() ) {
+			themeId		= UserPreferencesManager.ThemeType.DARK.ordinal();
+		}
 
+		long articleId			= AndroidUtil.filterIDFromUri(getIntent().getData() );
 		WebView wv			= (WebView) findViewById(R.id.web_comments);
-		wv.loadUrl(URLDictionary.BASE_READERS_COMMENTS + articleID);
+		wv.loadUrl(URLDictionary.buildURL_ReadersComments(articleId, themeId) );
 	}
 }
