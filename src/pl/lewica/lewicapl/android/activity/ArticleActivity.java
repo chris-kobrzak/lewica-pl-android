@@ -290,30 +290,9 @@ public class ArticleActivity extends Activity {
 
 		TextView tv;
 		tv							= (TextView) findViewById(R.id.article_category);
-		categoryID				= cursor.getInt(inxCategoryID);
 		tv.setTypeface(categoryTypeface);
-		switch (categoryID) {
-			case Article.SECTION_POLAND:
-				tv.setText(context.getString(R.string.heading_poland) );
-				break;
-
-			case Article.SECTION_WORLD:
-				tv.setText(context.getString(R.string.heading_world) );
-				break;
-
-			// TODO Confirm we need the case statements below
-			case Article.SECTION_OPINIONS:
-				tv.setText(context.getString(R.string.heading_texts) );
-				break;
-
-			case Article.SECTION_REVIEWS:
-				tv.setText(context.getString(R.string.heading_reviews) );
-				break;
-
-			case Article.SECTION_CULTURE:
-				tv.setText(context.getString(R.string.heading_culture) );
-				break;
-		}
+		categoryID				= cursor.getInt(inxCategoryID);
+		tv.setText(getCategoryLabel(categoryID, context) );
 
 		tv							= (TextView) findViewById(R.id.article_date);
 		long unixTime		= cursor.getLong(inxDatePub);	// Dates are stored as Unix timestamps
@@ -343,26 +322,8 @@ public class ArticleActivity extends Activity {
 		ImageView iv			= (ImageView) findViewById(R.id.article_image);
 		iv.setImageBitmap(null);
 		if (cursor.getInt(inxHasThumb) == 1) {
-			boolean downloadImage		= true;
-			// Checking if this image is available in our local cache.
-			if (imageCache.isCached(articleID) ) {
-				Bitmap bitmap	= imageCache.get(articleID);
-				if (bitmap != null) {
-					loadImage(bitmap);
-					downloadImage		= false;
-				}
-			}
-			// Image needs to downloaded from the server
-			if (downloadImage) {
-				String imageUrl		= ArticleURL.buildURLImage(ID, cursor.getString(inxThumbExt) );
-	
-				// Images need to be downloaded in a separate thread as we cannot block the UI thread.
-				// Note: we do not currently cache images on this screen and they are downloaded from the Internet on every request.
-				imageTask	= new ImageLoadTask();
-				imageTask.execute(imageUrl);
-			}
+			loadImageFromCacheOrServer(ID, cursor.getString(inxThumbExt) );
 		}
-		
 
 		// Only mark the article as read once.  If it's already marked as such - just stop here.
 		if (cursor.getInt(inxWasRead) == 1) {
@@ -408,6 +369,50 @@ public class ArticleActivity extends Activity {
 		ImageView iv			= (ImageView) findViewById(R.id.article_image);
 
 		iv.setImageBitmap(bm);
+	}
+
+
+	private void loadImageFromCacheOrServer(long articleId, String extension) {
+		boolean downloadImage		= true;
+		// Checking if this image is available in our local cache.
+		if (imageCache.isCached(articleID) ) {
+			Bitmap bitmap	= imageCache.get(articleID);
+			if (bitmap != null) {
+				loadImage(bitmap);
+				downloadImage		= false;
+			}
+		}
+		// Image needs to downloaded from the server
+		if (downloadImage) {
+			String imageUrl		= ArticleURL.buildURLImage(articleId, extension);
+
+			// Images need to be downloaded in a separate thread as we cannot block the UI thread.
+			// Note: we do not currently cache images on this screen and they are downloaded from the Internet on every request.
+			imageTask	= new ImageLoadTask();
+			imageTask.execute(imageUrl);
+		}
+	}
+
+
+	private String getCategoryLabel(int categoryId, Context context) {
+		switch (categoryId) {
+			case Article.SECTION_POLAND:
+				return context.getString(R.string.heading_poland);
+
+			case Article.SECTION_WORLD:
+				return context.getString(R.string.heading_world);
+
+			// TODO Confirm we need the case statements below
+			case Article.SECTION_OPINIONS:
+				return context.getString(R.string.heading_texts);
+
+			case Article.SECTION_REVIEWS:
+				return context.getString(R.string.heading_reviews);
+
+			case Article.SECTION_CULTURE:
+				return context.getString(R.string.heading_culture);
+		}
+		return null;
 	}
 
 
