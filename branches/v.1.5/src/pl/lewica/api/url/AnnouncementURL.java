@@ -15,6 +15,8 @@
 */
 package pl.lewica.api.url;
 
+import pl.lewica.URLDictionary;
+
 /**
  * Provides the lewica.pl announcements Web Service URL. 
  * You may set the parameters and then request the URL string from the buildURL method.
@@ -25,7 +27,6 @@ package pl.lewica.api.url;
  */
 public class AnnouncementURL implements WebServiceURL {
 
-	public static final String WEB_SERVICE					= "http://lewica.pl/api/ogloszenia.php";
 	// The maximum number of entries that can be downloaded is limited to 10 by the server anyway.
 	public static final int LIMIT								= 10;
 
@@ -38,7 +39,7 @@ public class AnnouncementURL implements WebServiceURL {
 
 
 	public String buildURL() {
-		StringBuilder sb	= new StringBuilder(WEB_SERVICE);
+		StringBuilder sb	= new StringBuilder(URLDictionary.API.ANNOUNCEMENTS);
 
 		if (newerThan > 0) {
 			sb.append("&");
@@ -55,7 +56,7 @@ public class AnnouncementURL implements WebServiceURL {
 		}
 
 		// If the query string has length, that means that the first char is "&" and it has to be replaced with "?".
-		int qsStart	= WEB_SERVICE.length();
+		int qsStart	= URLDictionary.API.ANNOUNCEMENTS.length();
 		if (sb.length() > qsStart) {
 			sb.replace(qsStart, qsStart + 1, "?");
 		}
