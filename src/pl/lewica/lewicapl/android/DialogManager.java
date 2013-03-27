@@ -11,6 +11,10 @@ import android.view.ViewGroup;
 import android.widget.SeekBar;
 
 
+/**
+ * Set of utilities facilitating standard Android dialogs and pop-up windows
+ * @author Krzysztof Kobrzak
+ */
 public class DialogManager {
 
 
@@ -21,6 +25,14 @@ public class DialogManager {
 	}
 
 
+	/**
+	 * Displays a standard dialog box with the slider widget and one button.
+	 * User sliding events handling is delegated to the sliderProgressDelegate object
+	 * passed to this method.
+	 * @param slider
+	 * @param activityContext
+	 * @param sliderProgressDelegate
+	 */
 	public static void showDialogWithSlider(SliderDialog slider, Activity activityContext, final SliderEventHandler sliderProgressDelegate) {
 		View layout	= getDialogLayout(activityContext);
 

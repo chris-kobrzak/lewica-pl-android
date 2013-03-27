@@ -1,5 +1,10 @@
 package pl.lewica.lewicapl.android;
 
+/**
+ * Helper class holding details of dialog boxes with the slider widget.
+ * Currently utilised by DialogManager.
+ * @author Krzysztof Kobrzak
+ */
 public class SliderDialog {
 
 	private int mSliderMax; 

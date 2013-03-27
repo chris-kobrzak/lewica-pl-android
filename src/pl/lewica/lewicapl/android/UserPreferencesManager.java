@@ -68,6 +68,9 @@ public class UserPreferencesManager {
 	}
 
 
+	/**
+	 * @return True if the currently selected theme is light (dark text on white background)
+	 */
 	public static boolean isLightTheme() {
 		return sTheme == ThemeType.LIGHT;
 	}
@@ -181,6 +184,11 @@ public class UserPreferencesManager {
 	}
 
 
+	/**
+	 * Converts text size in float values to points "understood" by the slider widget
+	 * @param textSize
+	 * @return Text size in points
+	 */
 	public static int convertTextSize(float textSize) {
 		int textSizeInt	= Math.round(textSize);
 		int minSize		= Math.round(sMinTextSize);
@@ -190,6 +198,13 @@ public class UserPreferencesManager {
 	}
 
 
+	/**
+	 * Converts text size expressed in point units "understood" by the slider widget
+	 * to float values that can be used directly by Android TextView methods
+	 * or stored in user preferences files via the Android PreferenceManager.
+	 * @param textSize
+	 * @return
+	 */
 	public static float convertTextSize(int textSize) {
 		int increment	= Math.round(sTextSizeIncrement);
 		int minSize	= Math.round(sMinTextSize);

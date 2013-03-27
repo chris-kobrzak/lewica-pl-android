@@ -13,7 +13,7 @@ import android.content.Intent;
 
 public class BroadcastSender {
 
-	private static BroadcastSender _instance;
+	private static BroadcastSender instance;
 	private Context context;
 
 
@@ -28,16 +28,17 @@ public class BroadcastSender {
 	 * @return BroadcastSender
 	 */
 	public static synchronized BroadcastSender getInstance(Context context) {
-		if (_instance == null) {
-			_instance	= new BroadcastSender(context);
+		if (instance == null) {
+			instance	= new BroadcastSender(context);
 		}
 
-		return _instance;
+		return instance;
 	}
 
 
 	/**
 	 * Attempts to switch the top bar network activity indicator on or off by notifying the application activity.  
+	 * @param show
 	 */
 	public void indicateDeviceNetworkActivity(boolean show) {
 		String action;
@@ -115,25 +116,29 @@ public class BroadcastSender {
 				reloadTab(Tab.NEWS);
 				reloadTab(Tab.ARTICLES);
 				break;
-				
+
 			case BLOG_POST:
 				reloadTab(Tab.BLOGS);
 				break;
-				
+
 			case ANNOUNCEMENT:
 				reloadTab(Tab.ANNOUNCEMENTS);
 				break;
-				
+
 			case HISTORY:
 				reloadTab(Tab.HISTORY);
 				break;
-				
+
 			default:
 				return;
 		}
 	}
 
 
+	/**
+	 * Asks for a refresh of the blog post listing activity filtered by a blog author 
+	 * @param blogID
+	 */
 	public void reloadTab_BlogPostListFilteredByBlogID(int blogID) {
 		String action	= BlogPostListActivity.RELOAD_VIEW;
 

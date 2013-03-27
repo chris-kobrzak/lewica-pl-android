@@ -22,11 +22,12 @@ package pl.lewica.lewicapl.android;
  */
 public class UpdateStatus {
 	private int totalUpdated;
-	
-	
+
+
 	public int getTotalUpdated() {
 		return totalUpdated;
 	}
+
 	public void setTotalUpdated(int totalUpdated) {
 		this.totalUpdated = totalUpdated;
 	}
