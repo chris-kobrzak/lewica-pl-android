@@ -41,8 +41,6 @@ public class ArticleURL implements WebServiceURL {
 	private int limit					= LIMIT;	// Maximum number of entries per section.
 	private String sectionList	= "";	// Comma-separated list of sections, as per the Article model constants.
 	private String format			= "xml";
-//	private int[] section			= new int[] {};	TODO
-
 
 
 	public String buildURL() {
