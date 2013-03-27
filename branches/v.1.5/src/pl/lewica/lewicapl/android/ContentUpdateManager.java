@@ -138,7 +138,7 @@ public class ContentUpdateManager {
 	 * If this is the case the lastUpdated time stamp is also set to the current time.
 	 * @param isRunning
 	 */
-	public void setRunning(boolean isRunning) {
+	private void setRunning(boolean isRunning) {
 		if (! this.isRunning && isRunning) {
 			setLastUpdated(DateUtil.getCurrentUnixTime() );
 		}
