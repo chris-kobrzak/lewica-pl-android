@@ -17,13 +17,14 @@ package pl.lewica.api.url;
 
 import java.util.Calendar;
 
+import pl.lewica.URLDictionary;
+
 /**
  * Provides lewica.pl API URL based on the parameters set.
  * @author Krzysztof Kobrzak
  */
 public class HistoryURL implements WebServiceURL {
 
-	public static final String WEB_SERVICE			= "http://lewica.pl/api/kalendarium.php";
 	public static final int LIMIT						= 100;
 
 	public static final String PARAM_DAY			= "dzien"; 
@@ -43,7 +44,7 @@ public class HistoryURL implements WebServiceURL {
 
 
 	public String buildURL() {
-		StringBuilder sb	= new StringBuilder(WEB_SERVICE);
+		StringBuilder sb	= new StringBuilder(URLDictionary.API.HISTORY);
 
 		if (day == 0) {
 			day		= cal.get(Calendar.DATE);
@@ -69,7 +70,7 @@ public class HistoryURL implements WebServiceURL {
 		sb.append(month);
 
 		// If the query string has length, that means that the first char is "&" and it has to be replaced with "?".
-		int qsStart	= WEB_SERVICE.length();
+		int qsStart	= URLDictionary.API.HISTORY.length();
 		sb.replace(qsStart, qsStart + 1, "?");
 
 		return sb.toString();
