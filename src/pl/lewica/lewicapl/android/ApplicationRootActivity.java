@@ -29,8 +29,6 @@ import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewParent;
 import android.view.Window;
 import android.widget.TabHost;
 
@@ -80,6 +78,8 @@ public class ApplicationRootActivity extends TabActivity {
 		try {
 			AndroidUtil.setUpResourcesHiddenFromAndroidGallery(storageDir);
 		} catch (IOException err) {}
+
+		AndroidUtil.setApplicationTitleBackgroundColour(getResources().getColor(R.color.red), this);
 
 		filter		= new IntentFilter();
 		filter.addAction(START_INDETERMINATE_PROGRESS);
@@ -135,16 +135,6 @@ public class ApplicationRootActivity extends TabActivity {
 		tag		= Tab.HISTORY.name();
 		spec		= tabHost.newTabSpec(tag).setIndicator(res.getString(R.string.tab_history), res.getDrawable(R.drawable.ic_tab_calendar) ).setContent(intent);
 		tabHost.addTab(spec);
-
-		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
-		View titleView = getWindow().findViewById(android.R.id.title);
-		if (titleView != null) {
-			ViewParent parent	= titleView.getParent();
-			if (parent != null && (parent instanceof View) ) {
-				View parentView	= (View)parent;
-				parentView.setBackgroundColor(res.getColor(R.color.red) );
-			}
-		}
 
 		tabHost.setCurrentTab(Tab.NEWS.ordinal() );
 	}

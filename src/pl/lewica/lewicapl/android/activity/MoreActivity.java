@@ -17,17 +17,16 @@ package pl.lewica.lewicapl.android.activity;
 
 import pl.lewica.URLDictionary;
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.AndroidUtil;
 import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.theme.Theme;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewParent;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -53,16 +52,7 @@ public class MoreActivity extends Activity {
 		loadView();
 		loadTheme(getApplicationContext() );
 
-		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
-		Resources res		= getResources();
-		View titleView = getWindow().findViewById(android.R.id.title);
-		if (titleView != null) {
-			ViewParent parent	= titleView.getParent();
-			if (parent != null && (parent instanceof View)) {
-				View parentView	= (View)parent;
-				parentView.setBackgroundColor(res.getColor(R.color.red) );
-			}
-		}
+		AndroidUtil.setApplicationTitleBackgroundColour(getResources().getColor(R.color.red), this);
 	}
 
 
@@ -77,27 +67,27 @@ public class MoreActivity extends Activity {
 		tv.setText(this.getString(R.string.heading_homepage) );
 		tv.setClickable(true);
 		tv.setOnClickListener(new TextClickListener() );
-		
+
 		tv	= (TextView) findViewById(R.id.more_facebook);
 		tv.setTypeface(categoryTypeface);
 		tv.setText(this.getString(R.string.heading_facebook) );
 		tv.setOnClickListener(new TextClickListener() );
-		
+
 		tv	= (TextView) findViewById(R.id.more_blogs);
 		tv.setTypeface(categoryTypeface);
 		tv.setText(this.getString(R.string.heading_blogs) );
 		tv.setOnClickListener(new TextClickListener() );
-		
+
 		tv	= (TextView) findViewById(R.id.more_links);
 		tv.setTypeface(categoryTypeface);
 		tv.setText(this.getString(R.string.heading_links) );
 		tv.setOnClickListener(new TextClickListener() );
-		
+
 		tv	= (TextView) findViewById(R.id.more_search);
 		tv.setTypeface(categoryTypeface);
 		tv.setText(this.getString(R.string.heading_search) );
 		tv.setOnClickListener(new TextClickListener() );
-		
+
 		tv	= (TextView) findViewById(R.id.more_team);
 		tv.setTypeface(categoryTypeface);
 		tv.setText(this.getString(R.string.heading_team) );
