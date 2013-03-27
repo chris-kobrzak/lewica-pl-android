@@ -20,7 +20,6 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -30,7 +29,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewParent;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -72,8 +70,6 @@ public class AnnouncementActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.detail_announcement);
 
-		Resources res		= getResources();
-		
 		// Custom font used by the category headings
 		categoryTypeface	= Typeface.createFromAsset(getAssets(), "Impact.ttf");
 
@@ -99,15 +95,7 @@ public class AnnouncementActivity extends Activity {
 		loadTextSize(UserPreferencesManager.getTextSize(this) );
 		loadTheme(getApplicationContext() );
 
-		// Custom title background colour, http://stackoverflow.com/questions/2251714/set-title-background-color
-		View titleView = getWindow().findViewById(android.R.id.title);
-		if (titleView != null) {
-			ViewParent parent	= titleView.getParent();
-			if (parent != null && (parent instanceof View) ) {
-				View parentView	= (View)parent;
-				parentView.setBackgroundColor(res.getColor(R.color.red) );
-			}
-		}
+		AndroidUtil.setApplicationTitleBackgroundColour(getResources().getColor(R.color.red), this);
 	}
 
 
