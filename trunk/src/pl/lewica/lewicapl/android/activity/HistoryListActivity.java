@@ -35,7 +35,9 @@ import android.widget.TextView;
 
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ContentUpdateManager;
+import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.HistoryDAO;
+import pl.lewica.lewicapl.android.theme.Theme;
 
 
 /**
@@ -60,7 +62,7 @@ public class HistoryListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.list_history);	// This comes from this file's name /res/list_history.xml
 
-		// Load a list view container from list_articles.xml
+		// Load a list view container from list_history.xml
 		listView					= (ListView) findViewById(R.id.list_history_events);
 
 		// Custom font used by the category headings
@@ -80,11 +82,17 @@ public class HistoryListActivity extends Activity {
 		historyDAO.open();
 		Cursor cursor			= historyDAO.select(month, day, limitRows);
 		startManagingCursor(cursor);
-		
+
+		int layout;
+		if (UserPreferencesManager.isLightTheme() ) {
+			layout	= R.layout.list_history_item;
+		} else {
+			layout	= R.layout.list_history_item_dark;
+		}
 		// Set list view adapter - this links the view with the data
 		listAdapter				= new SimpleCursorAdapter(
 				this, 
-				R.layout.list_history_item,
+				layout,
 				cursor, 
 				new String[] { HistoryDAO.FIELD_YEAR, HistoryDAO.FIELD_EVENT },
 				new int[] { R.id.history_year, R.id.history_event }
@@ -97,6 +105,8 @@ public class HistoryListActivity extends Activity {
 			} 
 		}; 
 		listView.setAdapter(listAdapter);
+		Theme appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
+		appTheme.setListViewDividerColour(listView, this);
 
 		// Register to receive content update messages
 		IntentFilter filter		= new IntentFilter();
@@ -151,7 +161,7 @@ public class HistoryListActivity extends Activity {
 	}
 
 
-	public void reloadRows() {
+	private void reloadRows() {
 		Calendar cal			= Calendar.getInstance();
 		CursorAdapter ca	= (CursorAdapter) listAdapter;
 		// Reload rows

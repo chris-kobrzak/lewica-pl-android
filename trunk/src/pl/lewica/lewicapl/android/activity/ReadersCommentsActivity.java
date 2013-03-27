@@ -17,9 +17,9 @@ package pl.lewica.lewicapl.android.activity;
 
 import pl.lewica.URLDictionary;
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.AndroidUtil;
+import pl.lewica.lewicapl.android.UserPreferencesManager;
 import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.webkit.WebView;
 
@@ -29,8 +29,6 @@ import android.webkit.WebView;
  */
 public class ReadersCommentsActivity extends Activity {
 
-	private long articleID;
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -38,24 +36,14 @@ public class ReadersCommentsActivity extends Activity {
 
 		setContentView(R.layout.web_readers_comments);
 
-		articleID					= filterIDFromUri(getIntent() );
-		
-		WebView wv			= (WebView) findViewById(R.id.web_comments);
-		wv.loadUrl(URLDictionary.BASE_READERS_COMMENTS + articleID);
-	}
+		long articleId	= AndroidUtil.filterIDFromUri(getIntent().getData() );
+		float textSize	= UserPreferencesManager.getTextSize(getApplicationContext() );
+		int themeId		= UserPreferencesManager.ThemeType.LIGHT.ordinal();
+		if (! UserPreferencesManager.isLightTheme() ) {
+			themeId		= UserPreferencesManager.ThemeType.DARK.ordinal();
+		}
 
-	/**
-	 * Activities on Android are invoked with a Uri string.  This method captures and returns the last bit of this Uri
-	 * which it assumes to be a numeric ID of the current article.
-	 * @param intent
-	 * @return
-	 */
-	public long filterIDFromUri(Intent intent) {
-		Uri uri						= intent.getData();
-		String articleIDString	= uri.getLastPathSegment();
-		
-		// TODO Make sure articleID is indeed a number
-		Long articleID			= Long.valueOf(articleIDString);
-		return articleID;
+		WebView wv		= (WebView) findViewById(R.id.web_comments);
+		wv.loadUrl(URLDictionary.buildURL_ReadersComments(articleId, (int) textSize, themeId) );
 	}
 }

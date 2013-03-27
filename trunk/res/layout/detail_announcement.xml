@@ -34,8 +34,9 @@
 			<TextView
 				android:text="@string/placeholder_where"
 				android:id="@+id/announcement_where_label"
-				android:layout_width="60dp"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
+				android:paddingLeft="7dp"
 				style="@style/InfoLabel"
 			/>
 			<TextView
@@ -43,8 +44,7 @@
 				android:id="@+id/announcement_where"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:paddingLeft="7dp"
-				android:paddingRight="7dp"
+				style="@style/InfoParagraph"
 			/>
 		</LinearLayout>
 		<LinearLayout
@@ -57,8 +57,9 @@
 			<TextView
 				android:text="@string/placeholder_when"
 				android:id="@+id/announcement_when_label"
-				android:layout_width="60dp"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
+				android:paddingLeft="7dp"
 				style="@style/InfoLabel"
 			/>
 			<TextView
@@ -66,8 +67,7 @@
 				android:id="@+id/announcement_when"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:paddingLeft="7dp"
-				android:paddingRight="7dp"
+				style="@style/InfoParagraph"
 			/>
 		</LinearLayout>
 		<TextView

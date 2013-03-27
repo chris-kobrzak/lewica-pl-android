@@ -49,7 +49,9 @@ import android.widget.TextView;
 import pl.lewica.lewicapl.R;
 import pl.lewica.api.model.Article;
 import pl.lewica.api.url.ArticleURL;
+import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
+import pl.lewica.lewicapl.android.theme.Theme;
 
 
 /**
@@ -65,6 +67,7 @@ public class PublicationListActivity extends Activity {
 	private ListAdapter listAdapter;
 	private ListView listView;
 	private PublicationsUpdateBroadcastReceiver receiver;
+	private static Theme appTheme;
 	// When users select a new article, navigate back to the list and start scrolling up and down, the cursor won't know this article should be marked as read.
 	// That results in articles still being marked as unread (titles in red rather than blue).
 	// That's why we need to cache the list of clicked articles.  Please note, it is down to ArcticleActivity to flag articles as read in the database.
@@ -107,9 +110,7 @@ public class PublicationListActivity extends Activity {
 		listView.setOnItemClickListener(new OnItemClickListener() {
 //			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				TextView tv;
 				Context context		= getApplicationContext();
-				Resources res			= context.getResources();
 
 				// Redirect to article details screen
 				Intent intent	= new Intent(context, ArticleActivity.class);
@@ -120,19 +121,22 @@ public class PublicationListActivity extends Activity {
 				startActivity(intent);
 
 				// Mark current article as read by changing its colour...
-				int colour		= res.getColor(R.color.read);
-				tv					= (TextView) view.findViewById(R.id.article_item_title);
-				tv.setTextColor(colour);
+				appTheme	= UserPreferencesManager.getThemeInstance(context);
+				TextView tv		= (TextView) view.findViewById(R.id.article_item_title);
+				tv.setTextColor(appTheme.getListHeadingColour(true) );
 				// ... and flagging it in local cache accordingly
 				clicked.add(id);
 
 				return;
 			}
 		});
+
+		appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
+		appTheme.setListViewDividerColour(listView, this);
 	}
 
 
-	public void reloadRows() {
+	private void reloadRows() {
 		CursorAdapter ca	= (CursorAdapter) listAdapter;
 		// Reload rows
 		Cursor newCursor	= articleDAO.selectLatestTexts();
@@ -144,7 +148,9 @@ public class PublicationListActivity extends Activity {
 	private class PublicationsUpdateBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
 			reloadRows();
+			appTheme.setListViewDividerColour(listView, context);
 		}
 	}
 
@@ -198,26 +204,21 @@ public class PublicationListActivity extends Activity {
 		 */
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
-			TextView tv;
-			ImageView iv;
-			int colour;
+			appTheme	= UserPreferencesManager.getThemeInstance(context);
+
 			// Title
-			tv	= (TextView) view.findViewById(R.id.article_item_title);
-			if (cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) ) ) {
-				colour	= res.getColor(R.color.unread);
-			} else {
-				colour	= res.getColor(R.color.read);
-			}
-			tv.setTextColor(colour);
+			boolean unread	= cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) );
+			TextView tv	= (TextView) view.findViewById(R.id.article_item_title);
+			tv.setTextColor(appTheme.getListHeadingColour(! unread) );
 			tv.setText(cursor.getString(colIndex_Title) );
 			// Publications do not have editor's comments so no need for the pencil icon here
-			iv	= (ImageView) view.findViewById(R.id.ico_pencil);
+			ImageView iv	= (ImageView) view.findViewById(R.id.ico_pencil);
 			iv.setVisibility(View.GONE);
 			// Datetime
-			tv	= (TextView) view.findViewById(R.id.article_item_date);
+			TextView tvDate	= (TextView) view.findViewById(R.id.article_item_date);
 			long unixTime	= cursor.getLong(colIndex_DatePub);	// Dates are stored as Unix timestamps
 			Date d				= new Date(unixTime);
-			tv.setText(dateFormat.format(d) );
+			tvDate.setText(dateFormat.format(d) );
 
 			// Thumbnail
 			iv	= (ImageView) view.findViewById(R.id.article_item_icon);
@@ -251,6 +252,9 @@ public class PublicationListActivity extends Activity {
 						break;
 				}
 			}
+
+			tvDate.setTextColor(appTheme.getListTextColour() );
+			view.setBackgroundColor(appTheme.getBackgroundColour() );
 		}
 
 		@Override

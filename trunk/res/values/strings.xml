@@ -5,11 +5,15 @@
 	<color name="red">#fa1000</color>
 	<color name="orange">#ffb31a</color>
 	<color name="grey_light">#eee</color>
+	<color name="grey">#ccc</color>
 	<color name="grey_dark">#aaa</color>
 	<color name="grey_darker">#303030</color>
+	<color name="black">#000</color>
 	<color name="blue_facebook">#1D4088</color>
 	<color name="unread">#BF0000</color>
 	<color name="read">#136F80</color>
+	<color name="blue_light">#5CBBCD</color>
+	<color name="red_light">#F24949</color>
 	<string name="title_news">LewicaPL: informacje</string>
 	<string name="title_opinions">LewicaPL: publicystyka</string>
 	<string name="title_article">LewicaPL: artykuł</string>
@@ -30,6 +34,9 @@
 	<string name="nav_readers_comments">Komentarze</string>
 	<string name="nav_share">Poleć</string>
 	<string name="nav_show_this_blog_only">Inne wpisy na tym blogu</string>
+	<string name="menu_change_text_size">Rozmiar czcionki</string>
+	<string name="menu_change_background">Zmień tło</string>
+	<string name="heading_change_text_size">Zmiana rozmiaru czcionki</string>
 	<string name="heading_poland">polska</string>
 	<string name="heading_world">świat</string>
 	<string name="heading_texts">publicystyka</string>
@@ -65,4 +72,5 @@
 	<string name="placeholder_where">Gdzie</string>
 	<string name="placeholder_year">Rok</string>
 	<string name="path_images">/lewicapl/images/</string>
+	<string name="ok">OK</string>
 </resources>

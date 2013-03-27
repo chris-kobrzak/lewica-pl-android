@@ -18,6 +18,11 @@ package pl.lewica.lewicapl.android;
 import java.io.File;
 import java.io.IOException;
 
+import android.app.Activity;
+import android.net.Uri;
+import android.view.View;
+import android.view.ViewParent;
+
 
 public class AndroidUtil {
 
@@ -33,5 +38,37 @@ public class AndroidUtil {
 			return;
 		}
 		hideGallery.createNewFile();
+	}
+
+
+	/**
+	 * Sets custom title background colour,
+	 * see http://stackoverflow.com/questions/2251714/set-title-background-color
+	 * @param colour
+	 */
+	public static void setApplicationTitleBackgroundColour(int colour, Activity activity) {
+		View titleView = activity.getWindow().findViewById(android.R.id.title);
+		if (titleView == null) {
+			return;
+		}
+		ViewParent parent	= titleView.getParent();
+		if (parent == null || ! (parent instanceof View) ) {
+			return;
+		}
+		View parentView	= (View)parent;
+		parentView.setBackgroundColor(colour);
+	}
+
+
+	/**
+	 * Activities on Android are invoked with a Uri string.  This method captures and returns the last bit of this Uri
+	 * which it assumes to be a numeric ID of the current article/announcements etc.
+	 * @param intent
+	 * @return
+	 */
+	public static long filterIDFromUri(Uri uri) {
+		String id	= uri.getLastPathSegment();
+
+		return Long.valueOf(id);
 	}
 }

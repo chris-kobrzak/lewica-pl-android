@@ -15,6 +15,8 @@
 */
 package pl.lewica.api.url;
 
+import pl.lewica.URLDictionary;
+
 /**
  * Provides the lewica.pl articles Web Service URL. 
  * You may set the parameters and then request the URL string from the buildURL method.
@@ -24,7 +26,6 @@ package pl.lewica.api.url;
  */
 public class ArticleURL implements WebServiceURL {
 
-	public static final String WEB_SERVICE					= "http://lewica.pl/api/publikacje.php";
 	public static final String PATH_IMAGE					= "http://lewica.pl/im/";
 	public static final String PATH_THUMBNAIL			= "http://lewica.pl/im/thumbs/";
 	public static final String PREFIX_THUMBNAIL		= "th_";
@@ -40,12 +41,10 @@ public class ArticleURL implements WebServiceURL {
 	private int limit					= LIMIT;	// Maximum number of entries per section.
 	private String sectionList	= "";	// Comma-separated list of sections, as per the Article model constants.
 	private String format			= "xml";
-//	private int[] section			= new int[] {};	TODO
-
 
 
 	public String buildURL() {
-		StringBuilder sb	= new StringBuilder(WEB_SERVICE);
+		StringBuilder sb	= new StringBuilder(URLDictionary.API.PUBLICATIONS);
 
 		if (newerThan > 0) {
 			sb.append("&");
@@ -76,7 +75,7 @@ public class ArticleURL implements WebServiceURL {
 		}
 
 		// If the query string has length, that means that the first char is "&" and it has to be replaced with "?".
-		int qsStart	= WEB_SERVICE.length();
+		int qsStart	= URLDictionary.API.PUBLICATIONS.length();
 		sb.replace(qsStart, qsStart + 1, "?");
 
 		return sb.toString();
@@ -97,17 +96,6 @@ public class ArticleURL implements WebServiceURL {
 		sb.append(extension);
 
 		return sb.toString();
-	}
-	
-	
-	/**
-	 * Returns a URL for a given thumbnail image, e.g. http://lewica.pl/im/thumbs/th_25365.jpg
-	 * @param id
-	 * @param extension
-	 * @return
-	 */
-	public static String buildURLThumbnail(long id, String extension) {
-		return PATH_THUMBNAIL + buildNameThumbnail(id, extension);
 	}
 
 

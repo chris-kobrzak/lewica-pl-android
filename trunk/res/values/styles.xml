@@ -7,7 +7,7 @@
 		<item name="android:paddingBottom">5dp</item>
 	</style>
 	<style name="ListItemHeading">
-		<item name="android:textSize">22sp</item>
+		<item name="android:textSize">24sp</item>
 		<item name="android:typeface">serif</item>
 		<item name="android:textColor">@color/red</item>
 	</style>
@@ -15,12 +15,12 @@
 		<item name="android:textSize">14sp</item>
 	</style>
 	<style name="ListItemLabel">
-		<item name="android:textSize">14sp</item>
+		<item name="android:textSize">17sp</item>
 		<item name="android:typeface">serif</item>
 		<item name="android:textColor">@color/read</item>
 	</style>
 	<style name="ListItemDetailText">
-		<item name="android:textSize">12sp</item>
+		<item name="android:textSize">13sp</item>
 	</style>
 	<style name="InfoBar">
 		<item name="android:background">@color/orange</item>
@@ -45,8 +45,13 @@
 	<style name="InfoLabel">
 		<item name="android:paddingLeft">7dp</item>
 		<item name="android:paddingRight">7dp</item>
-		<item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+		<item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
 		<item name="android:textColor">@color/read</item>
+	</style>
+	<style name="InfoParagraph">
+		<item name="android:paddingLeft">7dp</item>
+		<item name="android:paddingRight">7dp</item>
+		<item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
 	</style>
 	<style name="StandardHeading">
 		<item name="android:paddingLeft">7dp</item>
