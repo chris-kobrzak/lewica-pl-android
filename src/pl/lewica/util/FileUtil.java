@@ -15,12 +15,22 @@
 */
 package pl.lewica.util;
 
+import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import org.apache.http.util.ByteArrayBuffer;
+
+import android.util.Log;
 
 /**
  * Collection of file and IO related utilities.
@@ -66,4 +76,55 @@ public class FileUtil {
 		return result;
 	}
 
+
+	public static boolean fetchAndSaveImage(String sourceUrl, String destinationPath, boolean overwrite)
+			throws MalformedURLException, IOException {
+		File destinationFile	= new File(destinationPath);
+		if (destinationFile.exists() && ! overwrite) {
+			return false;
+		}
+
+		BufferedInputStream bis	= null;
+		FileOutputStream fos		= null;
+
+		try {
+			URL url	= new URL(sourceUrl);
+			// See http://stackoverflow.com/questions/3498643/dalvik-message-default-buffer-size-used-in-bufferedinputstream-constructor-it/7516554#7516554
+			int bufferSize	= 8192;
+			bis	= new BufferedInputStream(url.openStream(), bufferSize);
+			ByteArrayBuffer bab	= new ByteArrayBuffer(50);
+
+			int current	= 0;
+			while ( (current = bis.read() ) != -1) {
+				bab.append( (byte) current);
+			}
+
+			fos	= new FileOutputStream(destinationFile);
+			fos.write(bab.toByteArray() );
+			fos.close();
+		} catch (MalformedURLException e) {
+			throw e;
+		} catch (IOException e) {
+			throw e;
+		} finally {
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException ioe) {
+					// This issue can be safely skipped but there's no harm in logging it
+					Log.w("FileUtil", "Unable to close file output stream for " + sourceUrl);
+				}
+			}
+			if (bis != null) {
+				try {
+					bis.close();
+				} catch (IOException ioe) {
+					// This issue can be safely skipped but there's no harm in logging it
+					Log.w("FileUtil", "Unable to close buffered input stream for " + sourceUrl);
+				}
+			}
+		}
+
+		return true;
+	}
 }

@@ -35,6 +35,7 @@ import android.widget.TextView;
 
 import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.ContentUpdateManager;
+import pl.lewica.lewicapl.android.ContentUpdateManager.CommandType;
 import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.HistoryDAO;
 import pl.lewica.lewicapl.android.theme.Theme;
@@ -138,7 +139,7 @@ public class HistoryListActivity extends Activity {
 
 		ContentUpdateManager updateManager	= ContentUpdateManager.getInstance(getApplicationContext(), null);
 		if (! updateManager.isRunning() ) {
-			updateManager.manageAndBroadcastUpdates(ContentUpdateManager.CommandType.INIT_HISTORY, false);
+			updateManager.runSingle(CommandType.INIT_HISTORY);
 		}
 	}
 

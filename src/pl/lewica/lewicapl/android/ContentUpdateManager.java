@@ -15,12 +15,9 @@
 */
 package pl.lewica.lewicapl.android;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,11 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.http.util.ByteArrayBuffer;
-
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import pl.lewica.api.FeedDownloadManager;
 import pl.lewica.api.model.Announcement;
@@ -46,11 +42,13 @@ import pl.lewica.api.url.AnnouncementURL;
 import pl.lewica.api.url.ArticleURL;
 import pl.lewica.api.url.BlogPostURL;
 import pl.lewica.api.url.HistoryURL;
+import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
 import pl.lewica.lewicapl.android.database.HistoryDAO;
 import pl.lewica.util.DateUtil;
+import pl.lewica.util.FileUtil;
 
 
 /**
@@ -62,8 +60,8 @@ import pl.lewica.util.DateUtil;
 public class ContentUpdateManager {
 	private static final String TAG	= "ContentUpdateManager";
 
-	private static ContentUpdateManager _instance;
-	
+	private static ContentUpdateManager instance;
+
 	private File storageDir;
 	private Context context;
 	private BroadcastSender broadcastSender;
@@ -105,11 +103,11 @@ public class ContentUpdateManager {
 	 * @return ContentUpdateManager
 	 */
 	public static synchronized ContentUpdateManager getInstance(Context context, File storageDir) {
-		if (_instance == null) {
-			_instance	= new ContentUpdateManager(context, storageDir);
+		if (instance == null) {
+			instance	= new ContentUpdateManager(context, storageDir);
 		}
 
-		return _instance;
+		return instance;
 	}
 
 
@@ -251,71 +249,22 @@ public class ContentUpdateManager {
 		}
 
 		Iterator<Map<String, String>> iter	= imageSet.iterator();
-
-		Map<String,String> imageMeta;
-		long ID;
-		String imageName;
-		String imageURL;
-		String imagePath;
-		File image;
-		URL url;
-
-		BufferedInputStream bis	= null;
-		FileOutputStream fos		= null;
-		ByteArrayBuffer bab;
-		int current;
-		// See http://stackoverflow.com/questions/3498643/dalvik-message-default-buffer-size-used-in-bufferedinputstream-constructor-it/7516554#7516554
-		int bufferSize	= 8192;
-
 		while (iter.hasNext() ) {
-			imageMeta	= iter.next();
-			ID									= Long.parseLong(imageMeta.get("ID") );
+			Map<String,String> imageMeta	= iter.next();
+			long ID	= Long.parseLong(imageMeta.get("ID") );
 
-			imageName					= ArticleURL.buildNameThumbnail(ID, imageMeta.get("Ext") );
+			String imageName		= ArticleURL.buildNameThumbnail(ID, imageMeta.get("Ext") );
 			// Source image (on the server)
-			imageURL						= ArticleURL.PATH_THUMBNAIL + imageName;
-			// Destination image (on phone's SD card)
-			imagePath						= storageDir.getPath() + "/" + imageName; 
-
-			image							= new File(imagePath);
-			if (image.exists() ) {
-				continue;
-			}
+			String imageURL			= ArticleURL.PATH_THUMBNAIL + imageName;
+			// Destination image (on phone's storage)
+			String imagePath		= storageDir.getPath() + "/" + imageName;
 
 			try {
-				url				= new URL(imageURL);
-				bis			= new BufferedInputStream(url.openStream(), bufferSize);
-				bab			= new ByteArrayBuffer(50);
-
-				current	= 0;
-				while ( (current = bis.read() ) != -1) {
-					bab.append( (byte) current);
-				}
-
-				fos	= new FileOutputStream(image);
-				fos.write(bab.toByteArray() );
-				fos.close();
+				return FileUtil.fetchAndSaveImage(imageURL, imagePath, false);
 			} catch (MalformedURLException e) {
 				Log.w(TAG, "MalformedURLException: " + e.getMessage() );
-				return false;
 			} catch (IOException e) {
 				Log.w(TAG, "IOException: " + e.getMessage() );
-				return false;
-			} finally {
-				if (fos != null) {
-					try {
-						fos.close();
-					} catch (IOException ioe) {
-						Log.w(TAG, "Unable to close file output stream for " + imageURL);
-					}
-				}
-				if (bis != null) {
-					try {
-						bis.close();
-					} catch (IOException ioe) {
-						Log.w(TAG, "Unable to close buffered input stream for " + imageURL);
-					}
-				}
 			}
 		}
 
@@ -465,6 +414,11 @@ public class ContentUpdateManager {
 	}
 
 
+	public void runSingle(CommandType command) {
+		manageAndBroadcastUpdates(command, false);
+	}
+
+
 	/**
 	 * Manages the process of updating content in a sequential manner.
 	 * 
@@ -478,7 +432,7 @@ public class ContentUpdateManager {
 	 * @param command The action which the method starts the updates from.
 	 * @param chainReaction Tells the method if it should continue running other updates as per the order of tasks specified in the method description.
 	 */
-	public void manageAndBroadcastUpdates(CommandType command, boolean chainReaction) {
+	private void manageAndBroadcastUpdates(CommandType command, boolean chainReaction) {
 		setRunning(true);
 
 		// Please note, the order of the case statements matters!
@@ -497,6 +451,7 @@ public class ContentUpdateManager {
 			case NEW_PUBLICATIONS:
 				// Notify the news and publication listing screens
 				broadcastSender.reloadTabsOnDataUpdate(DataModelType.ARTICLE);
+				Toast.makeText(context, context.getString(R.string.updated_articles), Toast.LENGTH_SHORT).show();
 
 				// No break statement here, just let it jump to the next NO_PUBLICATIONS case that will take care of deciding what to do next.
 
@@ -519,6 +474,7 @@ public class ContentUpdateManager {
 
 			case NEW_BLOG_POSTS:
 				broadcastSender.reloadTabsOnDataUpdate(DataModelType.BLOG_POST);
+				Toast.makeText(context, context.getString(R.string.updated_blog_entries), Toast.LENGTH_SHORT).show();
 
 				// No break statement here, just let it jump to the next NO_BLOG_ENTRIES case that will take care of deciding what to do next.
 
@@ -534,6 +490,7 @@ public class ContentUpdateManager {
 
 			case NEW_ANNOUNCEMENTS:
 				broadcastSender.reloadTabsOnDataUpdate(DataModelType.ANNOUNCEMENT);
+				Toast.makeText(context, context.getString(R.string.updated_announcements), Toast.LENGTH_SHORT).show();
 
 				// No break statement here, just let it jump to the next NO_ANNOUNCEMENTS case that will take care of deciding what to do next.
 
