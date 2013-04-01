@@ -62,6 +62,9 @@
 	<string name="description_article_item_icon">Ikona artykułu</string>
 	<string name="description_ico_pencil">Ikona komentarza redakcyjnego</string>
 	<string name="description_article_image">Ilustracja</string>
+	<string name="updated_articles">Pobrano nowe artykuły</string>
+	<string name="updated_announcements">Pobrano nowe ogłoszenia</string>
+	<string name="updated_blog_entries">Pobrano nowe wpisy blogowe</string>
 	<string name="placeholder_category">Kategoria</string>
 	<string name="placeholder_content">Treść</string>
 	<string name="placeholder_date">Data</string>
