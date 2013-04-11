@@ -17,26 +17,18 @@ import android.widget.SeekBar;
  */
 public class DialogManager {
 
-
-	public interface SliderEventHandler {
-		public void changeValue(int points);
-
-		public void finishSliding(int points);
-	}
-
-
 	/**
 	 * Displays a standard dialog box with the slider widget and one button.
 	 * User sliding events handling is delegated to the sliderProgressDelegate object
 	 * passed to this method.
 	 * @param slider
 	 * @param activityContext
-	 * @param sliderProgressDelegate
+	 * @param seekBarChangeListener
 	 */
-	public static void showDialogWithSlider(SliderDialog slider, Activity activityContext, final SliderEventHandler sliderProgressDelegate) {
+	public static void showDialogWithSlider(SliderDialog slider, Activity activityContext, final SeekBar.OnSeekBarChangeListener seekBarChangeListener) {
 		View layout	= getDialogLayout(activityContext);
 
-		configureSlider(layout, slider, sliderProgressDelegate);
+		configureSlider(layout, slider, seekBarChangeListener);
 
 		AlertDialog dialog	= buildAlertDialogWithOneButton(slider, layout, activityContext);
 
@@ -44,24 +36,12 @@ public class DialogManager {
 	}
 
 
-	private static void configureSlider(View layout, SliderDialog slider, final SliderEventHandler sliderProgressDelegate) {
+	private static void configureSlider(View layout, SliderDialog slider, final SeekBar.OnSeekBarChangeListener seekBarChangeListener) {
 		SeekBar sb		= (SeekBar) layout.findViewById(R.id.dialog_slider);
 		sb.setMax(slider.getSliderMax() );
 		sb.setProgress(slider.getSliderValue() );
 		sb.setPadding(90, 20, 90, 20);
-		sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
-				sliderProgressDelegate.changeValue(progress);
-			}
-
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {}
-
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
-				sliderProgressDelegate.finishSliding(seekBar.getProgress() );
-			}
-		});
+		sb.setOnSeekBarChangeListener(seekBarChangeListener);
 	}
 
 
