@@ -41,6 +41,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ScrollView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import pl.lewica.api.model.Article;
@@ -51,7 +52,6 @@ import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.DialogManager;
 import pl.lewica.lewicapl.android.SliderDialog;
-import pl.lewica.lewicapl.android.DialogManager.SliderEventHandler;
 import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 import pl.lewica.lewicapl.android.theme.Theme;
@@ -72,7 +72,7 @@ public class ArticleActivity extends Activity {
 	private Map<String,Long> nextPrevID;
 	private ImageLoadTask imageTask;
 	private ImageCache imageCache;
-	private SliderEventHandler mTextSizeHandler;
+	private SeekBar.OnSeekBarChangeListener mSeekBarChangeListener;
 
 	private TextView tvTitle;
 	private TextView tvContent;
@@ -97,7 +97,7 @@ public class ArticleActivity extends Activity {
 		articleDAO				= new ArticleDAO(this);
 		articleDAO.open();
 
-		mTextSizeHandler	= new TextSizeHandler(this);
+		mSeekBarChangeListener	= new SeekBarChangeListener(this);
 
 		// When user changes the orientation, Android restarts the activity.  Say, users navigated through articles using
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
@@ -217,7 +217,7 @@ public class ArticleActivity extends Activity {
 				sd.setTitleResource(R.string.heading_change_text_size);
 				sd.setOkButtonResource(R.string.ok);
 
-				DialogManager.showDialogWithSlider(sd, this, mTextSizeHandler);
+				DialogManager.showDialogWithSlider(sd, this, mSeekBarChangeListener);
 				return true;
 
 			case R.id.menu_change_background:
@@ -444,26 +444,27 @@ public class ArticleActivity extends Activity {
 	}
 
 
-	private class TextSizeHandler implements DialogManager.SliderEventHandler {
+	private class SeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
 
 		private Activity mActivity;
 
-		public TextSizeHandler(Activity activity) {
+		public SeekBarChangeListener(Activity activity) {
 			mActivity	= activity;
 		}
 
-
 		@Override
-		public void changeValue(int points) {
-			float textSize		= UserPreferencesManager.convertTextSize(points);
+		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+			float textSize		= UserPreferencesManager.convertTextSize(progress);
 
 			loadTextSize(textSize);
 		}
 
+		@Override
+		public void onStartTrackingTouch(SeekBar seekBar) {}
 
 		@Override
-		public void finishSliding(int points) {
-			float textSize		= UserPreferencesManager.convertTextSize(points);
+		public void onStopTrackingTouch(SeekBar seekBar) {
+			float textSize		= UserPreferencesManager.convertTextSize(seekBar.getProgress() );
 
 			UserPreferencesManager.setTextSize(textSize, mActivity);
 		}
