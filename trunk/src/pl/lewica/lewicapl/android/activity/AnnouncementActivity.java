@@ -45,7 +45,7 @@ import pl.lewica.lewicapl.android.database.BaseTextDAO;
 import pl.lewica.lewicapl.android.theme.Theme;
 
 
-public class AnnouncementActivity extends Activity {
+public class AnnouncementActivity extends Activity implements StandardTextScreen {
 	// This intent's base Uri.  It should have a numeric ID appended to it.
 	public static final String BASE_URI	= "content://lewicapl/announcements/announcement/";
 
@@ -77,7 +77,7 @@ public class AnnouncementActivity extends Activity {
 		annDAO				= new AnnouncementDAO(this);
 		annDAO.open();
 
-		mSeekBarChangeListener	= new SeekBarChangeListener(this);
+		mSeekBarChangeListener	= new SeekBarChangeListener(this, this);
 
 		// When user changes the orientation, Android restarts the activity.  Say, users navigated through articles using
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
@@ -334,7 +334,8 @@ public class AnnouncementActivity extends Activity {
 	}
 
 
-	private void loadTextSize(float textSize) {
+	@Override
+	public void loadTextSize(float textSize) {
 		tvTitle.setTextSize(textSize + UserPreferencesManager.HEADING_TEXT_DIFF);
 		tvWhere.setTextSize(textSize);
 		tvWhereLbl.setTextSize(textSize);
@@ -360,32 +361,5 @@ public class AnnouncementActivity extends Activity {
 				BroadcastSender.getInstance(context).reloadTab(ApplicationRootActivity.Tab.ANNOUNCEMENTS);
 			}
 		}).start();
-	}
-
-
-	private class SeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
-
-		private Activity mActivity;
-
-		public SeekBarChangeListener(Activity activity) {
-			mActivity	= activity;
-		}
-
-		@Override
-		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-			float textSize		= UserPreferencesManager.convertTextSize(progress);
-
-			loadTextSize(textSize);
-		}
-
-		@Override
-		public void onStartTrackingTouch(SeekBar seekBar) {}
-
-		@Override
-		public void onStopTrackingTouch(SeekBar seekBar) {
-			float textSize		= UserPreferencesManager.convertTextSize(seekBar.getProgress() );
-
-			UserPreferencesManager.setTextSize(textSize, mActivity);
-		}
 	}
 }

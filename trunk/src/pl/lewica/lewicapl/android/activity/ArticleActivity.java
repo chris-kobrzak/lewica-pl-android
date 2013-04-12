@@ -57,7 +57,7 @@ import pl.lewica.lewicapl.android.database.ArticleDAO;
 import pl.lewica.lewicapl.android.theme.Theme;
 
 
-public class ArticleActivity extends Activity {
+public class ArticleActivity extends Activity implements StandardTextScreen {
 	// This intent's base Uri.  It should have a numeric ID appended to it.
 	public static final String URI_BASE						= "content://lewicapl/articles/article/";
 	public static final String URI_BASE_COMMENTS	= "content://lewicapl/articles/article/comments/";
@@ -97,7 +97,7 @@ public class ArticleActivity extends Activity {
 		articleDAO				= new ArticleDAO(this);
 		articleDAO.open();
 
-		mSeekBarChangeListener	= new SeekBarChangeListener(this);
+		mSeekBarChangeListener	= new SeekBarChangeListener(this, this);
 
 		// When user changes the orientation, Android restarts the activity.  Say, users navigated through articles using
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
@@ -337,7 +337,11 @@ public class ArticleActivity extends Activity {
 	}
 
 
-	private void loadTextSize(float textSize) {
+	/* (non-Javadoc)
+	 * @see pl.lewica.lewicapl.android.activity.DetailsPage#loadTextSize(float)
+	 */
+	@Override
+	public void loadTextSize(float textSize) {
 		tvTitle.setTextSize(textSize + UserPreferencesManager.HEADING_TEXT_DIFF);
 		tvContent.setTextSize(textSize);
 		tvComment.setTextSize(textSize);
@@ -441,33 +445,6 @@ public class ArticleActivity extends Activity {
 				}
 			}
 		}).start();
-	}
-
-
-	private class SeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
-
-		private Activity mActivity;
-
-		public SeekBarChangeListener(Activity activity) {
-			mActivity	= activity;
-		}
-
-		@Override
-		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-			float textSize		= UserPreferencesManager.convertTextSize(progress);
-
-			loadTextSize(textSize);
-		}
-
-		@Override
-		public void onStartTrackingTouch(SeekBar seekBar) {}
-
-		@Override
-		public void onStopTrackingTouch(SeekBar seekBar) {
-			float textSize		= UserPreferencesManager.convertTextSize(seekBar.getProgress() );
-
-			UserPreferencesManager.setTextSize(textSize, mActivity);
-		}
 	}
 
 
