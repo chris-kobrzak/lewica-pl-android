@@ -119,13 +119,42 @@ public class ArticleDAO extends BaseTextDAO {
 
 
 	public int updateMarkNewsAsRead() {
+		String whereClause	= getWhereClauseForMarkingNewsAsRead();
+
+		return updateMarkAsRead(whereClause);
+	}
+
+
+	public int updateMarkTextsAsRead() {
+		String whereClause	= getWhereClauseForMarkingTextsAsRead();
+
+		return updateMarkAsRead(whereClause);
+	}
+
+
+	private int updateMarkAsRead(String whereClause) {
+		ContentValues updateData	= new ContentValues();
+		updateData.put(FIELD_WAS_READ, 1);
+
+		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
+		int totalUpdates	= databaseWritable.update(
+			DATABASE_TABLE,
+			updateData,
+			whereClause,
+			null
+		);
+		databaseWritable.close();
+		
+		return totalUpdates;
+	}
+
+
+	/**
+	 * Builds WHERE clause
+	 * @return SQL WHERE statement
+	 */
+	private String getWhereClauseForMarkingNewsAsRead() {
 		StringBuilder sb		= new StringBuilder();
-		ContentValues cv	= new ContentValues();
-
-		// UPDATE operation
-		cv.put(FIELD_WAS_READ, 1);
-
-		// WHERE clause
 		sb.append(FIELD_CATEGORY_ID);
 		sb.append(" IN (");
 		sb.append(Article.SECTION_POLAND);
@@ -135,27 +164,15 @@ public class ArticleDAO extends BaseTextDAO {
 		sb.append(FIELD_WAS_READ);
 		sb.append(" = 0");
 
-		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
-
-		int totalUpdates	= databaseWritable.update(
-			DATABASE_TABLE, 
-			cv, 
-			sb.toString(), 
-			null
-		);
-		databaseWritable.close();
-
-		return totalUpdates;
+		return sb.toString();
 	}
 
 
-	public int updateMarkTextsAsRead() {
+	/**
+	 * @return
+	 */
+	private String getWhereClauseForMarkingTextsAsRead() {
 		StringBuilder sb		= new StringBuilder();
-		ContentValues cv	= new ContentValues();
-
-		// UPDATE operation
-		cv.put(FIELD_WAS_READ, 1);
-
 		// WHERE clause
 		sb.append(FIELD_CATEGORY_ID);
 		sb.append(" IN (");
@@ -168,17 +185,7 @@ public class ArticleDAO extends BaseTextDAO {
 		sb.append(FIELD_WAS_READ);
 		sb.append(" = 0");
 
-		SQLiteDatabase databaseWritable	= dbHelper.getWritableDatabase();
-
-		int totalUpdates	= databaseWritable.update(
-			DATABASE_TABLE, 
-			cv, 
-			sb.toString(), 
-			null
-		);
-		databaseWritable.close();
-
-		return totalUpdates;
+		return sb.toString();
 	}
 
 
