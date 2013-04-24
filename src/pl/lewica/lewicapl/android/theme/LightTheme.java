@@ -37,9 +37,9 @@ public class LightTheme implements Theme {
 	@Override
 	public int getListHeadingColour(boolean read) {
 		if (read) {
-			return res.getColor(R.color.read);
+			return res.getColor(R.color.grey_dark);
 		} else {
-			return res.getColor(R.color.unread);
+			return res.getColor(R.color.read);
 		}
 	}
 
