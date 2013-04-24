@@ -233,9 +233,7 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 		int idxPublishedByEmail	= cursor.getColumnIndex(AnnouncementDAO.FIELD_PUBLISHED_EMAIL);
 
 		// When using previous-next facility you need to make sure the scroll view's position is at the top of the screen
-		ScrollView sv	= (ScrollView) findViewById(R.id.announcement_scroll_view);
-		sv.fullScroll(View.FOCUS_UP);
-		sv.setSmoothScrollingEnabled(true);
+		AndroidUtil.scrollToTop(R.id.announcement_scroll_view, this);
 
 		// Now start populating all views with data
 		tvTitle					= (TextView) findViewById(R.id.announcement_title);
