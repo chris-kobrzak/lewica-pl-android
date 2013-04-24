@@ -248,7 +248,7 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 
 		tvContent				= (TextView) findViewById(R.id.announcement_content);
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
-		tvContent.setText(cursor.getString(idxContent).replace("\r", "") );
+		tvContent.setText(AndroidUtil.removeCarriageReturns(cursor.getString(idxContent) ) );
 
 		// Where
 		tvWhere					= (TextView) findViewById(R.id.announcement_where);

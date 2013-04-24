@@ -281,7 +281,7 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 
 		tvContent					= (TextView) findViewById(R.id.blog_post_content);
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
-		tvContent.setText(cursor.getString(inxText).replace("\r", "") );
+		tvContent.setText(AndroidUtil.removeCarriageReturns(cursor.getString(inxText) ) );
 
 		tvAuthor = (TextView) findViewById(R.id.blog_post_author);
 		String author			= cursor.getString(inxPublishedBy);

@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.net.Uri;
 import android.view.View;
 import android.view.ViewParent;
+import android.widget.ScrollView;
 
 
 public class AndroidUtil {
@@ -59,6 +60,25 @@ public class AndroidUtil {
 		parentView.setBackgroundColor(colour);
 	}
 
+
+	/**
+	 * E.g. when using previous-next facility you need to make sure the scroll view's position is back at the top of the screen
+	 */
+	public static void scrollToTop(int scrollViewId, Activity activity) {
+		ScrollView sv	= (ScrollView) activity.findViewById(scrollViewId);
+		sv.fullScroll(View.FOCUS_UP);
+		sv.setSmoothScrollingEnabled(true);
+	}
+
+
+	/**
+	 * Fix for carriage returns displayed as rectangle characters in Android 1.6
+	 * @param str
+	 * @return
+	 */
+	public static String removeCarriageReturns(String str) {
+		return str.replace("\r", "");
+	}
 
 	/**
 	 * Activities on Android are invoked with a Uri string.  This method captures and returns the last bit of this Uri
