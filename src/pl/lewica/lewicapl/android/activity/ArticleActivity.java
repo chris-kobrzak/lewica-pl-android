@@ -279,22 +279,15 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 		}
 
 		// Save the URL in memory so the "share link" option in menu can access it easily
-		articleURL				= cursor.getString(inxURL);
+		articleURL		= cursor.getString(inxURL);
+		categoryID		= cursor.getInt(inxCategoryID);
+
+		loadCategoryLabel(categoryID);
+		loadDateTime(cursor.getLong(inxDatePub) );	// Dates are stored as Unix timestamps
 
 		// Now start populating all views with data
-		tvTitle					= (TextView) findViewById(R.id.article_title);
+		tvTitle			= (TextView) findViewById(R.id.article_title);
 		tvTitle.setText(cursor.getString(inxTitle) );
-
-		TextView tv;
-		tv							= (TextView) findViewById(R.id.article_category);
-		tv.setTypeface(categoryTypeface);
-		categoryID				= cursor.getInt(inxCategoryID);
-		tv.setText(getCategoryLabel(categoryID, context) );
-
-		tv							= (TextView) findViewById(R.id.article_date);
-		long unixTime		= cursor.getLong(inxDatePub);	// Dates are stored as Unix timestamps
-		Date d					= new Date(unixTime);
-		tv.setText(dateFormat.format(d) );
 
 		tvContent	= (TextView) findViewById(R.id.article_content);
 		tvContent.setText(AndroidUtil.removeCarriageReturns(cursor.getString(inxContent) ) );
@@ -302,7 +295,7 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 		loadEditorialComment(cursor.getString(inxComment) );
 
 		// Reset image to avoid issues when navigating between previous and next articles
-		ImageView iv			= (ImageView) findViewById(R.id.article_image);
+		ImageView iv		= (ImageView) findViewById(R.id.article_image);
 		iv.setImageBitmap(null);
 		if (cursor.getInt(inxHasThumb) == 1) {
 			loadImageFromCacheOrServer(ID, cursor.getString(inxThumbExt) );
@@ -317,28 +310,6 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 		cursor.close();
 
 		reloadListingTabAndMarkAsRead(ID, context);
-	}
-
-
-	/**
-	 * @param commentString
-	 */
-	private void loadEditorialComment(String commentString) {
-		tvComment		= (TextView) findViewById(R.id.article_editor_comment);
-		TextView tv	= (TextView) findViewById(R.id.article_editor_comment_top);
-
-		if (commentString == null || commentString.length() == 0) {
-			tvComment.setText("");
-			tvComment.setVisibility(View.GONE);	// Hide top, dark grey bar
-			tv.setVisibility(View.GONE);
-			return;
-		}
-
-		// We are still here so there is an editorial comment
-		tvComment.setText(AndroidUtil.removeCarriageReturns(commentString) );
-		tvComment.setVisibility(View.VISIBLE);
-		// Reset visibility, may be useful when users navigate between articles (previous-next facility to be added in the future)
-		tv.setVisibility(View.VISIBLE);
 	}
 
 
@@ -367,6 +338,39 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 		} else {
 			tvComment.setBackgroundColor(theme.getEditorsCommentBackgroundColour() );
 		}
+	}
+
+
+	/**
+	 * @param commentString
+	 */
+	private void loadEditorialComment(String commentString) {
+		tvComment		= (TextView) findViewById(R.id.article_editor_comment);
+		TextView tv	= (TextView) findViewById(R.id.article_editor_comment_top);
+
+		if (commentString == null || commentString.length() == 0) {
+			tvComment.setText("");
+			tvComment.setVisibility(View.GONE);	// Hide top, dark grey bar
+			tv.setVisibility(View.GONE);
+			return;
+		}
+
+		// We are still here so there is an editorial comment
+		tvComment.setText(AndroidUtil.removeCarriageReturns(commentString) );
+		tvComment.setVisibility(View.VISIBLE);
+		// Reset visibility, may be useful when users navigate between articles (previous-next facility to be added in the future)
+		tv.setVisibility(View.VISIBLE);
+	}
+
+
+	/**
+	 * @param unixTime
+	 */
+	private void loadDateTime(long unixTime) {
+		TextView tv;
+		tv							= (TextView) findViewById(R.id.article_date);
+		Date d					= new Date(unixTime);
+		tv.setText(dateFormat.format(d) );
 	}
 
 
@@ -400,23 +404,33 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 	}
 
 
-	private String getCategoryLabel(int categoryId, Context context) {
+	/**
+	 * Loads the article category label in the view
+	 */
+	private void loadCategoryLabel(int categoryId) {
+		TextView tv		= (TextView) findViewById(R.id.article_category);
+		tv.setTypeface(categoryTypeface);
+		tv.setText(getCategoryLabel(categoryId) );
+	}
+
+
+	private String getCategoryLabel(int categoryId) {
 		switch (categoryId) {
 			case Article.SECTION_POLAND:
-				return context.getString(R.string.heading_poland);
+				return getString(R.string.heading_poland);
 
 			case Article.SECTION_WORLD:
-				return context.getString(R.string.heading_world);
+				return getString(R.string.heading_world);
 
 			// TODO Confirm we need the case statements below
 			case Article.SECTION_OPINIONS:
-				return context.getString(R.string.heading_texts);
+				return getString(R.string.heading_texts);
 
 			case Article.SECTION_REVIEWS:
-				return context.getString(R.string.heading_reviews);
+				return getString(R.string.heading_reviews);
 
 			case Article.SECTION_CULTURE:
-				return context.getString(R.string.heading_culture);
+				return getString(R.string.heading_culture);
 		}
 		return null;
 	}
