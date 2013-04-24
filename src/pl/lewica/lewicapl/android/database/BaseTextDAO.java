@@ -44,7 +44,7 @@ public abstract class BaseTextDAO extends BaseLewicaPLDAO implements BaseColumns
 	 * @param recordID
 	 * @return
 	 */
-	public int updateMarkAsRead(long recordID) {
+	public int updateMarkRecordAsRead(long recordID) {
 		ContentValues cv	= new ContentValues();
 
 		cv.put(FIELD_WAS_READ, 1);

@@ -307,7 +307,7 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 		final Context contextThread	= context;
 		new Thread(new Runnable() {
 			public void run() {
-				blogPostDAO.updateMarkAsRead(blogPostIDThread);
+				blogPostDAO.updateMarkRecordAsRead(blogPostIDThread);
 				BroadcastSender.getInstance(contextThread).reloadTab(ApplicationRootActivity.Tab.BLOGS);
 			}
 		}).start();
