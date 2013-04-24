@@ -433,7 +433,7 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 
 		new Thread(new Runnable() {
 			public void run() {
-				articleDAO.updateMarkAsRead(articleId);
+				articleDAO.updateMarkRecordAsRead(articleId);
 				switch (categoryIdFinal) {
 					case Article.SECTION_POLAND:
 					case Article.SECTION_WORLD:

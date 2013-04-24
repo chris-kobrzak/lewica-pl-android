@@ -357,7 +357,7 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 		// Java threads require variables to be declared as final
 		new Thread(new Runnable() {
 			public void run() {
-				annDAO.updateMarkAsRead(articleId);
+				annDAO.updateMarkRecordAsRead(articleId);
 				BroadcastSender.getInstance(context).reloadTab(ApplicationRootActivity.Tab.ANNOUNCEMENTS);
 			}
 		}).start();
