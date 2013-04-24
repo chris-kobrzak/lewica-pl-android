@@ -271,10 +271,7 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 		int inxHasThumb	= cursor.getColumnIndex(ArticleDAO.FIELD_HAS_IMAGE);
 		int inxThumbExt	= cursor.getColumnIndex(ArticleDAO.FIELD_IMAGE_EXTENSION);
 
-		// When using previous-next facility you need to make sure the scroll view's position is at the top of the screen
-		ScrollView sv	= (ScrollView) findViewById(R.id.article_scroll_view);
-		sv.fullScroll(View.FOCUS_UP);
-		sv.setSmoothScrollingEnabled(true);
+		AndroidUtil.scrollToTop(R.id.article_scroll_view, this);
 
 		// On the same token, make sure an image belonging to another article never appears here as a result of an async process.
 		if (imageTask != null) {
@@ -300,23 +297,9 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 		tv.setText(dateFormat.format(d) );
 
 		tvContent	= (TextView) findViewById(R.id.article_content);
-		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
-		tvContent.setText(cursor.getString(inxContent).replace("\r", "") );
+		tvContent.setText(AndroidUtil.removeCarriageReturns(cursor.getString(inxContent) ) );
 
-		tvComment				= (TextView) findViewById(R.id.article_editor_comment);
-		tv			= (TextView) findViewById(R.id.article_editor_comment_top);
-		String commentString		= cursor.getString(inxComment);
-		if (commentString != null && commentString.length() > 0) {
-			tvComment.setText(commentString.replace("\r", "") );
-			// Reset visibility, may be useful when users navigate between articles (previous-next facility to be added in the future)
-			tv.setVisibility(View.VISIBLE);
-			tvComment.setVisibility(View.VISIBLE);
-		} else {
-			tvComment.setText("");
-			tv.setVisibility(View.GONE);
-			// Hide top, dark grey bar
-			tvComment.setVisibility(View.GONE);
-		}
+		loadEditorialComment(cursor.getString(inxComment) );
 
 		// Reset image to avoid issues when navigating between previous and next articles
 		ImageView iv			= (ImageView) findViewById(R.id.article_image);
@@ -334,6 +317,28 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 		cursor.close();
 
 		reloadListingTabAndMarkAsRead(ID, context);
+	}
+
+
+	/**
+	 * @param commentString
+	 */
+	private void loadEditorialComment(String commentString) {
+		tvComment		= (TextView) findViewById(R.id.article_editor_comment);
+		TextView tv	= (TextView) findViewById(R.id.article_editor_comment_top);
+
+		if (commentString == null || commentString.length() == 0) {
+			tvComment.setText("");
+			tvComment.setVisibility(View.GONE);	// Hide top, dark grey bar
+			tv.setVisibility(View.GONE);
+			return;
+		}
+
+		// We are still here so there is an editorial comment
+		tvComment.setText(AndroidUtil.removeCarriageReturns(commentString) );
+		tvComment.setVisibility(View.VISIBLE);
+		// Reset visibility, may be useful when users navigate between articles (previous-next facility to be added in the future)
+		tv.setVisibility(View.VISIBLE);
 	}
 
 
