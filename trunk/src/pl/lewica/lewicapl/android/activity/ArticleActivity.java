@@ -377,24 +377,21 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 
 
 	private void loadImageFromCacheOrServer(long articleId, String extension) {
-		boolean downloadImage		= true;
 		// Checking if this image is available in our local cache.
 		if (imageCache.isCached(articleID) ) {
 			Bitmap bitmap	= imageCache.get(articleID);
 			if (bitmap != null) {
 				loadImage(bitmap);
-				downloadImage		= false;
+				return;
 			}
 		}
-		// Image needs to downloaded from the server
-		if (downloadImage) {
-			String imageUrl		= ArticleURL.buildURLImage(articleId, extension);
+		// We are still here... image needs to downloaded from the server
+		String imageUrl		= ArticleURL.buildURLImage(articleId, extension);
 
-			// Images need to be downloaded in a separate thread as we cannot block the UI thread.
-			// Note: we do not currently cache images on this screen and they are downloaded from the Internet on every request.
-			imageTask	= new ImageLoadTask();
-			imageTask.execute(imageUrl);
-		}
+		// Images need to be downloaded in a separate thread as we cannot block the UI thread.
+		// Note: we do not currently cache images on this screen and they are downloaded from the Internet on every request.
+		imageTask	= new ImageLoadTask();
+		imageTask.execute(imageUrl);
 	}
 
 
