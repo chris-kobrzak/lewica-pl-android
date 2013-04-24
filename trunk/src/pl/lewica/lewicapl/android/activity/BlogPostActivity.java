@@ -250,9 +250,7 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 		int inxPublishedBy		= cursor.getColumnIndex(BlogPostDAO.FIELD_AUTHOR);
 
 		// When using previous-next facility you need to make sure the scroll view's position is at the top of the screen
-		ScrollView sv	= (ScrollView) findViewById(R.id.blog_post_scroll_view);
-		sv.fullScroll(View.FOCUS_UP);
-		sv.setSmoothScrollingEnabled(true);
+		AndroidUtil.scrollToTop(R.id.blog_post_scroll_view, this);
 
 		blogID					= cursor.getInt(inxBlogID);
 		blogPostURL			= URLDictionary.buildURL_BlogPost(cursor.getInt(inxBlogID), ID);
@@ -301,16 +299,7 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 		// Tidy up
 		cursor.close();
 
-		// Mark this blog_post as read without blocking the UI thread
-		// Java threads require variables to be declared as final
-		final long blogPostIDThread	= ID;
-		final Context contextThread	= context;
-		new Thread(new Runnable() {
-			public void run() {
-				blogPostDAO.updateMarkRecordAsRead(blogPostIDThread);
-				BroadcastSender.getInstance(contextThread).reloadTab(ApplicationRootActivity.Tab.BLOGS);
-			}
-		}).start();
+		reloadListingTabAndMarkAsRead(ID, context);
 	}
 
 
@@ -330,5 +319,21 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 		tvTitle.setTextColor(theme.getHeadingColour() );
 		tvContent.setTextColor(theme.getTextColour() );
 		tvAuthor.setTextColor(theme.getTextColour() );
+	}
+
+
+	/**
+	 * 1. Marks this blog post as read without blocking the UI thread (Java threads require variables to be declared as final)
+	 * 2. Asks listing screens to refresh
+	 * @param articleId
+	 * @param context
+	 */
+	private void reloadListingTabAndMarkAsRead(final long id, final Context context) {		
+		new Thread(new Runnable() {
+			public void run() {
+				blogPostDAO.updateMarkRecordAsRead(id);
+				BroadcastSender.getInstance(context).reloadTab(ApplicationRootActivity.Tab.BLOGS);
+			}
+		}).start();
 	}
 }
