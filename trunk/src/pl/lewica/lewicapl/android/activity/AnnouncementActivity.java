@@ -215,11 +215,11 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 	 * or navigating between announcements using the previous-next facility (not yet implemented).
 	 * @param id
 	 */
-	private void loadContent(long ID, Context context) {
+	private void loadContent(long id, Context context) {
 		// Save it in this object's field
-		annID	= ID;
+		annID	= id;
 		// Fetch database record
-		Cursor cursor				= annDAO.selectOne(ID);
+		Cursor cursor				= annDAO.selectOne(id);
 
 		startManagingCursor(cursor);
 
@@ -249,61 +249,11 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 		tvContent.setText(AndroidUtil.removeCarriageReturns(cursor.getString(idxContent) ) );
 
 		// Where
-		tvWhere					= (TextView) findViewById(R.id.announcement_where);
-		tvWhereLbl			= (TextView) findViewById(R.id.announcement_where_label);
-		String where			= cursor.getString(idxWhere);
-		if (where != null && where.length() > 0) {
-			tvWhere.setText(where);
-			// Reset visibility, may be useful when users navigate between announcements (previous-next facility to be added in the future)
-			tvWhere.setVisibility(View.VISIBLE);
-			
-			tvWhereLbl.setText(getString(R.string.label_where) );
-			tvWhereLbl.setVisibility(View.VISIBLE);
-		} else {
-			tvWhere.setText("");
-			tvWhere.setVisibility(View.GONE);
-			// Hide top, dark grey bar
-			tvWhereLbl.setText("");
-			tvWhereLbl.setVisibility(View.GONE);
-		}
+		loadEventLocation(cursor.getString(idxWhere) );
 		// When
-		tvWhen					= (TextView) findViewById(R.id.announcement_when);
-		tvWhenLbl				= (TextView) findViewById(R.id.announcement_when_label);
-		String when			= cursor.getString(idxWhen);
-		if (when != null && when.length() > 0) {
-			tvWhen.setText(when);
-			// Reset visibility, may be useful when users navigate between announcements (previous-next facility to be added in the future)
-			tvWhen.setVisibility(View.VISIBLE);
-			
-			tvWhenLbl.setText(getString(R.string.label_when) );
-			tvWhenLbl.setVisibility(View.VISIBLE);
-		} else {
-			tvWhen.setText("");
-			tvWhen.setVisibility(View.GONE);
-			// Hide top, dark grey bar
-			tvWhenLbl.setText("");
-			tvWhenLbl.setVisibility(View.GONE);
-		}
+		loadEventTime(cursor.getString(idxWhen) );
 
-		tvAuthor				= (TextView) findViewById(R.id.announcement_author);
-		String author			= cursor.getString(idxPublishedBy);
-		String authorEmail	= cursor.getString(idxPublishedByEmail);
-
-		if (author.length() == 0 && authorEmail.length() > 0) {
-			author				= authorEmail;
-		}
-		if (author.length() > 0) {
-			if (authorEmail.length() > 0) {
-				tvAuthor.setText(Html.fromHtml("<a href=\"mailto:" + authorEmail + "?subject=" + context.getString(R.string.email_subject_announcement) + "\">" + author + "</a>") );
-				tvAuthor.setMovementMethod(LinkMovementMethod.getInstance() );
-			} else {
-				tvAuthor.setText(author);
-			}
-			tvAuthor.setVisibility(View.VISIBLE);
-		} else {
-			tvAuthor.setText("");
-			tvAuthor.setVisibility(View.INVISIBLE);
-		}
+		loadAnnouncementAuthor(cursor.getString(idxPublishedBy), cursor.getString(idxPublishedByEmail) );
 
 		// Only mark the announcement as read once.  If it's already marked as such - just stop here.
 		if (cursor.getInt(idxWasRead) == 1) {
@@ -313,7 +263,7 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 		// Tidy up
 		cursor.close();
 
-		reloadListingTabAndMarkAsRead(ID, context);
+		reloadListingTabAndMarkAsRead(id, context);
 	}
 
 
@@ -343,6 +293,83 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 		tvAuthor.setTextSize(textSize);
 	}
 
+
+	/**
+	 * @param cursor
+	 * @param idxWhere
+	 */
+	private void loadEventLocation(String location) {
+		tvWhere			= (TextView) findViewById(R.id.announcement_where);
+		tvWhereLbl	= (TextView) findViewById(R.id.announcement_where_label);
+
+		if (location != null && location.length() > 0) {
+			tvWhere.setText(location);
+			// Reset visibility, may be useful when users navigate between announcements (previous-next facility to be added in the future)
+			tvWhere.setVisibility(View.VISIBLE);
+			
+			tvWhereLbl.setText(getString(R.string.label_where) );
+			tvWhereLbl.setVisibility(View.VISIBLE);
+			return;
+		}
+
+		tvWhere.setText("");
+		tvWhere.setVisibility(View.GONE);
+		// Hide top, dark grey bar
+		tvWhereLbl.setText("");
+		tvWhereLbl.setVisibility(View.GONE);
+	}
+
+
+	/**
+	 * @param dateTime
+	 */
+	private void loadEventTime(String dateTime) {
+		tvWhen					= (TextView) findViewById(R.id.announcement_when);
+		tvWhenLbl				= (TextView) findViewById(R.id.announcement_when_label);
+
+		if (dateTime != null && dateTime.length() > 0) {
+			tvWhen.setText(dateTime);
+			// Reset visibility, may be useful when users navigate between announcements (previous-next facility to be added in the future)
+			tvWhen.setVisibility(View.VISIBLE);
+
+			tvWhenLbl.setText(getString(R.string.label_when) );
+			tvWhenLbl.setVisibility(View.VISIBLE);
+			return;
+		}
+
+		tvWhen.setText("");
+		tvWhen.setVisibility(View.GONE);
+		// Hide top, dark grey bar
+		tvWhenLbl.setText("");
+		tvWhenLbl.setVisibility(View.GONE);
+	}
+
+
+	/**
+	 * @param author
+	 * @param authorEmail
+	 */
+	private void loadAnnouncementAuthor(String author, String authorEmail) {
+		tvAuthor		= (TextView) findViewById(R.id.announcement_author);
+
+		if (author.length() == 0 && authorEmail.length() > 0) {
+			author		= authorEmail;
+		}
+		if (author.length() > 0) {
+			if (authorEmail.length() > 0) {
+				String emailSubject	= getString(R.string.email_subject_announcement);
+				tvAuthor.setText(Html.fromHtml("<a href=\"mailto:" + authorEmail + "?subject=" + emailSubject + "\">" + author + "</a>") );
+				tvAuthor.setMovementMethod(LinkMovementMethod.getInstance() );
+			} else {
+				tvAuthor.setText(author);
+			}
+			tvAuthor.setVisibility(View.VISIBLE);
+			return;
+		}
+
+		tvAuthor.setText("");
+		tvAuthor.setVisibility(View.INVISIBLE);
+	}
 
 	/**
 	 * 1. Marks this article as read without blocking the UI thread (Java threads require variables to be declared as final)
