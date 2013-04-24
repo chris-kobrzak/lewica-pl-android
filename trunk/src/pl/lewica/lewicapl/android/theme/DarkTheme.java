@@ -37,9 +37,9 @@ public class DarkTheme implements Theme {
 
 	public int getListHeadingColour(boolean read) {
 		if (read) {
-			return res.getColor(R.color.blue_light);
+			return res.getColor(R.color.grey_dark2);
 		} else {
-			return res.getColor(R.color.red_light);
+			return res.getColor(R.color.blue_light);
 		}
 	}
 
