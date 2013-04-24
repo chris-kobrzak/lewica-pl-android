@@ -49,6 +49,7 @@ import pl.lewica.lewicapl.android.database.BlogPostDAO;
 import pl.lewica.lewicapl.android.database.HistoryDAO;
 import pl.lewica.util.DateUtil;
 import pl.lewica.util.FileUtil;
+import pl.lewica.util.LanguageUtil;
 
 
 /**
@@ -451,7 +452,6 @@ public class ContentUpdateManager {
 			case NEW_PUBLICATIONS:
 				// Notify the news and publication listing screens
 				broadcastSender.reloadTabsOnDataUpdate(DataModelType.ARTICLE);
-				Toast.makeText(context, context.getString(R.string.updated_articles), Toast.LENGTH_SHORT).show();
 
 				// No break statement here, just let it jump to the next NO_PUBLICATIONS case that will take care of deciding what to do next.
 
@@ -474,7 +474,6 @@ public class ContentUpdateManager {
 
 			case NEW_BLOG_POSTS:
 				broadcastSender.reloadTabsOnDataUpdate(DataModelType.BLOG_POST);
-				Toast.makeText(context, context.getString(R.string.updated_blog_entries), Toast.LENGTH_SHORT).show();
 
 				// No break statement here, just let it jump to the next NO_BLOG_ENTRIES case that will take care of deciding what to do next.
 
@@ -490,7 +489,6 @@ public class ContentUpdateManager {
 
 			case NEW_ANNOUNCEMENTS:
 				broadcastSender.reloadTabsOnDataUpdate(DataModelType.ANNOUNCEMENT);
-				Toast.makeText(context, context.getString(R.string.updated_announcements), Toast.LENGTH_SHORT).show();
 
 				// No break statement here, just let it jump to the next NO_ANNOUNCEMENTS case that will take care of deciding what to do next.
 
@@ -517,6 +515,51 @@ public class ContentUpdateManager {
 	}
 
 
+	private String getArticlesUpdateMessage(int totalUpdated) {
+		int messageId	= R.string.updated_1_article;
+
+		if (totalUpdated == 1) {
+			return context.getString(messageId);
+		}
+		if (LanguageUtil.isPolishAccusative(totalUpdated) ) {
+			messageId		= R.string.updated_2_articles;
+		} else if (LanguageUtil.isPolishGenitive(totalUpdated) ) {
+			messageId		= R.string.updated_5_articles;
+		}
+		return context.getString(messageId).replace("%s", Integer.toString(totalUpdated) );
+	}
+
+
+	private String getBlogPostsUpdateMessage(int totalUpdated) {
+		int messageId	= R.string.updated_1_blog_entry;
+		
+		if (totalUpdated == 1) {
+			return context.getString(messageId);
+		}
+		if (LanguageUtil.isPolishAccusative(totalUpdated) ) {
+			messageId		= R.string.updated_2_blog_entries;
+		} else if (LanguageUtil.isPolishGenitive(totalUpdated) ) {
+			messageId		= R.string.updated_5_blog_entries;
+		}
+		return context.getString(messageId).replace("%s", Integer.toString(totalUpdated) );
+	}
+
+
+	private String getAnnouncementsUpdateMessage(int totalUpdated) {
+		int messageId	= R.string.updated_1_announcement;
+		
+		if (totalUpdated == 1) {
+			return context.getString(messageId);
+		}
+		if (LanguageUtil.isPolishAccusative(totalUpdated) ) {
+			messageId		= R.string.updated_2_announcements;
+		} else if (LanguageUtil.isPolishGenitive(totalUpdated) ) {
+			messageId		= R.string.updated_5_announcements;
+		}
+		return context.getString(messageId).replace("%s", Integer.toString(totalUpdated) );
+	}
+
+
 	/**
 	 * Manages publications update and calls the thumbnails update once completed.
 	 * This is an <em>inner class</em>.
@@ -533,12 +576,15 @@ public class ContentUpdateManager {
 
 		@Override
 		protected void onPostExecute(UpdateStatus status) {
-			if (status.getTotalUpdated() == 0) {
+			int totalUpdates	= status.getTotalUpdated();
+			if (totalUpdates == 0) {
 				manageAndBroadcastUpdates(CommandType.NO_PUBLICATIONS, true);
 				return;
 			}
 			// Notify the update manager straight away so it can kick off the other update tasks.
 			manageAndBroadcastUpdates(CommandType.NEW_PUBLICATIONS, true);
+
+			Toast.makeText(context, getArticlesUpdateMessage(totalUpdates), Toast.LENGTH_SHORT).show();
 
 			// We are still here and that means there is at least one thumbnail to be downloaded.
 			new DownloadArticleThumbnailsTask().execute(status);
@@ -583,11 +629,14 @@ public class ContentUpdateManager {
 		
 		@Override
 		protected void onPostExecute(UpdateStatus status) {
-			if (status.getTotalUpdated() == 0) {
+			int totalUpdates	= status.getTotalUpdated();
+			if (totalUpdates == 0) {
 				manageAndBroadcastUpdates(CommandType.NO_BLOG_POSTS, true);
 				return;
 			}
 			manageAndBroadcastUpdates(CommandType.NEW_BLOG_POSTS, true);
+
+			Toast.makeText(context, getBlogPostsUpdateMessage(totalUpdates), Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -603,11 +652,14 @@ public class ContentUpdateManager {
 
 		@Override
 		protected void onPostExecute(UpdateStatus status) {
-			if (status.getTotalUpdated() == 0) {
+			int totalUpdates	= status.getTotalUpdated();
+			if (totalUpdates == 0) {
 				manageAndBroadcastUpdates(CommandType.NO_ANNOUNCEMENTS, true);
 				return;
 			}
 			manageAndBroadcastUpdates(CommandType.NEW_ANNOUNCEMENTS, true);
+
+			Toast.makeText(context, getAnnouncementsUpdateMessage(totalUpdates), Toast.LENGTH_SHORT).show();
 		}
 	}
 
