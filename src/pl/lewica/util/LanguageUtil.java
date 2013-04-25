@@ -17,18 +17,18 @@ package pl.lewica.util;
 
 public class LanguageUtil {
 
-	// PL Biernik: 2-5, 22-24
+	// PL Biernik: 2-4, 22-24
 	public static boolean isPolishAccusative(int number) {
-		if ( (number > 1 && number < 5) || (number > 21 && number < 25) ) {
+		if ( (number >= 2 && number <= 4) || (number >= 22 && number <= 24) ) {
 			return true;
 		}
 		return false;
 	}
 
 
-	// PL Dopełniacz: 6-21, 25
+	// PL Dopełniacz: 5-21, 25
 	public static boolean isPolishGenitive(int number) {
-		if ( (number > 5 && number < 21) || number == 25) {
+		if ( (number >= 5 && number <= 21) || number == 25) {
 			return true;
 		}
 		return false;
