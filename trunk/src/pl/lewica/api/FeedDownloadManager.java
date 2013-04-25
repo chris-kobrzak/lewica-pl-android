@@ -64,12 +64,10 @@ public class FeedDownloadManager {
 	 */
 	public List<DataModel> fetchAndParse(DataModelType modelType, String URL) {
 		List<DataModel> elements;
-		HTTPUtil httpUtil;
-		SAXParser saxp;
 
 		try {
-			saxp										= factory.newSAXParser();
-			httpUtil									= new HTTPUtil(URL);
+			SAXParser saxp								= factory.newSAXParser();
+			HTTPUtil httpUtil							= new HTTPUtil(URL);
 			final InputSource source			= new InputSource(httpUtil.getInputStream() );
 			final XMLReader xmlreader		= saxp.getXMLReader();
 			final DefaultHandler handler	= SAXParserHandlerFactory.create(modelType);
