@@ -47,7 +47,7 @@ public class BlogPostSAXHandler extends DefaultHandler implements SAXParserDeleg
 	static final  String BLOG_POST_TEXT		= "tekst";
 
 	// In case any parsing problems the date falls back to this value:
-	public String defaultDate	= "2000-01-01";
+	private String defaultDate	= "2000-01-01";
 
 	private List<DataModel> blogPosts;
 	private BlogPost currentBlogPost;
@@ -113,15 +113,7 @@ public class BlogPostSAXHandler extends DefaultHandler implements SAXParserDeleg
 			currentBlogPost.setAuthorID(authorID);
 		}
 		else if (name.equalsIgnoreCase(BLOG_POST_PUB_DATE) ) {
-			DateFormat df	= new SimpleDateFormat(DateUtil.DATE_MASK_SQL);
-			Date pubDate	;
-			
-			try {
-				pubDate	= df.parse(builder.toString() );
-			} catch (ParseException e) {
-				// We don't want to let an invalid date crash the application so let's just use any date
-				pubDate	= java.sql.Date.valueOf(defaultDate);
-			}
+			Date pubDate = DateUtil.parseDateString(builder.toString(), java.sql.Date.valueOf(defaultDate) );
 			currentBlogPost.setDatePublished(pubDate);
 		}
 		else if (name.equalsIgnoreCase(BLOG_POST_BLOG_TITLE) ) {
