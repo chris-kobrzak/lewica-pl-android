@@ -317,37 +317,36 @@ public class ContentUpdateManager {
 	 * @return UpdateStatus
 	 */
 	private UpdateStatus fetchAndSaveAnnouncements(Context context) {
-		UpdateStatus status						= new UpdateStatus();
-		FeedDownloadManager fdm			= new FeedDownloadManager();
-		AnnouncementURL annURL				= new AnnouncementURL();
-		AnnouncementDAO annDAO			= new AnnouncementDAO(context);
-		
-		annDAO.open();
-		int lastAnnID					= annDAO.fetchLastID();
-		
-		annURL.setNewerThan(lastAnnID);
-		annURL.setLimit(10);
-		
-		List<DataModel> anns	= fdm.fetchAndParse(DataModelType.ANNOUNCEMENT, annURL.buildURL() );
-		int totalAnns					= anns.size();
-		
+		AnnouncementDAO annDao	= new AnnouncementDAO(context);
+		annDao.open();
+		int lastAnnID			= annDao.fetchLastID();
+
+		AnnouncementURL annUrl	= new AnnouncementURL();
+		annUrl.setNewerThan(lastAnnID);
+		annUrl.setLimit(10);
+
+		FeedDownloadManager fdm	= new FeedDownloadManager();
+		List<DataModel> anns	= fdm.fetchAndParse(DataModelType.ANNOUNCEMENT, annUrl.buildURL() );
+		int totalAnns			= anns.size();
+
+		UpdateStatus status		= new UpdateStatus();
 		if (totalAnns == 0) {
-			annDAO.close();
+			annDao.close();
 			status.setTotalUpdated(0);
-			
+
 			return status;
 		}
-		
+
 		Announcement ann;
 		// Loop through downloaded articles and insert them to the database
 		for (DataModel element: anns) {
 			ann	= (Announcement) element;
-			annDAO.insert(ann);
+			annDao.insert(ann);
 		}
-		
-		annDAO.close();
+
+		annDao.close();
 		status.setTotalUpdated(totalAnns);
-		
+
 		return status;
 	}
 
