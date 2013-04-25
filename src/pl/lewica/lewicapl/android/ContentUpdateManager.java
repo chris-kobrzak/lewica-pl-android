@@ -44,6 +44,7 @@ import pl.lewica.api.url.ArticleURL;
 import pl.lewica.api.url.BlogPostURL;
 import pl.lewica.api.url.HistoryURL;
 import pl.lewica.lewicapl.R;
+import pl.lewica.lewicapl.android.ApplicationRootActivity.Tab;
 import pl.lewica.lewicapl.android.database.AnnouncementDAO;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
@@ -535,25 +536,10 @@ public class ContentUpdateManager {
 			// Notify the update manager straight away so it can kick off the other update tasks.
 			manageAndBroadcastUpdates(CommandType.NEW_PUBLICATIONS, true);
 
-			Toast.makeText(context, getArticlesUpdateMessage(totalUpdates), Toast.LENGTH_SHORT).show();
+			Toast.makeText(context, UpdateMessage.getPolishMessage(Tab.ARTICLES, totalUpdates, context), Toast.LENGTH_SHORT).show();
 
 			// We are still here and that means there is at least one thumbnail to be downloaded.
 			new DownloadArticleThumbnailsTask().execute(status);
-		}
-
-
-		private String getArticlesUpdateMessage(int totalUpdated) {
-			int messageId	= R.string.updated_1_article;
-
-			if (totalUpdated == 1) {
-				return context.getString(messageId);
-			}
-			if (LanguageUtil.isPolishAccusative(totalUpdated) ) {
-				messageId		= R.string.updated_2_articles;
-			} else if (LanguageUtil.isPolishGenitive(totalUpdated) ) {
-				messageId		= R.string.updated_5_articles;
-			}
-			return context.getString(messageId).replace("%s", Integer.toString(totalUpdated) );
 		}
 	}
 
@@ -602,22 +588,7 @@ public class ContentUpdateManager {
 			}
 			manageAndBroadcastUpdates(CommandType.NEW_BLOG_POSTS, true);
 
-			Toast.makeText(context, getBlogPostsUpdateMessage(totalUpdates), Toast.LENGTH_SHORT).show();
-		}
-
-
-		private String getBlogPostsUpdateMessage(int totalUpdated) {
-			int messageId	= R.string.updated_1_blog_entry;
-			
-			if (totalUpdated == 1) {
-				return context.getString(messageId);
-			}
-			if (LanguageUtil.isPolishAccusative(totalUpdated) ) {
-				messageId		= R.string.updated_2_blog_entries;
-			} else if (LanguageUtil.isPolishGenitive(totalUpdated) ) {
-				messageId		= R.string.updated_5_blog_entries;
-			}
-			return context.getString(messageId).replace("%s", Integer.toString(totalUpdated) );
+			Toast.makeText(context, UpdateMessage.getPolishMessage(Tab.BLOGS, totalUpdates, context), Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -640,22 +611,7 @@ public class ContentUpdateManager {
 			}
 			manageAndBroadcastUpdates(CommandType.NEW_ANNOUNCEMENTS, true);
 
-			Toast.makeText(context, getAnnouncementsUpdateMessage(totalUpdates), Toast.LENGTH_SHORT).show();
-		}
-
-
-		private String getAnnouncementsUpdateMessage(int totalUpdated) {
-			int messageId	= R.string.updated_1_announcement;
-			
-			if (totalUpdated == 1) {
-				return context.getString(messageId);
-			}
-			if (LanguageUtil.isPolishAccusative(totalUpdated) ) {
-				messageId		= R.string.updated_2_announcements;
-			} else if (LanguageUtil.isPolishGenitive(totalUpdated) ) {
-				messageId		= R.string.updated_5_announcements;
-			}
-			return context.getString(messageId).replace("%s", Integer.toString(totalUpdated) );
+			Toast.makeText(context, UpdateMessage.getPolishMessage(Tab.ANNOUNCEMENTS, totalUpdates, context), Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -671,11 +627,79 @@ public class ContentUpdateManager {
 
 		@Override
 		protected void onPostExecute(UpdateStatus status) {
-			if (status.getTotalUpdated() == 0) {
+			int totalUpdates	= status.getTotalUpdated();
+			if (totalUpdates == 0) {
 				manageAndBroadcastUpdates(CommandType.NO_HISTORY, true);
 				return;
 			}
 			manageAndBroadcastUpdates(CommandType.NEW_HISTORY, true);
+
+			Toast.makeText(context, UpdateMessage.getPolishMessage(Tab.HISTORY, totalUpdates, context), Toast.LENGTH_SHORT).show();
+		}
+	}
+
+
+	private static class UpdateMessage {
+		private enum GrammaticalForm {
+			SINGLE, ACCUSATIVE, GENITIVE
+		}
+
+
+		public static String getPolishMessage(Tab tab, int totalUpdated, Context context) {
+			GrammaticalForm form	= GrammaticalForm.SINGLE;
+
+			if (totalUpdated == 1) {
+
+			} else if (LanguageUtil.isPolishAccusative(totalUpdated) ) {
+				form	= GrammaticalForm.ACCUSATIVE;
+			} else if (LanguageUtil.isPolishGenitive(totalUpdated) ) {
+				form	= GrammaticalForm.GENITIVE;
+			}
+
+			switch (tab) {
+				case NEWS:
+				case ARTICLES:
+					switch (form) {
+						case SINGLE:
+							return context.getString(R.string.updated_1_article);
+						case ACCUSATIVE:
+							return context.getString(R.string.updated_2_articles).replace("%s", Integer.toString(totalUpdated) );
+						case GENITIVE:
+							return context.getString(R.string.updated_5_articles).replace("%s", Integer.toString(totalUpdated) );
+					}
+				break;
+				case BLOGS:
+					switch (form) {
+						case SINGLE:
+							return context.getString(R.string.updated_1_blog_entry);
+						case ACCUSATIVE:
+							return context.getString(R.string.updated_2_blog_entries).replace("%s", Integer.toString(totalUpdated) );
+						case GENITIVE:
+							return context.getString(R.string.updated_5_blog_entries).replace("%s", Integer.toString(totalUpdated) );
+					}
+				break;
+				case ANNOUNCEMENTS:
+					switch (form) {
+						case SINGLE:
+							return context.getString(R.string.updated_1_announcement);
+						case ACCUSATIVE:
+							return context.getString(R.string.updated_2_announcements).replace("%s", Integer.toString(totalUpdated) );
+						case GENITIVE:
+							return context.getString(R.string.updated_5_announcements).replace("%s", Integer.toString(totalUpdated) );
+					}
+				break;
+				case HISTORY:
+					switch (form) {
+						case SINGLE:
+							return context.getString(R.string.updated_1_history_item);
+						case ACCUSATIVE:
+							return context.getString(R.string.updated_2_history_items).replace("%s", Integer.toString(totalUpdated) );
+						case GENITIVE:
+							return context.getString(R.string.updated_5_history_items).replace("%s", Integer.toString(totalUpdated) );
+					}
+				break;
+			}
+			return null;
 		}
 	}
 }
