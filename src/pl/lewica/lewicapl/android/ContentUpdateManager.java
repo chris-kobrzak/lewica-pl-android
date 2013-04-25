@@ -357,32 +357,31 @@ public class ContentUpdateManager {
 	 * @return UpdateStatus
 	 */
 	private UpdateStatus fetchAndSaveHistoryEvents(Context context) {
-		UpdateStatus status				= new UpdateStatus();
-		FeedDownloadManager fdm	= new FeedDownloadManager();
-		HistoryURL historyURL			= new HistoryURL();
-		HistoryDAO historyDAO			= new HistoryDAO(context);
-
-		historyDAO.open();
+		HistoryDAO historyDao	= new HistoryDAO(context);
+		historyDao.open();
 
 		// We are only going to be pulling new records if the local database doesn't have any entries for a given day.
 		// This is to avoid duplicates in the database.
 		Calendar cal			= Calendar.getInstance();
 		int month				= cal.get(Calendar.MONTH) + 1;
 		int day					= cal.get(Calendar.DATE);
-		if (historyDAO.hasEntriesForDate(month, day) ) {
-			historyDAO.close();
+		UpdateStatus status		= new UpdateStatus();
+		if (historyDao.hasEntriesForDate(month, day) ) {
+			historyDao.close();
 			status.setTotalUpdated(0);
 
 			return status;
 		}
 
-		historyURL.setLimit(50);
+		HistoryURL historyUrl	= new HistoryURL();
+		historyUrl.setLimit(50);
 
-		List<DataModel> entries	= fdm.fetchAndParse(DataModelType.HISTORY, historyURL.buildURL() );
-		int totalAnns						= entries.size();
+		FeedDownloadManager fdm	= new FeedDownloadManager();
+		List<DataModel> entries	= fdm.fetchAndParse(DataModelType.HISTORY, historyUrl.buildURL() );
+		int totalEntries		= entries.size();
 
-		if (totalAnns == 0) {
-			historyDAO.close();
+		if (totalEntries == 0) {
+			historyDao.close();
 			status.setTotalUpdated(0);
 
 			return status;
@@ -392,16 +391,16 @@ public class ContentUpdateManager {
 		// Loop through downloaded articles and insert them to the database
 		for (DataModel element: entries) {
 			history	= (History) element;
-			historyDAO.insert(history);
+			historyDao.insert(history);
 		}
 
-		historyDAO.close();
+		historyDao.close();
 
-		status.setTotalUpdated(totalAnns);
+		status.setTotalUpdated(totalEntries);
 
 		return status;
 	}
-	
+
 
 	/**
 	 * Convenience method that can be used to trigger the update process.
