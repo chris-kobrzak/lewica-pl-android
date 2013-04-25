@@ -16,6 +16,8 @@
 package pl.lewica.util;
 
 import java.util.Date;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 /**
@@ -43,4 +45,20 @@ public class DateUtil {
 		return sdf.format(date);
 	}
 
+
+	/**
+	 * @return
+	 */
+	public static Date parseDateString(String dateString, Date fallOverDate) {
+		DateFormat df	= new SimpleDateFormat(DATE_MASK_SQL);
+		Date pubDate	;
+
+		try {
+			pubDate	= df.parse(dateString);
+		} catch (ParseException e) {
+			// We don't want to let an invalid date crash the application so let's just use any date
+			pubDate	= fallOverDate;
+		}
+		return pubDate;
+	}
 }
