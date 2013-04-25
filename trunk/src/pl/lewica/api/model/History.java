@@ -20,10 +20,10 @@ package pl.lewica.api.model;
  * @author Krzysztof Kobrzak
  */
 public class History implements DataModel {
-	public int year;
-	public int month;
-	public int day;
-	public String event;
+	private int year;
+	private int month;
+	private int day;
+	private String event;
 
 
 	public int getYear() {
