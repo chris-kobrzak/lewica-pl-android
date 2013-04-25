@@ -30,6 +30,9 @@ public class URLDictionary {
 	public static final String SEARCH		= "http://lewica.pl/index.php?s=szukaj";
 	public static final String TEAM			= "http://lewica.pl/index.php?s=redakcja";
 
+	public static final String IMAGE			= "http://lewica.pl/im/";
+	public static final String THUMBNAIL	= "http://lewica.pl/im/thumbs/";
+
 	private static String sBaseReadersComments	= "http://lewica.pl/forum/index.php?fuse=messages.";
 
 	public static class API {

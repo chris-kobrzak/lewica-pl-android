@@ -31,6 +31,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+import pl.lewica.URLDictionary;
 import pl.lewica.api.FeedDownloadManager;
 import pl.lewica.api.model.Announcement;
 import pl.lewica.api.model.Article;
@@ -254,7 +255,7 @@ public class ContentUpdateManager {
 
 			String imageName		= ArticleURL.buildNameThumbnail(ID, imageMeta.get("Ext") );
 			// Source image (on the server)
-			String imageURL			= ArticleURL.PATH_THUMBNAIL + imageName;
+			String imageURL			= URLDictionary.THUMBNAIL + imageName;
 			// Destination image (on phone's storage)
 			String imagePath		= storageDir.getPath() + "/" + imageName;
 
