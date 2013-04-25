@@ -22,15 +22,15 @@ import java.util.Date;
  * @author Krzysztof Kobrzak
  */
 public class Announcement implements DataModel {
-	public int ID;
-	public boolean wasRead;
-	public Date dateExpiry;
-	public String what;
-	public String where;
-	public String when;
-	public String content;
-	public String publishedBy;
-	public String publishedByEmail;
+	private int ID;
+	private boolean wasRead;
+	private Date dateExpiry;
+	private String what;
+	private String where;
+	private String when;
+	private String content;
+	private String publishedBy;
+	private String publishedByEmail;
 
 
 	public int getID() {
