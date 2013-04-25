@@ -167,7 +167,7 @@ public class PublicationListActivity extends Activity {
 		private static final int VIEW_TYPE_GROUP_CONTINUE	= 1;
 		private static final int VIEW_TYPE_COUNT					= 3;
 
-		public LayoutInflater inflater;
+		private LayoutInflater inflater;
 		private static Resources res;
 
 		private int colIndex_ID;
