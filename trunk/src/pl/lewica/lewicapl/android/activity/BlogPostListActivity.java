@@ -52,6 +52,7 @@ public class BlogPostListActivity extends Activity {
 
 	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.blogpostlistactivity.RELOAD";
 
+
 	// Currently it's only possible to filter the list by blog ID.
 	public static enum dataFilters {
 		BLOG_ID
@@ -95,29 +96,7 @@ public class BlogPostListActivity extends Activity {
 		listView.setAdapter(listAdapter);
 
 		// Clicking on an item should redirect to the details view
-		listView.setOnItemClickListener(new OnItemClickListener() {
-//			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Context context		= getApplicationContext();
-
-				// Redirect to article details screen
-				Intent intent	= new Intent(context, BlogPostActivity.class);
-				// Builds a uri in the following format: content://lewicapl/articles/article/[0-9]+
-				Uri uri			= Uri.parse(BlogPostActivity.BASE_URI + Long.toString(id) );
-				// Passes activity Uri as parameter that can be used to work out ID of requested article.
-				intent.setData(uri);
-				startActivity(intent);
-
-				// Mark current blog post as read by changing its colour...
-				TextView tv			= (TextView) view.findViewById(R.id.blog_post_item_title);
-				appTheme	= UserPreferencesManager.getThemeInstance(context);
-				tv.setTextColor(appTheme.getListHeadingColour(true) );
-				// ... and flagging it in local cache accordingly
-				clicked.add(id);
-
-				return;
-			}
-		});
+		listView.setOnItemClickListener(new BlogPostClickListener() );
 
 		appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
 		appTheme.setListViewDividerColour(listView, this);
@@ -141,6 +120,31 @@ public class BlogPostListActivity extends Activity {
 
 
 	// INNER CLASSES
+	private class BlogPostClickListener implements OnItemClickListener {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			Context context		= getApplicationContext();
+
+			// Redirect to article details screen
+			Intent intent	= new Intent(context, BlogPostActivity.class);
+			// Builds a uri in the following format: content://lewicapl/articles/article/[0-9]+
+			Uri uri			= Uri.parse(BlogPostActivity.BASE_URI + Long.toString(id) );
+			// Passes activity Uri as parameter that can be used to work out ID of requested article.
+			intent.setData(uri);
+			startActivity(intent);
+
+			// Mark current blog post as read by changing its colour...
+			TextView tv			= (TextView) view.findViewById(R.id.blog_post_item_title);
+			appTheme	= UserPreferencesManager.getThemeInstance(context);
+			tv.setTextColor(appTheme.getListHeadingColour(true) );
+			// ... and flagging it in local cache accordingly
+			clicked.add(id);
+
+			return;
+		}
+	}
+
+
 	private class BlogPostsUpdateBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {

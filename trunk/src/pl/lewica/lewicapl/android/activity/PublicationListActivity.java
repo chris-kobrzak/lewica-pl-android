@@ -107,29 +107,7 @@ public class PublicationListActivity extends Activity {
 		listView.setAdapter(listAdapter);
 
 		// Clicking on an item should redirect to the details view
-		listView.setOnItemClickListener(new OnItemClickListener() {
-//			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Context context		= getApplicationContext();
-
-				// Redirect to article details screen
-				Intent intent	= new Intent(context, ArticleActivity.class);
-				// Builds a uri in the following format: content://lewicapl/articles/article/[0-9]+
-				Uri uri			= Uri.parse(ArticleActivity.URI_BASE + Long.toString(id) );
-				// Passes activity Uri as parameter that can be used to work out ID of requested article.
-				intent.setData(uri);
-				startActivity(intent);
-
-				// Mark current article as read by changing its colour...
-				appTheme	= UserPreferencesManager.getThemeInstance(context);
-				TextView tv		= (TextView) view.findViewById(R.id.article_item_title);
-				tv.setTextColor(appTheme.getListHeadingColour(true) );
-				// ... and flagging it in local cache accordingly
-				clicked.add(id);
-
-				return;
-			}
-		});
+		listView.setOnItemClickListener(new ArticlesClickListener() );
 
 		appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
 		appTheme.setListViewDividerColour(listView, this);
@@ -142,6 +120,32 @@ public class PublicationListActivity extends Activity {
 		Cursor newCursor	= articleDAO.selectLatestTexts();
 		ca.changeCursor(newCursor);
 	}
+
+
+	private class ArticlesClickListener implements OnItemClickListener {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			Context context		= getApplicationContext();
+
+			// Redirect to article details screen
+			Intent intent	= new Intent(context, ArticleActivity.class);
+			// Builds a uri in the following format: content://lewicapl/articles/article/[0-9]+
+			Uri uri			= Uri.parse(ArticleActivity.URI_BASE + Long.toString(id) );
+			// Passes activity Uri as parameter that can be used to work out ID of requested article.
+			intent.setData(uri);
+			startActivity(intent);
+
+			// Mark current article as read by changing its colour...
+			appTheme	= UserPreferencesManager.getThemeInstance(context);
+			TextView tv		= (TextView) view.findViewById(R.id.article_item_title);
+			tv.setTextColor(appTheme.getListHeadingColour(true) );
+			// ... and flagging it in local cache accordingly
+			clicked.add(id);
+
+			return;
+		}
+	}
+
 
 
 	// INNER CLASSES

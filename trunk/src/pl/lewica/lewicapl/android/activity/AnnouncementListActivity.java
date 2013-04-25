@@ -88,29 +88,7 @@ public class AnnouncementListActivity extends Activity {
 		listView.setAdapter(listAdapter);
 
 		// Clicking on an item should redirect to the details view
-		listView.setOnItemClickListener(new OnItemClickListener() {
-//			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Context context		= getApplicationContext();
-
-				// Redirect to article details screen
-				Intent intent	= new Intent(context, AnnouncementActivity.class);
-				// Builds a uri in the following format: content://lewicapl/articles/article/[0-9]+
-				Uri uri			= Uri.parse(AnnouncementActivity.BASE_URI + Long.toString(id) );
-				// Passes activity Uri as parameter that can be used to work out ID of requested article.
-				intent.setData(uri);
-				startActivity(intent);
-
-				// Mark current announcement as read by changing its colour...
-				TextView tv					= (TextView) view.findViewById(R.id.announcement_item_title);
-				appTheme	= UserPreferencesManager.getThemeInstance(context);
-				tv.setTextColor(appTheme.getListHeadingColour(true) );
-				// ... and flagging it in local cache accordingly
-				clicked.add(id);
-
-				return;
-			}
-		});
+		listView.setOnItemClickListener(new AnnouncementClickListener() );
 
 		appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
 		appTheme.setListViewDividerColour(listView, this);
@@ -126,6 +104,31 @@ public class AnnouncementListActivity extends Activity {
 
 
 	// INNER CLASSES
+	private class AnnouncementClickListener implements OnItemClickListener {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			Context context		= getApplicationContext();
+
+			// Redirect to article details screen
+			Intent intent	= new Intent(context, AnnouncementActivity.class);
+			// Builds a uri in the following format: content://lewicapl/articles/article/[0-9]+
+			Uri uri			= Uri.parse(AnnouncementActivity.BASE_URI + Long.toString(id) );
+			// Passes activity Uri as parameter that can be used to work out ID of requested article.
+			intent.setData(uri);
+			startActivity(intent);
+
+			// Mark current announcement as read by changing its colour...
+			TextView tv					= (TextView) view.findViewById(R.id.announcement_item_title);
+			appTheme	= UserPreferencesManager.getThemeInstance(context);
+			tv.setTextColor(appTheme.getListHeadingColour(true) );
+			// ... and flagging it in local cache accordingly
+			clicked.add(id);
+
+			return;
+		}
+	}
+
+
 	private class AnnouncementsUpdateBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -134,7 +137,6 @@ public class AnnouncementListActivity extends Activity {
 			appTheme.setListViewDividerColour(listView, context);
 		}
 	}
-
 
 
 	/**
