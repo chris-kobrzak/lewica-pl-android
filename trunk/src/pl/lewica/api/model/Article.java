@@ -31,18 +31,18 @@ public class Article implements DataModel {
 	public static final int SECTION_REVIEWS		= 4;
 	public static final int SECTION_CULTURE		= 5;
 
-	public int ID;
-	public int articleCategoryID;
-	public List<Integer> relatedIDs;
-	public Date datePublished;
-	public boolean wasRead;
-	public boolean hasThumbnail;
-	public String imageExtension;
-	public URL URL;
-	public String title;
-	public String text;
-	public String editorComment;
-	public int totalComments;
+	private int ID;
+	private int articleCategoryID;
+	private List<Integer> relatedIDs;
+	private Date datePublished;
+	private boolean wasRead;
+	private boolean hasThumbnail;
+	private String imageExtension;
+	private URL URL;
+	private String title;
+	private String text;
+	private String editorComment;
+	private int totalComments;
 
 
 	public int getID() {

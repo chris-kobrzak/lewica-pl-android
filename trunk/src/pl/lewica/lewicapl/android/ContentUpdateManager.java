@@ -184,21 +184,20 @@ public class ContentUpdateManager {
 	 * @return UpdateStatus
 	 */
 	private UpdateStatus fetchAndSaveArticles(Context context) {
-		ArticleUpdateStatus status		= new ArticleUpdateStatus();
-		FeedDownloadManager fdm	= new FeedDownloadManager();
-		ArticleURL articleURL				= new ArticleURL();
-		ArticleDAO articleDAO			= new ArticleDAO(context);
-
+		ArticleDAO articleDAO	= new ArticleDAO(context);
 		articleDAO.open();
-		int lastArticleID						= articleDAO.fetchLastID();
+		int lastArticleID		= articleDAO.fetchLastID();
 
+		ArticleURL articleURL	= new ArticleURL();
 		articleURL.setSectionList("1,2,3,4,5");	// TODO This should be done using an array, not a list.
 		articleURL.setNewerThan(lastArticleID);
 		articleURL.setLimit(5);
 
-		List<DataModel> articles		= fdm.fetchAndParse(DataModelType.ARTICLE, articleURL.buildURL() );
-		int totalArticles						= articles.size();
+		FeedDownloadManager fdm	= new FeedDownloadManager();
+		List<DataModel> articles	= fdm.fetchAndParse(DataModelType.ARTICLE, articleURL.buildURL() );
+		int totalArticles			= articles.size();
 
+		ArticleUpdateStatus status	= new ArticleUpdateStatus();
 		if (totalArticles == 0) {
 			articleDAO.close();
 			status.setTotalUpdated(0);
@@ -208,14 +207,13 @@ public class ContentUpdateManager {
 
 		// A container for images to be downloaded.  Order of downloads doesn't matter hence Set instead of ArrayList.
 		Set<Map<String, String>> set	= new HashSet<Map<String, String>>();
-		Article article;
 
 		// Loop through downloaded articles and insert them to the database
 		for (DataModel element: articles) {
-			article	= (Article) element;
+			Article article	= (Article) element;
 			articleDAO.insert(article);
 
-			if (! article.hasThumbnail ) {
+			if (! article.hasThumbnail() ) {
 				continue;
 			}
 
@@ -224,7 +222,7 @@ public class ContentUpdateManager {
 			// This is to be able to show them updated content as soon as possible since text downloads are much faster than images.
 			Map<String,String> imageMeta	= new HashMap<String,String>();
 			imageMeta.put("ID", Integer.toString(article.getID() ) );
-			imageMeta.put("Ext", article.imageExtension );
+			imageMeta.put("Ext", article.getImageExtension() );
 			set.add(imageMeta);
 		}
 
@@ -515,51 +513,6 @@ public class ContentUpdateManager {
 	}
 
 
-	private String getArticlesUpdateMessage(int totalUpdated) {
-		int messageId	= R.string.updated_1_article;
-
-		if (totalUpdated == 1) {
-			return context.getString(messageId);
-		}
-		if (LanguageUtil.isPolishAccusative(totalUpdated) ) {
-			messageId		= R.string.updated_2_articles;
-		} else if (LanguageUtil.isPolishGenitive(totalUpdated) ) {
-			messageId		= R.string.updated_5_articles;
-		}
-		return context.getString(messageId).replace("%s", Integer.toString(totalUpdated) );
-	}
-
-
-	private String getBlogPostsUpdateMessage(int totalUpdated) {
-		int messageId	= R.string.updated_1_blog_entry;
-		
-		if (totalUpdated == 1) {
-			return context.getString(messageId);
-		}
-		if (LanguageUtil.isPolishAccusative(totalUpdated) ) {
-			messageId		= R.string.updated_2_blog_entries;
-		} else if (LanguageUtil.isPolishGenitive(totalUpdated) ) {
-			messageId		= R.string.updated_5_blog_entries;
-		}
-		return context.getString(messageId).replace("%s", Integer.toString(totalUpdated) );
-	}
-
-
-	private String getAnnouncementsUpdateMessage(int totalUpdated) {
-		int messageId	= R.string.updated_1_announcement;
-		
-		if (totalUpdated == 1) {
-			return context.getString(messageId);
-		}
-		if (LanguageUtil.isPolishAccusative(totalUpdated) ) {
-			messageId		= R.string.updated_2_announcements;
-		} else if (LanguageUtil.isPolishGenitive(totalUpdated) ) {
-			messageId		= R.string.updated_5_announcements;
-		}
-		return context.getString(messageId).replace("%s", Integer.toString(totalUpdated) );
-	}
-
-
 	/**
 	 * Manages publications update and calls the thumbnails update once completed.
 	 * This is an <em>inner class</em>.
@@ -588,6 +541,21 @@ public class ContentUpdateManager {
 
 			// We are still here and that means there is at least one thumbnail to be downloaded.
 			new DownloadArticleThumbnailsTask().execute(status);
+		}
+
+
+		private String getArticlesUpdateMessage(int totalUpdated) {
+			int messageId	= R.string.updated_1_article;
+
+			if (totalUpdated == 1) {
+				return context.getString(messageId);
+			}
+			if (LanguageUtil.isPolishAccusative(totalUpdated) ) {
+				messageId		= R.string.updated_2_articles;
+			} else if (LanguageUtil.isPolishGenitive(totalUpdated) ) {
+				messageId		= R.string.updated_5_articles;
+			}
+			return context.getString(messageId).replace("%s", Integer.toString(totalUpdated) );
 		}
 	}
 
@@ -638,6 +606,21 @@ public class ContentUpdateManager {
 
 			Toast.makeText(context, getBlogPostsUpdateMessage(totalUpdates), Toast.LENGTH_SHORT).show();
 		}
+
+
+		private String getBlogPostsUpdateMessage(int totalUpdated) {
+			int messageId	= R.string.updated_1_blog_entry;
+			
+			if (totalUpdated == 1) {
+				return context.getString(messageId);
+			}
+			if (LanguageUtil.isPolishAccusative(totalUpdated) ) {
+				messageId		= R.string.updated_2_blog_entries;
+			} else if (LanguageUtil.isPolishGenitive(totalUpdated) ) {
+				messageId		= R.string.updated_5_blog_entries;
+			}
+			return context.getString(messageId).replace("%s", Integer.toString(totalUpdated) );
+		}
 	}
 
 
@@ -660,6 +643,21 @@ public class ContentUpdateManager {
 			manageAndBroadcastUpdates(CommandType.NEW_ANNOUNCEMENTS, true);
 
 			Toast.makeText(context, getAnnouncementsUpdateMessage(totalUpdates), Toast.LENGTH_SHORT).show();
+		}
+
+
+		private String getAnnouncementsUpdateMessage(int totalUpdated) {
+			int messageId	= R.string.updated_1_announcement;
+			
+			if (totalUpdated == 1) {
+				return context.getString(messageId);
+			}
+			if (LanguageUtil.isPolishAccusative(totalUpdated) ) {
+				messageId		= R.string.updated_2_announcements;
+			} else if (LanguageUtil.isPolishGenitive(totalUpdated) ) {
+				messageId		= R.string.updated_5_announcements;
+			}
+			return context.getString(messageId).replace("%s", Integer.toString(totalUpdated) );
 		}
 	}
 
