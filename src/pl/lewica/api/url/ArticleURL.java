@@ -26,8 +26,6 @@ import pl.lewica.URLDictionary;
  */
 public class ArticleURL implements WebServiceURL {
 
-	public static final String PATH_IMAGE					= "http://lewica.pl/im/";
-	public static final String PATH_THUMBNAIL			= "http://lewica.pl/im/thumbs/";
 	public static final String PREFIX_THUMBNAIL		= "th_";
 	public static final int LIMIT								= 5;
 
@@ -89,7 +87,7 @@ public class ArticleURL implements WebServiceURL {
 	 * @return
 	 */
 	public static String buildURLImage(long id, String extension) {
-		StringBuilder sb	= new StringBuilder(PATH_IMAGE);
+		StringBuilder sb	= new StringBuilder(URLDictionary.IMAGE);
 
 		sb.append(id);
 		sb.append(".");
