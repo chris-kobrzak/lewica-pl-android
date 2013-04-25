@@ -30,7 +30,7 @@ import pl.lewica.api.model.DataModel;
  * @author Krzysztof Kobrzak
  */
 public class HistorySAXHandler extends DefaultHandler implements SAXParserDelegate {
-	List<DataModel> calendarEntries;
+	private List<DataModel> calendarEntries;
 	private History currentEntry;
 	private int	 entryDay;
 	private int	 entryMonth;
