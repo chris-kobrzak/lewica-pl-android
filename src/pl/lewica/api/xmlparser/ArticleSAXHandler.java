@@ -21,6 +21,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -32,6 +33,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import pl.lewica.api.model.Article;
 import pl.lewica.api.model.DataModel;
 import pl.lewica.util.DateUtil;
+import pl.lewica.util.ListUtil;
 
 /**
  * Articles feed XML parser using the SAX engine.
@@ -51,7 +53,7 @@ public class ArticleSAXHandler extends DefaultHandler implements SAXParserDelega
 	public static final  String ARTICLE_EDITOR_COMMENT	= "opinia";
 
 	// In case any parsing problems the date falls back to this value:
-	public String defaultDate	= "2000-01-01";
+	private String defaultDate	= "2000-01-01";
 
 	private List<DataModel> articles;
 	private Article currentArticle;
@@ -112,26 +114,11 @@ public class ArticleSAXHandler extends DefaultHandler implements SAXParserDelega
 			currentArticle.setArticleCategoryID(categoryID);
 		}
 		else if (name.equalsIgnoreCase(ARTICLE_RELATED_IDS) ) {
-			List<Integer> articleIDs	= new ArrayList<Integer>();
-			Scanner s						= new Scanner(builder.toString() );
-			s.useDelimiter(",");
-
-			while (s.hasNextInt() ) {
-				articleIDs.add(s.nextInt() );
-			}
-			s.close();
+			List<Integer> articleIDs = ListUtil.parseIntegersList(builder.toString() );
 			currentArticle.setRelatedIDs(articleIDs);
 		}
 		else if (name.equalsIgnoreCase(ARTICLE_PUB_DATE) ) {
-			DateFormat df	= new SimpleDateFormat(DateUtil.DATE_MASK_SQL);
-			Date pubDate	;
-
-			try {
-				pubDate	= df.parse(builder.toString() );
-			} catch (ParseException e) {
-				// We don't want to let an invalid date crash the application so let's just use any date
-				pubDate	= java.sql.Date.valueOf(defaultDate);
-			}
+			Date pubDate = DateUtil.parseDateString(builder.toString(), java.sql.Date.valueOf(defaultDate) );
 			currentArticle.setDatePublished(pubDate);
 		}
 		else if (name.equalsIgnoreCase(ARTICLE_IMAGE) ) {
