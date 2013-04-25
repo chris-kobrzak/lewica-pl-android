@@ -22,15 +22,15 @@ import java.util.Date;
  * @author Krzysztof Kobrzak
  */
 public class BlogPost implements DataModel {
-	public int ID;
-	public int blogID;
-	public int authorID;
-	public Date datePublished;
-	public boolean wasRead;
-	public String blogTitle;
-	public String author;
-	public String title;
-	public String text;
+	private int ID;
+	private int blogID;
+	private int authorID;
+	private Date datePublished;
+	private boolean wasRead;
+	private String blogTitle;
+	private String author;
+	private String title;
+	private String text;
 
 
 	public int getID() {

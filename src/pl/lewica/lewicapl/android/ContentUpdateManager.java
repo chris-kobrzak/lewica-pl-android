@@ -277,20 +277,19 @@ public class ContentUpdateManager {
 	 * @return UpdateStatus
 	 */
 	private UpdateStatus fetchAndSaveBlogPosts(Context context) {
-		UpdateStatus status						= new UpdateStatus();
-		FeedDownloadManager fdm			= new FeedDownloadManager();
-		BlogPostURL blogPostURL				= new BlogPostURL();
-		BlogPostDAO blogPostDAO			= new BlogPostDAO(context);
-
+		BlogPostDAO blogPostDAO		= new BlogPostDAO(context);
 		blogPostDAO.open();
-		int lastBlogPostID					= blogPostDAO.fetchLastID();
+		int lastBlogPostID			= blogPostDAO.fetchLastID();
 
+		BlogPostURL blogPostURL		= new BlogPostURL();
 		blogPostURL.setNewerThan(lastBlogPostID);
 		blogPostURL.setLimit(15);
 
+		FeedDownloadManager fdm		= new FeedDownloadManager();
 		List<DataModel> blogPosts	= fdm.fetchAndParse(DataModelType.BLOG_POST, blogPostURL.buildURL() );
-		int totalBlogPosts					= blogPosts.size();
+		int totalBlogPosts			= blogPosts.size();
 
+		UpdateStatus status			= new UpdateStatus();
 		if (totalBlogPosts == 0) {
 			blogPostDAO.close();
 			status.setTotalUpdated(0);
