@@ -72,6 +72,9 @@
 	<string name="updated_1_blog_entry">Pobrano nowy wpis blogowy</string>
 	<string name="updated_2_blog_entries">Pobrano %s nowe wpisy blogowe</string>
 	<string name="updated_5_blog_entries">Pobrano %s nowych wpisów blogowych</string>
+	<string name="updated_1_history_item">Pobrano nową pozycję w dziale historii</string>
+	<string name="updated_2_history_items">Pobrano %s nowe pozycje w dziale historii</string>
+	<string name="updated_5_history_items">Pobrano %s nowych pozycji w dziale historii</string>
 	<string name="placeholder_category">Kategoria</string>
 	<string name="placeholder_content">Treść</string>
 	<string name="placeholder_date">Data</string>
