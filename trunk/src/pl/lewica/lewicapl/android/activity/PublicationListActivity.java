@@ -174,13 +174,13 @@ public class PublicationListActivity extends Activity {
 		private LayoutInflater inflater;
 		private static Resources res;
 
-		private int colIndex_ID;
-		private int colIndex_CategoryID;
-		private int colIndex_Title;
-		private int colIndex_DatePub;
-		private int colIndex_WasRead;
-		private int colIndex_HasThumb;
-		private int colIndex_ThumbExt;
+		private int inxID;
+		private int inxCategoryID;
+		private int inxTitle;
+		private int inxDatePub;
+		private int inxWasRead;
+		private int inxHasThumb;
+		private int inxThumbExt;
 
 		private static SimpleDateFormat dateFormat	= new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
@@ -194,13 +194,13 @@ public class PublicationListActivity extends Activity {
 			res					= context.getResources();
 
 			// Get and cache column indices
-			colIndex_ID					= cursor.getColumnIndex(ArticleDAO.FIELD_ID);
-			colIndex_CategoryID		= cursor.getColumnIndex(ArticleDAO.FIELD_CATEGORY_ID);
-			colIndex_Title				= cursor.getColumnIndex(ArticleDAO.FIELD_TITLE);
-			colIndex_DatePub			= cursor.getColumnIndex(ArticleDAO.FIELD_DATE_PUBLISHED);
-			colIndex_WasRead			= cursor.getColumnIndex(ArticleDAO.FIELD_WAS_READ);
-			colIndex_HasThumb		= cursor.getColumnIndex(ArticleDAO.FIELD_HAS_IMAGE);
-			colIndex_ThumbExt		= cursor.getColumnIndex(ArticleDAO.FIELD_IMAGE_EXTENSION);
+			inxID					= cursor.getColumnIndex(ArticleDAO.FIELD_ID);
+			inxCategoryID		= cursor.getColumnIndex(ArticleDAO.FIELD_CATEGORY_ID);
+			inxTitle				= cursor.getColumnIndex(ArticleDAO.FIELD_TITLE);
+			inxDatePub			= cursor.getColumnIndex(ArticleDAO.FIELD_DATE_PUBLISHED);
+			inxWasRead			= cursor.getColumnIndex(ArticleDAO.FIELD_WAS_READ);
+			inxHasThumb		= cursor.getColumnIndex(ArticleDAO.FIELD_HAS_IMAGE);
+			inxThumbExt		= cursor.getColumnIndex(ArticleDAO.FIELD_IMAGE_EXTENSION);
 		}
 
 		/**
@@ -211,26 +211,26 @@ public class PublicationListActivity extends Activity {
 			appTheme	= UserPreferencesManager.getThemeInstance(context);
 
 			// Title
-			boolean unread	= cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) );
+			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! clicked.contains(cursor.getLong(inxID) );
 			TextView tv	= (TextView) view.findViewById(R.id.article_item_title);
 			tv.setTextColor(appTheme.getListHeadingColour(! unread) );
-			tv.setText(cursor.getString(colIndex_Title) );
+			tv.setText(cursor.getString(inxTitle) );
 			// Publications do not have editor's comments so no need for the pencil icon here
 			ImageView iv	= (ImageView) view.findViewById(R.id.ico_pencil);
 			iv.setVisibility(View.GONE);
 			// Datetime
 			TextView tvDate	= (TextView) view.findViewById(R.id.article_item_date);
-			long unixTime	= cursor.getLong(colIndex_DatePub);	// Dates are stored as Unix timestamps
+			long unixTime	= cursor.getLong(inxDatePub);	// Dates are stored as Unix timestamps
 			Date d				= new Date(unixTime);
 			tvDate.setText(dateFormat.format(d) );
 
 			// Thumbnail
 			iv	= (ImageView) view.findViewById(R.id.article_item_icon);
 			iv.setImageBitmap(null);
-			if (cursor.getInt(colIndex_HasThumb) == 0) {
+			if (cursor.getInt(inxHasThumb) == 0) {
 				iv.setVisibility(View.INVISIBLE);
 			} else {
-				String imgPath	= storageDir.getPath() + "/" + ArticleURL.buildNameThumbnail(cursor.getLong(colIndex_ID), cursor.getString(colIndex_ThumbExt) );
+				String imgPath	= storageDir.getPath() + "/" + ArticleURL.buildNameThumbnail(cursor.getLong(inxID), cursor.getString(inxThumbExt) );
 				Bitmap bMap		= BitmapFactory.decodeFile(imgPath);
 				iv.setImageBitmap(bMap);
 				// Reset image to avoid issues when navigating between previous and next articles
@@ -238,24 +238,7 @@ public class PublicationListActivity extends Activity {
 			}
 
 			// If there is a group header, set their values
-			tv	= (TextView) view.findViewById(R.id.article_items_heading);
-			if (tv != null) {
-				tv.setTypeface(categoryTypeface);
-
-				switch (cursor.getInt(colIndex_CategoryID) ) {
-					case Article.SECTION_OPINIONS:
-						tv.setText(context.getString(R.string.heading_texts) );
-						break;
-						
-					case Article.SECTION_REVIEWS:
-						tv.setText(context.getString(R.string.heading_reviews) );
-						break;
-						
-					case Article.SECTION_CULTURE:
-						tv.setText(context.getString(R.string.heading_culture) );
-						break;
-				}
-			}
+			loadCategoryLabel(cursor.getInt(inxCategoryID), view, context);
 
 			tvDate.setTextColor(appTheme.getListTextColour() );
 			view.setBackgroundColor(appTheme.getBackgroundColour() );
@@ -338,9 +321,9 @@ public class PublicationListActivity extends Activity {
 				return false;
 			}
 			// Get date values for current and previous data items
-			int categoryID		= cursor.getInt(colIndex_CategoryID);
+			int categoryID		= cursor.getInt(inxCategoryID);
 			cursor.moveToPosition(position - 1);
-			int categoryIDPrev	= cursor.getInt(colIndex_CategoryID);
+			int categoryIDPrev	= cursor.getInt(inxCategoryID);
 			// Restore cursor position
 			cursor.moveToPosition(position);
 			
@@ -349,6 +332,22 @@ public class PublicationListActivity extends Activity {
 			} else {
 				return true;
 			}
+		}
+
+
+		/**
+		 * @param view
+		 * @param context
+		 * @param cursor
+		 */
+		private void loadCategoryLabel(int categoryId, View view, Context context) {
+			TextView tv	= (TextView) view.findViewById(R.id.article_items_heading);
+			if (tv == null) {
+				return;
+			}
+
+			tv.setTypeface(categoryTypeface);
+			tv.setText(ArticleUtil.getCategoryLabel(categoryId, context) );
 		}
 	}
 	// End of NewsCursorAdapter
