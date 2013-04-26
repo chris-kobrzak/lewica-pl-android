@@ -410,29 +410,7 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 	private void loadCategoryLabel(int categoryId) {
 		TextView tv		= (TextView) findViewById(R.id.article_category);
 		tv.setTypeface(categoryTypeface);
-		tv.setText(getCategoryLabel(categoryId) );
-	}
-
-
-	private String getCategoryLabel(int categoryId) {
-		switch (categoryId) {
-			case Article.SECTION_POLAND:
-				return getString(R.string.heading_poland);
-
-			case Article.SECTION_WORLD:
-				return getString(R.string.heading_world);
-
-			// TODO Confirm we need the case statements below
-			case Article.SECTION_OPINIONS:
-				return getString(R.string.heading_texts);
-
-			case Article.SECTION_REVIEWS:
-				return getString(R.string.heading_reviews);
-
-			case Article.SECTION_CULTURE:
-				return getString(R.string.heading_culture);
-		}
-		return null;
+		tv.setText(ArticleUtil.getCategoryLabel(categoryId, getApplicationContext() ) );
 	}
 
 
