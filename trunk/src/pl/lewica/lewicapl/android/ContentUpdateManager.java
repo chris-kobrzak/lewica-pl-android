@@ -261,7 +261,7 @@ public class ContentUpdateManager {
 			String imagePath		= storageDir.getPath() + "/" + imageName;
 
 			try {
-				return FileUtil.fetchAndSaveImage(imageURL, imagePath, false);
+				FileUtil.fetchAndSaveImage(imageURL, imagePath, false);
 			} catch (MalformedURLException e) {
 				Log.w(TAG, "MalformedURLException: " + e.getMessage() );
 			} catch (IOException e) {
