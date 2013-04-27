@@ -11,7 +11,7 @@ public interface Theme {
 
 	public int getListHeadingColour(boolean read);
 
-	public int getListTextColour();
+	public int getListTextColour(boolean read);
 
 	public void setListViewDividerColour(ListView listView, Context context);
 

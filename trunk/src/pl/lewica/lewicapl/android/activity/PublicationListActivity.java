@@ -212,7 +212,7 @@ public class PublicationListActivity extends Activity {
 			long unixTime	= cursor.getLong(inxDatePub);	// Dates are stored as Unix timestamps
 			Date d				= new Date(unixTime);
 			tvDate.setText(dateFormat.format(d) );
-			tvDate.setTextColor(appTheme.getListTextColour() );
+			tvDate.setTextColor(appTheme.getListTextColour(! unread) );
 
 			// Thumbnail
 			loadImage(cursor, view);

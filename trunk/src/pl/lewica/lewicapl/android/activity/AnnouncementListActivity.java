@@ -204,7 +204,7 @@ public class AnnouncementListActivity extends Activity {
 				tvWhereWhen.setVisibility(View.GONE);
 			}
 
-			tvWhereWhen.setTextColor(appTheme.getListTextColour() );
+			tvWhereWhen.setTextColor(appTheme.getListTextColour(! unread) );
 			view.setBackgroundColor(appTheme.getBackgroundColour() );
 		}
 
