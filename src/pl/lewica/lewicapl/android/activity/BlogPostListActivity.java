@@ -171,12 +171,12 @@ public class BlogPostListActivity extends Activity {
 		public LayoutInflater inflater;
 		private static Resources res;
 
-		private int colIndex_ID;
-		private int colIndex_WasRead;
-		private int colIndex_DatePub;
-		private int colIndex_Title;
-		private int colIndex_Author;
-		private int colIndex_Blog;
+		private int inxID;
+		private int inxWasRead;
+		private int inxDatePub;
+		private int inxTitle;
+		private int inxAuthor;
+		private int inxBlog;
 
 		private static SimpleDateFormat dateFormat	= new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
@@ -191,12 +191,12 @@ public class BlogPostListActivity extends Activity {
 			res					= context.getResources();
 
 			// Get and cache column indices
-			colIndex_ID					= cursor.getColumnIndex(BlogPostDAO.FIELD_ID);
-			colIndex_WasRead			= cursor.getColumnIndex(BlogPostDAO.FIELD_WAS_READ);
-			colIndex_DatePub			= cursor.getColumnIndex(BlogPostDAO.FIELD_DATE_PUBLISHED);
-			colIndex_Title				= cursor.getColumnIndex(BlogPostDAO.FIELD_TITLE);
-			colIndex_Author				= cursor.getColumnIndex(BlogPostDAO.FIELD_AUTHOR);
-			colIndex_Blog				= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_TITLE);
+			inxID					= cursor.getColumnIndex(BlogPostDAO.FIELD_ID);
+			inxWasRead			= cursor.getColumnIndex(BlogPostDAO.FIELD_WAS_READ);
+			inxDatePub			= cursor.getColumnIndex(BlogPostDAO.FIELD_DATE_PUBLISHED);
+			inxTitle				= cursor.getColumnIndex(BlogPostDAO.FIELD_TITLE);
+			inxAuthor				= cursor.getColumnIndex(BlogPostDAO.FIELD_AUTHOR);
+			inxBlog				= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_TITLE);
 		}
 
 		/**
@@ -206,18 +206,18 @@ public class BlogPostListActivity extends Activity {
 		public void bindView(View view, Context context, Cursor cursor) {
 			appTheme	= UserPreferencesManager.getThemeInstance(context);
 
-			boolean unread	= cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) );
+			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! clicked.contains(cursor.getLong(inxID) );
 			TextView tvTitle	= (TextView) view.findViewById(R.id.blog_post_item_title);
 			tvTitle.setTextColor(appTheme.getListHeadingColour(! unread) );
-			tvTitle.setText(cursor.getString(colIndex_Author) + ": " + cursor.getString(colIndex_Title) );
+			tvTitle.setText(cursor.getString(inxAuthor) + ": " + cursor.getString(inxTitle) );
 
 			TextView tvDate	= (TextView) view.findViewById(R.id.blog_post_item_date);
-			long unixTime	= cursor.getLong(colIndex_DatePub);
+			long unixTime	= cursor.getLong(inxDatePub);
 			Date d				= new Date(unixTime);
 			tvDate.setText(dateFormat.format(d) );
 
 			TextView tvBlog	= (TextView) view.findViewById(R.id.blog_post_item_blog_title);
-			String blogTitle	= cursor.getString(colIndex_Blog);
+			String blogTitle	= cursor.getString(inxBlog);
 			if (blogTitle.length() > 0) {
 				tvBlog.setText(blogTitle);
 				tvBlog.setVisibility(View.VISIBLE);

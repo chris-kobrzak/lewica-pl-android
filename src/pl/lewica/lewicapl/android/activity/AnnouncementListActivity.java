@@ -148,11 +148,11 @@ public class AnnouncementListActivity extends Activity {
 
 		public LayoutInflater inflater;
 
-		private int colIndex_ID;
-		private int colIndex_WasRead;
-		private int colIndex_Title;
-		private int colIndex_Where;
-		private int colIndex_When;
+		private int inxID;
+		private int inxWasRead;
+		private int inxTitle;
+		private int inxWhere;
+		private int inxWhen;
 
 
 		AnnouncementsCursorAdapter(Context context, Cursor cursor, boolean autoRequery) {
@@ -162,11 +162,11 @@ public class AnnouncementListActivity extends Activity {
 			inflater				= LayoutInflater.from(context);
 
 			// Get and cache column indices
-			colIndex_ID					= cursor.getColumnIndex(AnnouncementDAO.FIELD_ID);
-			colIndex_WasRead			= cursor.getColumnIndex(AnnouncementDAO.FIELD_WAS_READ);
-			colIndex_Title				= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHAT);
-			colIndex_Where				= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHERE);
-			colIndex_When				= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHEN);
+			inxID					= cursor.getColumnIndex(AnnouncementDAO.FIELD_ID);
+			inxWasRead			= cursor.getColumnIndex(AnnouncementDAO.FIELD_WAS_READ);
+			inxTitle				= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHAT);
+			inxWhere				= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHERE);
+			inxWhen				= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHEN);
 		}
 
 		/**
@@ -177,14 +177,14 @@ public class AnnouncementListActivity extends Activity {
 			appTheme	= UserPreferencesManager.getThemeInstance(context);
 
 			// Title
-			boolean unread	= cursor.getInt(colIndex_WasRead) == 0 && ! clicked.contains(cursor.getLong(colIndex_ID) );
+			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! clicked.contains(cursor.getLong(inxID) );
 			TextView tv	= (TextView) view.findViewById(R.id.announcement_item_title);
 			tv.setTextColor(appTheme.getListHeadingColour(! unread) );
-			tv.setText(cursor.getString(colIndex_Title) );
+			tv.setText(cursor.getString(inxTitle) );
 			// Where and when?
 			TextView tvWhereWhen	= (TextView) view.findViewById(R.id.announcement_item_details);
-			String where	= cursor.getString(colIndex_Where);
-			String when	= cursor.getString(colIndex_When);
+			String where	= cursor.getString(inxWhere);
+			String when	= cursor.getString(inxWhen);
 			tvWhereWhen.setVisibility(View.VISIBLE);
 
 			if (where.length() > 0 && when.length() > 0) {
