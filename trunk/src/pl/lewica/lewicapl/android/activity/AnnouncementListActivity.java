@@ -181,30 +181,19 @@ public class AnnouncementListActivity extends Activity {
 			TextView tv	= (TextView) view.findViewById(R.id.announcement_item_title);
 			tv.setTextColor(appTheme.getListHeadingColour(! unread) );
 			tv.setText(cursor.getString(inxTitle) );
+
 			// Where and when?
+			String dateAndPlace	= getDateAndPlaceText(cursor.getString(inxWhere), cursor.getString(inxWhen) );
 			TextView tvWhereWhen	= (TextView) view.findViewById(R.id.announcement_item_details);
-			String where	= cursor.getString(inxWhere);
-			String when	= cursor.getString(inxWhen);
-			tvWhereWhen.setVisibility(View.VISIBLE);
-
-			if (where.length() > 0 && when.length() > 0) {
-				StringBuilder sb	= new StringBuilder();
-				sb.append(where);
-				sb.append(" | ");
-				sb.append(when);
-
-				tvWhereWhen.setText(sb.toString() );
-			} else if (where.length() > 0) {
-				tvWhereWhen.setText(where);
-			} else if (when.length() > 0) {
-				tvWhereWhen.setText(when);
+			if (dateAndPlace != null) {
+				tvWhereWhen.setText(dateAndPlace);
+				tvWhereWhen.setVisibility(View.VISIBLE);
+				tvWhereWhen.setTextColor(appTheme.getListTextColour(! unread) );
 			} else {
-				// We are still here - that means both where and when info is empty.
 				tvWhereWhen.setText("");
 				tvWhereWhen.setVisibility(View.GONE);
 			}
 
-			tvWhereWhen.setTextColor(appTheme.getListTextColour(! unread) );
 			view.setBackgroundColor(appTheme.getBackgroundColour() );
 		}
 
@@ -212,6 +201,30 @@ public class AnnouncementListActivity extends Activity {
 		@Override
 		public View newView(Context context, Cursor cursor, ViewGroup parent) {
 			return inflater.inflate(R.layout.list_announcements_item, parent, false);
+		}
+
+
+		/**
+		 * @param where
+		 * @param when
+		 */
+		private String getDateAndPlaceText(String where, String when) {
+			if (where.length() > 0 && when.length() > 0) {
+				StringBuilder sb	= new StringBuilder();
+				sb.append(where);
+				sb.append(" | ");
+				sb.append(when);
+
+				return sb.toString();
+			}
+			if (where.length() > 0) {
+				return where;
+			}
+			if (when.length() > 0) {
+				return when;
+			}
+			// We are still here - that means both where and when info is empty.
+			return null;
 		}
 	}
 	// End of NewsCursorAdapter
