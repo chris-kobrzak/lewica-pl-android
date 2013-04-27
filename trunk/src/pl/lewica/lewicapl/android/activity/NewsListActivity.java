@@ -15,7 +15,7 @@
 */
 package pl.lewica.lewicapl.android.activity;
 
-import java.io.File; 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -32,7 +32,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,8 +45,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import pl.lewica.lewicapl.R;
-import pl.lewica.api.model.Article;
 import pl.lewica.api.url.ArticleURL;
+import pl.lewica.lewicapl.android.AndroidUtil;
 import pl.lewica.lewicapl.android.UserPreferencesManager;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 import pl.lewica.lewicapl.android.theme.Theme;
@@ -61,7 +60,6 @@ public class NewsListActivity extends Activity {
 	public static final String RELOAD_VIEW	= "pl.lewica.lewicapl.android.activity.newslistactivity.RELOAD";
 
 	private static Typeface categoryTypeface;
-	private static File storageDir;
 	private ArticleDAO articleDAO;
 	private ListAdapter listAdapter;
 	private ListView listView;
@@ -84,11 +82,6 @@ public class NewsListActivity extends Activity {
 
 		// Custom font used by the category headings
 		categoryTypeface	= Typeface.createFromAsset(getAssets(), "Impact.ttf");
-
-		// Thumbnails store
-		File sdDir				= Environment.getExternalStorageDirectory();
-		storageDir				= new File(sdDir + getResources().getString(R.string.path_images) );
-		storageDir.mkdirs();
 
 		// Register to receive content update messages
 		IntentFilter filter		= new IntentFilter();
@@ -227,23 +220,13 @@ public class NewsListActivity extends Activity {
 			long unixTime	= cursor.getLong(inxDatePub);	// Dates are stored as Unix timestamps
 			Date d				= new Date(unixTime);
 			tvDate.setText(dateFormat.format(d) );
+			tvDate.setTextColor(appTheme.getListTextColour() );
 
-			iv	= (ImageView) view.findViewById(R.id.article_item_icon);
-			iv.setImageBitmap(null);
-			if (cursor.getInt(inxHasThumb) == 0) {
-				iv.setVisibility(View.INVISIBLE);
-			} else {
-				String imgPath	= storageDir.getPath() + "/" + ArticleURL.buildNameThumbnail(cursor.getLong(inxID), cursor.getString(inxThumbExt) );
-				Bitmap bMap		= BitmapFactory.decodeFile(imgPath);
-				iv.setImageBitmap(bMap);
-				// Reset image to avoid issues when navigating between previous and next articles
-				iv.setVisibility(View.VISIBLE);
-			}
+			loadImage(cursor, view);
 
 			// If there is a group header, set their values
 			loadCategoryLabel(cursor.getInt(inxCategoryID), view, context);
 
-			tvDate.setTextColor(appTheme.getListTextColour() );
 			view.setBackgroundColor(appTheme.getBackgroundColour() );
 		}
 
@@ -353,6 +336,28 @@ public class NewsListActivity extends Activity {
 
 			tv.setTypeface(categoryTypeface);
 			tv.setText(ArticleUtil.getCategoryLabel(categoryId, context) );
+		}
+
+
+		/**
+		 * @param view
+		 * @param cursor
+		 */
+		private void loadImage(Cursor cursor, View view) {
+			ImageView iv	= (ImageView) view.findViewById(R.id.article_item_icon);
+			iv.setImageBitmap(null);
+			iv.setVisibility(View.INVISIBLE);
+			if (cursor.getInt(inxHasThumb) == 0) {
+				return;
+			}
+			String imgPath	= AndroidUtil.getStorageDir().getPath() + "/" + ArticleURL.buildNameThumbnail(cursor.getLong(inxID), cursor.getString(inxThumbExt) );
+			File img	= new File(imgPath);
+			if (! img.exists() ) {
+				return;
+			}
+			Bitmap bMap		= BitmapFactory.decodeFile(imgPath);
+			iv.setImageBitmap(bMap);
+			iv.setVisibility(View.VISIBLE);
 		}
 	}
 	// End of NewsCursorAdapter
