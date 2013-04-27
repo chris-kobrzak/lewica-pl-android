@@ -69,14 +69,10 @@ public class ApplicationRootActivity extends TabActivity {
 		// This allows to show and hide the progress indicator in the top bar and needs to be done before content view set-up
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
-		File sdDir		= Environment.getExternalStorageDirectory();
-		File storageDir		= new File(sdDir + getResources().getString(R.string.path_images) );
-		if (! storageDir.exists() ) {
-			storageDir.mkdirs();
-		}
+		AndroidUtil.setStorageDir(getResources().getString(R.string.path_images) );
 		// it's not a big deal if this operation fails so let's just try-catch it.
 		try {
-			AndroidUtil.setUpResourcesHiddenFromAndroidGallery(storageDir);
+			AndroidUtil.setUpResourcesHiddenFromAndroidGallery(AndroidUtil.getStorageDir() );
 		} catch (IOException err) {}
 
 		AndroidUtil.setApplicationTitleBackgroundColour(getResources().getColor(R.color.red), this);
@@ -88,7 +84,7 @@ public class ApplicationRootActivity extends TabActivity {
 		registerReceiver(receiver, filter);
 
 		// Required by the content update module
-		updateManager		= ContentUpdateManager.getInstance(getApplicationContext(), storageDir);
+		updateManager		= ContentUpdateManager.getInstance(getApplicationContext(), AndroidUtil.getStorageDir() );
 		broadcastSender	= BroadcastSender.getInstance(this);
 	}
 
@@ -296,7 +292,6 @@ public class ApplicationRootActivity extends TabActivity {
 
 		updateManager.run();
 	}
-
 
 
 	// INNER CLASSES
