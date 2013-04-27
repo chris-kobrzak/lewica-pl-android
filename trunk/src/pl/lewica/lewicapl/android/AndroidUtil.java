@@ -20,12 +20,29 @@ import java.io.IOException;
 
 import android.app.Activity;
 import android.net.Uri;
+import android.os.Environment;
 import android.view.View;
 import android.view.ViewParent;
 import android.widget.ScrollView;
 
 
 public class AndroidUtil {
+
+	private static File storageDir	= null;
+
+
+	public static File getStorageDir() {
+		return storageDir;
+	}
+
+
+	protected static void setStorageDir(String path) {
+		File sdDir		= Environment.getExternalStorageDirectory();
+		storageDir		= new File(sdDir + path);
+		if (! storageDir.exists() ) {
+			storageDir.mkdirs();
+		}
+	}
 
 
 	/**
