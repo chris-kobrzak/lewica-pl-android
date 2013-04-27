@@ -44,8 +44,12 @@ public class DarkTheme implements Theme {
 	}
 
 	@Override
-	public int getListTextColour() {
-		return res.getColor(R.color.grey);
+	public int getListTextColour(boolean read) {
+		if (read) {
+			return res.getColor(R.color.grey_dark);
+		} else {
+			return res.getColor(R.color.grey);
+		}
 	}
 
 	private int getListViewDividerColour() {

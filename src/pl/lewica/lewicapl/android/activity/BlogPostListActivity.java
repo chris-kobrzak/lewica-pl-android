@@ -226,8 +226,8 @@ public class BlogPostListActivity extends Activity {
 				tvBlog.setVisibility(View.GONE);
 			}
 
-			tvDate.setTextColor(appTheme.getListTextColour() );
-			tvBlog.setTextColor(appTheme.getListTextColour() );
+			tvDate.setTextColor(appTheme.getListTextColour(! unread) );
+			tvBlog.setTextColor(appTheme.getListTextColour(! unread) );
 			view.setBackgroundColor(appTheme.getBackgroundColour() );
 		}
 
