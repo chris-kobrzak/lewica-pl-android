@@ -25,7 +25,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -169,7 +168,6 @@ public class BlogPostListActivity extends Activity {
 	private static final class BlogPostsCursorAdapter extends CursorAdapter {
 
 		public LayoutInflater inflater;
-		private static Resources res;
 
 		private int inxID;
 		private int inxWasRead;
@@ -187,8 +185,6 @@ public class BlogPostListActivity extends Activity {
 
 			// Get the layout inflater
 			inflater				= LayoutInflater.from(context);
-
-			res					= context.getResources();
 
 			// Get and cache column indices
 			inxID					= cursor.getColumnIndex(BlogPostDAO.FIELD_ID);
