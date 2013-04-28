@@ -1,11 +1,11 @@
-package pl.lewica.lewicapl.android.activity;
+package pl.lewica.lewicapl.android.activity.util;
 
 import pl.lewica.lewicapl.android.UserPreferencesManager;
 import android.app.Activity;
 import android.widget.SeekBar;
 
 
-class TextSizeChangeListener implements SeekBar.OnSeekBarChangeListener {
+public class TextSizeChangeListener implements SeekBar.OnSeekBarChangeListener {
 
 	private Activity mActivity;
 	private StandardTextScreen mDetailsPage;
