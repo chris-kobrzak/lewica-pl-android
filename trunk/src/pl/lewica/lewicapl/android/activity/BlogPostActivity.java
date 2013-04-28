@@ -79,7 +79,7 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 		blogPostDAO				= new BlogPostDAO(this);
 		blogPostDAO.open();
 
-		mSeekBarChangeListener	= new SeekBarChangeListener(this, this);
+		mSeekBarChangeListener	= new TextSizeChangeListener(this, this);
 
 		// When user changes the orientation, Android restarts the activity.  Say, users navigated through articles using
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
