@@ -188,12 +188,12 @@ public class BlogPostListActivity extends Activity {
 			inflater				= LayoutInflater.from(context);
 
 			// Get and cache column indices
-			inxID					= cursor.getColumnIndex(BlogPostDAO.FIELD_ID);
-			inxWasRead			= cursor.getColumnIndex(BlogPostDAO.FIELD_WAS_READ);
-			inxDatePub			= cursor.getColumnIndex(BlogPostDAO.FIELD_DATE_PUBLISHED);
-			inxTitle				= cursor.getColumnIndex(BlogPostDAO.FIELD_TITLE);
-			inxAuthor				= cursor.getColumnIndex(BlogPostDAO.FIELD_AUTHOR);
-			inxBlog				= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_TITLE);
+			inxID				= cursor.getColumnIndex(BlogPostDAO.FIELD_ID);
+			inxWasRead	= cursor.getColumnIndex(BlogPostDAO.FIELD_WAS_READ);
+			inxDatePub	= cursor.getColumnIndex(BlogPostDAO.FIELD_DATE_PUBLISHED);
+			inxTitle			= cursor.getColumnIndex(BlogPostDAO.FIELD_TITLE);
+			inxAuthor		= cursor.getColumnIndex(BlogPostDAO.FIELD_AUTHOR);
+			inxBlog			= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_TITLE);
 		}
 
 		/**
@@ -203,35 +203,56 @@ public class BlogPostListActivity extends Activity {
 		public void bindView(View view, Context context, Cursor cursor) {
 			appTheme	= UserPreferencesManager.getThemeInstance(context);
 
-			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! clicked.contains(cursor.getLong(inxID) );
 			TextView tvTitle	= (TextView) view.findViewById(R.id.blog_post_item_title);
-			tvTitle.setTextColor(appTheme.getListHeadingColour(! unread) );
 			tvTitle.setText(cursor.getString(inxAuthor) + ": " + cursor.getString(inxTitle) );
 
+			Date d				= new Date(cursor.getLong(inxDatePub) );
 			TextView tvDate	= (TextView) view.findViewById(R.id.blog_post_item_date);
-			long unixTime	= cursor.getLong(inxDatePub);
-			Date d				= new Date(unixTime);
 			tvDate.setText(dateFormat.format(d) );
 
 			TextView tvBlog	= (TextView) view.findViewById(R.id.blog_post_item_blog_title);
-			String blogTitle	= cursor.getString(inxBlog);
-			if (blogTitle.length() > 0) {
-				tvBlog.setText(blogTitle);
-				tvBlog.setVisibility(View.VISIBLE);
-			} else {
-				tvBlog.setText("");
-				tvBlog.setVisibility(View.GONE);
-			}
+			loadBlogTitle(tvBlog, cursor.getString(inxBlog) );
 
-			tvDate.setTextColor(appTheme.getListTextColour(! unread) );
-			tvBlog.setTextColor(appTheme.getListTextColour(! unread) );
-			view.setBackgroundColor(appTheme.getBackgroundColour() );
+			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! clicked.contains(cursor.getLong(inxID) );
+			loadTheme(! unread, view, tvTitle, tvDate, tvBlog);
 		}
 
 
 		@Override
 		public View newView(Context context, Cursor cursor, ViewGroup parent) {
 			return inflater.inflate(R.layout.list_blog_posts_item, parent, false);
+		}
+
+
+		/**
+		 * @param view
+		 * @param cursor
+		 * @return
+		 */
+		private void loadBlogTitle(TextView tvBlog, String blogTitle) {
+			if (blogTitle.length() > 0) {
+				tvBlog.setText(blogTitle);
+				tvBlog.setVisibility(View.VISIBLE);
+				return;
+			}
+
+			tvBlog.setText("");
+			tvBlog.setVisibility(View.GONE);
+		}
+
+
+		/**
+		 * @param read
+		 * @param view
+		 * @param tvTitle
+		 * @param tvDate
+		 * @param tvBlog
+		 */
+		private void loadTheme(boolean read, View view, TextView tvTitle, TextView tvDate, TextView tvBlog) {
+			tvTitle.setTextColor(appTheme.getListHeadingColour(read) );
+			tvDate.setTextColor(appTheme.getListTextColour(read) );
+			tvBlog.setTextColor(appTheme.getListTextColour(read) );
+			view.setBackgroundColor(appTheme.getBackgroundColour() );
 		}
 	}
 	// End of NewsCursorAdapter
