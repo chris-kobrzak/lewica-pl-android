@@ -18,6 +18,7 @@ package pl.lewica.lewicapl.android.activity;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import android.app.Activity;
@@ -176,7 +177,7 @@ public class BlogPostListActivity extends Activity {
 		private int inxAuthor;
 		private int inxBlog;
 
-		private static SimpleDateFormat dateFormat	= new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		private static SimpleDateFormat dateFormat	= new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.ENGLISH);
 
 
 

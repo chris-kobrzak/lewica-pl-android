@@ -19,6 +19,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import android.app.Activity;
@@ -173,7 +174,7 @@ public class PublicationListActivity extends Activity {
 		private int inxHasThumb;
 		private int inxThumbExt;
 
-		private static SimpleDateFormat dateFormat	= new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		private static SimpleDateFormat dateFormat	= new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.ENGLISH);
 
 
 		PublicationsCursorAdapter(Context context, Cursor cursor, boolean autoRequery) {
