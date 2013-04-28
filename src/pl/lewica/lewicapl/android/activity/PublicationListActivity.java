@@ -362,7 +362,6 @@ public class PublicationListActivity extends Activity {
 		 * @param view
 		 * @param tvTitle
 		 * @param tvDate
-		 * @param tvBlog
 		 */
 		private void loadTheme(boolean read, View view, TextView tvTitle, TextView tvDate) {
 			tvTitle.setTextColor(appTheme.getListHeadingColour(read) );
