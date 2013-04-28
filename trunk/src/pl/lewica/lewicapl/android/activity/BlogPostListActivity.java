@@ -66,7 +66,6 @@ public class BlogPostListActivity extends Activity {
 	private BlogPostDAO blogPostDAO;
 	private ListAdapter listAdapter;
 	private ListView listView;
-	private BroadcastReceiver receiver;
 	private static Theme appTheme;
 
 	private int limitRows		= 15;
@@ -83,7 +82,7 @@ public class BlogPostListActivity extends Activity {
 		// Register to receive content update messages
 		IntentFilter filter		= new IntentFilter();
 		filter.addAction(RELOAD_VIEW);
-		receiver					= new BlogPostsUpdateBroadcastReceiver();	// Instance of an inner class
+		BroadcastReceiver receiver		= new BlogPostsUpdateBroadcastReceiver();	// Instance of an inner class
 		registerReceiver(receiver, filter);
 
 		// Access data
@@ -119,6 +118,16 @@ public class BlogPostListActivity extends Activity {
 	}
 
 
+	private static void addToClickedItems(Long id) {
+		clicked.add(id);
+	}
+
+
+	private static boolean wasItemClicked(Long id) {
+		return clicked.contains(id);
+	}
+
+
 	// INNER CLASSES
 	private class BlogPostClickListener implements OnItemClickListener {
 		@Override
@@ -137,8 +146,7 @@ public class BlogPostListActivity extends Activity {
 			TextView tv			= (TextView) view.findViewById(R.id.blog_post_item_title);
 			appTheme	= UserPreferencesManager.getThemeInstance(context);
 			tv.setTextColor(appTheme.getListHeadingColour(true) );
-			// ... and flagging it in local cache accordingly
-			clicked.add(id);
+			addToClickedItems(id);
 
 			return;
 		}
@@ -213,7 +221,7 @@ public class BlogPostListActivity extends Activity {
 			TextView tvBlog	= (TextView) view.findViewById(R.id.blog_post_item_blog_title);
 			loadBlogTitle(tvBlog, cursor.getString(inxBlog) );
 
-			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! clicked.contains(cursor.getLong(inxID) );
+			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! wasItemClicked(cursor.getLong(inxID) );
 			loadTheme(! unread, view, tvTitle, tvDate, tvBlog);
 		}
 

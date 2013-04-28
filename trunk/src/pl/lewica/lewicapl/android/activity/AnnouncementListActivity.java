@@ -103,6 +103,16 @@ public class AnnouncementListActivity extends Activity {
 	}
 
 
+	private static void addToClickedItems(Long id) {
+		clicked.add(id);
+	}
+
+
+	private static boolean wasItemClicked(Long id) {
+		return clicked.contains(id);
+	}
+
+
 	// INNER CLASSES
 	private class AnnouncementClickListener implements OnItemClickListener {
 		@Override
@@ -117,12 +127,11 @@ public class AnnouncementListActivity extends Activity {
 			intent.setData(uri);
 			startActivity(intent);
 
-			// Mark current announcement as read by changing its colour...
+			// Mark current announcement as read by changing its colour
 			TextView tv					= (TextView) view.findViewById(R.id.announcement_item_title);
 			appTheme	= UserPreferencesManager.getThemeInstance(context);
 			tv.setTextColor(appTheme.getListHeadingColour(true) );
-			// ... and flagging it in local cache accordingly
-			clicked.add(id);
+			addToClickedItems(id);
 
 			return;
 		}
@@ -176,25 +185,21 @@ public class AnnouncementListActivity extends Activity {
 		public void bindView(View view, Context context, Cursor cursor) {
 			appTheme	= UserPreferencesManager.getThemeInstance(context);
 
-			// Title
-			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! clicked.contains(cursor.getLong(inxID) );
-			TextView tv	= (TextView) view.findViewById(R.id.announcement_item_title);
-			tv.setTextColor(appTheme.getListHeadingColour(! unread) );
-			tv.setText(cursor.getString(inxTitle) );
+			TextView tvTitle	= (TextView) view.findViewById(R.id.announcement_item_title);
+			tvTitle.setText(cursor.getString(inxTitle) );
 
-			// Where and when?
 			String dateAndPlace	= getDateAndPlaceText(cursor.getString(inxWhere), cursor.getString(inxWhen) );
 			TextView tvWhereWhen	= (TextView) view.findViewById(R.id.announcement_item_details);
 			if (dateAndPlace != null) {
 				tvWhereWhen.setText(dateAndPlace);
 				tvWhereWhen.setVisibility(View.VISIBLE);
-				tvWhereWhen.setTextColor(appTheme.getListTextColour(! unread) );
 			} else {
 				tvWhereWhen.setText("");
 				tvWhereWhen.setVisibility(View.GONE);
 			}
 
-			view.setBackgroundColor(appTheme.getBackgroundColour() );
+			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! wasItemClicked(cursor.getLong(inxID) );
+			loadTheme(! unread, view, tvTitle, tvWhereWhen);
 		}
 
 
@@ -225,6 +230,19 @@ public class AnnouncementListActivity extends Activity {
 			}
 			// We are still here - that means both where and when info is empty.
 			return null;
+		}
+
+
+		/**
+		 * @param read
+		 * @param view
+		 * @param tvTitle
+		 * @param tvWhereWhen
+		 */
+		private void loadTheme(boolean read, View view, TextView tvTitle, TextView tvWhereWhen) {
+			tvTitle.setTextColor(appTheme.getListHeadingColour(read) );
+			tvWhereWhen.setTextColor(appTheme.getListTextColour(read) );
+			view.setBackgroundColor(appTheme.getBackgroundColour() );
 		}
 	}
 	// End of NewsCursorAdapter
