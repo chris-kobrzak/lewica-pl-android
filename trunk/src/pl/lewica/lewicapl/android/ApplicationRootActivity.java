@@ -15,7 +15,6 @@
 */
 package pl.lewica.lewicapl.android;
 
-import java.io.File;
 import java.io.IOException;
 
 import android.app.TabActivity;
@@ -25,7 +24,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
