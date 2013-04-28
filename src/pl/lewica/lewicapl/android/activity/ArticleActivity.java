@@ -97,7 +97,7 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 		articleDAO				= new ArticleDAO(this);
 		articleDAO.open();
 
-		mSeekBarChangeListener	= new SeekBarChangeListener(this, this);
+		mSeekBarChangeListener	= new TextSizeChangeListener(this, this);
 
 		// When user changes the orientation, Android restarts the activity.  Say, users navigated through articles using
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original

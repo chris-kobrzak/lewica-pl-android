@@ -5,12 +5,12 @@ import android.app.Activity;
 import android.widget.SeekBar;
 
 
-class SeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
+class TextSizeChangeListener implements SeekBar.OnSeekBarChangeListener {
 
 	private Activity mActivity;
 	private StandardTextScreen mDetailsPage;
 
-	public SeekBarChangeListener(Activity activity, StandardTextScreen detailsPage) {
+	public TextSizeChangeListener(Activity activity, StandardTextScreen detailsPage) {
 		mActivity		= activity;
 		mDetailsPage	= detailsPage;
 	}
