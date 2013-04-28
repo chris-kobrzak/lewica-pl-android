@@ -65,7 +65,6 @@ public class PublicationListActivity extends Activity {
 	private ArticleDAO articleDAO;
 	private ListAdapter listAdapter;
 	private ListView listView;
-	private PublicationsUpdateBroadcastReceiver receiver;
 	private static Theme appTheme;
 	// When users select a new article, navigate back to the list and start scrolling up and down, the cursor won't know this article should be marked as read.
 	// That results in articles still being marked as unread (titles in red rather than blue).
@@ -88,7 +87,7 @@ public class PublicationListActivity extends Activity {
 		// Register to receive content update messages
 		IntentFilter filter		= new IntentFilter();
 		filter.addAction(RELOAD_VIEW);
-		receiver					= new PublicationsUpdateBroadcastReceiver();	// Instance of an inner class
+		BroadcastReceiver receiver		= new PublicationsUpdateBroadcastReceiver();	// Instance of an inner class
 		registerReceiver(receiver, filter);
 
 		// Access data
@@ -116,6 +115,16 @@ public class PublicationListActivity extends Activity {
 	}
 
 
+	private static void addToClickedItems(Long id) {
+		clicked.add(id);
+	}
+
+
+	private static boolean wasItemClicked(Long id) {
+		return clicked.contains(id);
+	}
+
+
 	private class ArticlesClickListener implements OnItemClickListener {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -129,12 +138,11 @@ public class PublicationListActivity extends Activity {
 			intent.setData(uri);
 			startActivity(intent);
 
-			// Mark current article as read by changing its colour...
+			// Mark current article as read by changing its colour
 			appTheme	= UserPreferencesManager.getThemeInstance(context);
 			TextView tv		= (TextView) view.findViewById(R.id.article_item_title);
 			tv.setTextColor(appTheme.getListHeadingColour(true) );
-			// ... and flagging it in local cache accordingly
-			clicked.add(id);
+			addToClickedItems(id);
 
 			return;
 		}
@@ -201,28 +209,24 @@ public class PublicationListActivity extends Activity {
 		public void bindView(View view, Context context, Cursor cursor) {
 			appTheme	= UserPreferencesManager.getThemeInstance(context);
 
-			// Title
-			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! clicked.contains(cursor.getLong(inxID) );
-			TextView tv	= (TextView) view.findViewById(R.id.article_item_title);
-			tv.setTextColor(appTheme.getListHeadingColour(! unread) );
-			tv.setText(cursor.getString(inxTitle) );
-			// Publications do not have editor's comments so no need for the pencil icon here
-			ImageView iv	= (ImageView) view.findViewById(R.id.ico_pencil);
-			iv.setVisibility(View.GONE);
-			// Datetime
-			TextView tvDate	= (TextView) view.findViewById(R.id.article_item_date);
-			long unixTime	= cursor.getLong(inxDatePub);	// Dates are stored as Unix timestamps
-			Date d				= new Date(unixTime);
-			tvDate.setText(dateFormat.format(d) );
-			tvDate.setTextColor(appTheme.getListTextColour(! unread) );
+			TextView tvTitle	= (TextView) view.findViewById(R.id.article_item_title);
+			tvTitle.setText(cursor.getString(inxTitle) );
 
-			// Thumbnail
+			Date d				= new Date(cursor.getLong(inxDatePub) );	// Dates are stored as Unix timestamps
+			TextView tvDate	= (TextView) view.findViewById(R.id.article_item_date);
+			tvDate.setText(dateFormat.format(d) );
+
 			loadImage(cursor, view);
 
 			// If there is a group header, set their values
 			loadCategoryLabel(cursor.getInt(inxCategoryID), view, context);
 
-			view.setBackgroundColor(appTheme.getBackgroundColour() );
+			// Publications do not have editor's comments so no need for the pencil icon here
+			ImageView iv	= (ImageView) view.findViewById(R.id.ico_pencil);
+			iv.setVisibility(View.GONE);
+
+			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! wasItemClicked(cursor.getLong(inxID) );
+			loadTheme(! unread, view, tvTitle, tvDate);
 		}
 
 		@Override
@@ -242,11 +246,11 @@ public class PublicationListActivity extends Activity {
 			cursor.moveToPosition(position);
 
 			// Check item grouping
-			if (isNewGroup(cursor, position) ) {
-				return VIEW_TYPE_GROUP_START;
-			} else {
+			if (! isNewGroup(cursor, position) ) {
 				return VIEW_TYPE_GROUP_CONTINUE;
 			}
+
+			return VIEW_TYPE_GROUP_START;
 		}
 
 		@Override
@@ -280,7 +284,7 @@ public class PublicationListActivity extends Activity {
 			// Ignore clicks on the list header
 			View vHeader	= v.findViewById(R.id.article_items_heading);
 			vHeader.setOnClickListener(new OnClickListener() {
-//				@Override
+				@Override
 				public void onClick(View v) {}
 			});
 			return v;
@@ -310,9 +314,8 @@ public class PublicationListActivity extends Activity {
 			
 			if (categoryID == categoryIDPrev) {
 				return false;
-			} else {
-				return true;
 			}
+			return true;
 		}
 
 
@@ -351,6 +354,20 @@ public class PublicationListActivity extends Activity {
 			Bitmap bMap		= BitmapFactory.decodeFile(imgPath);
 			iv.setImageBitmap(bMap);
 			iv.setVisibility(View.VISIBLE);
+		}
+
+
+		/**
+		 * @param read
+		 * @param view
+		 * @param tvTitle
+		 * @param tvDate
+		 * @param tvBlog
+		 */
+		private void loadTheme(boolean read, View view, TextView tvTitle, TextView tvDate) {
+			tvTitle.setTextColor(appTheme.getListHeadingColour(read) );
+			tvDate.setTextColor(appTheme.getListTextColour(read) );
+			view.setBackgroundColor(appTheme.getBackgroundColour() );
 		}
 	}
 	// End of NewsCursorAdapter

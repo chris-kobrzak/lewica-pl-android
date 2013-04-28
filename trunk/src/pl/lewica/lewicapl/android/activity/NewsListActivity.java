@@ -65,13 +65,12 @@ public class NewsListActivity extends Activity {
 	private ArticleDAO articleDAO;
 	private ListAdapter listAdapter;
 	private ListView listView;
-	private BroadcastReceiver receiver;
 	private static Theme appTheme;
 	// When users select a new article, navigate back to the list and start scrolling up and down, the cursor won't know this article should be marked as read.
 	// That results in articles still being marked as unread (titles in red rather than blue).
 	// That's why we need to cache the list of clicked articles.  Please note, it is down to ArcticleActivity to flag articles as read in the database.
 	private static Set<Long> clicked	= new HashSet<Long>();
-//	private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
+
 
 
 	@Override
@@ -88,7 +87,7 @@ public class NewsListActivity extends Activity {
 		// Register to receive content update messages
 		IntentFilter filter		= new IntentFilter();
 		filter.addAction(RELOAD_VIEW);
-		receiver					= new NewsUpdateBroadcastReceiver();	// Instance of an inner class
+		BroadcastReceiver receiver		= new NewsUpdateBroadcastReceiver();	// Instance of an inner class
 		registerReceiver(receiver, filter);
 
 		// Access data
@@ -116,6 +115,16 @@ public class NewsListActivity extends Activity {
 	}
 
 
+	private static void addToClickedItems(Long id) {
+		clicked.add(id);
+	}
+
+
+	private static boolean wasItemClicked(Long id) {
+		return clicked.contains(id);
+	}
+
+
 	private class ArticlesItemClickListener implements OnItemClickListener {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -129,12 +138,11 @@ public class NewsListActivity extends Activity {
 			intent.setData(uri);
 			startActivity(intent);
 
-			// Mark current article as read by changing its colour...
+			// Mark current article as read by changing its colour
 			TextView tv		= (TextView) view.findViewById(R.id.article_item_title);
 			appTheme	= UserPreferencesManager.getThemeInstance(context);
 			tv.setTextColor(appTheme.getListHeadingColour(true) );
-			// ... and flagging it in the database accordingly
-			clicked.add(id);
+			addToClickedItems(id);
 
 			return;
 		}
@@ -143,7 +151,7 @@ public class NewsListActivity extends Activity {
 
 
 	// INNER CLASSES
-	public class NewsUpdateBroadcastReceiver extends BroadcastReceiver {
+	private class NewsUpdateBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			appTheme	= UserPreferencesManager.getThemeInstance(getApplicationContext() );
@@ -166,7 +174,7 @@ public class NewsListActivity extends Activity {
 		private static final int VIEW_TYPE_GROUP_CONTINUE	= 1;
 		private static final int VIEW_TYPE_COUNT					= 2;
 		
-		public LayoutInflater inflater;
+		private LayoutInflater inflater;
 
 		private int inxID;
 		private int inxCategoryID;
@@ -204,32 +212,28 @@ public class NewsListActivity extends Activity {
 		public void bindView(View view, Context context, Cursor cursor) {
 			appTheme	= UserPreferencesManager.getThemeInstance(context);
 
-			// Editor's comments icon
-			int hasComment	= cursor.getInt(inxHasComment);
-			ImageView iv	= (ImageView) view.findViewById(R.id.ico_pencil);
-			if (hasComment == 0) {
-				iv.setVisibility(View.INVISIBLE);
-			} else {
-				iv.setVisibility(View.VISIBLE);
-			}
-
-			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! clicked.contains(cursor.getLong(inxID) );
 			TextView tvTitle	= (TextView) view.findViewById(R.id.article_item_title);
-			tvTitle.setTextColor(appTheme.getListHeadingColour(! unread) );
 			tvTitle.setText(cursor.getString(inxTitle) );
 
+			Date d				= new Date(cursor.getLong(inxDatePub) );	// Dates are stored as Unix timestamps
 			TextView tvDate	= (TextView) view.findViewById(R.id.article_item_date);
-			long unixTime	= cursor.getLong(inxDatePub);	// Dates are stored as Unix timestamps
-			Date d				= new Date(unixTime);
 			tvDate.setText(dateFormat.format(d) );
-			tvDate.setTextColor(appTheme.getListTextColour(! unread) );
 
 			loadImage(cursor, view);
 
 			// If there is a group header, set their values
 			loadCategoryLabel(cursor.getInt(inxCategoryID), view, context);
 
-			view.setBackgroundColor(appTheme.getBackgroundColour() );
+			// Editor's comments icon
+			ImageView iv	= (ImageView) view.findViewById(R.id.ico_pencil);
+			if (cursor.getInt(inxHasComment) == 0) {
+				iv.setVisibility(View.INVISIBLE);
+			} else {
+				iv.setVisibility(View.VISIBLE);
+			}
+
+			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! wasItemClicked(cursor.getLong(inxID) );
+			loadTheme(! unread, view, tvTitle, tvDate);
 		}
 
 
@@ -248,13 +252,12 @@ public class NewsListActivity extends Activity {
 			// For other items, decide based on current data
 			Cursor cursor	= getCursor();
 			cursor.moveToPosition(position);
-
 			// Check item grouping
-			if (isNewGroup(cursor, position) ) {
-				return VIEW_TYPE_GROUP_START;
-			} else {
+			if (! isNewGroup(cursor, position) ) {
 				return VIEW_TYPE_GROUP_CONTINUE;
 			}
+
+			return VIEW_TYPE_GROUP_START;
 		}
 
 		@Override
@@ -288,7 +291,7 @@ public class NewsListActivity extends Activity {
 			// Ignore clicks on the list header
 			View vHeader	= v.findViewById(R.id.article_items_heading);
 			vHeader.setOnClickListener(new OnClickListener() {
-//				@Override
+				@Override
 				public void onClick(View v) {}
 			});
 			return v;
@@ -316,12 +319,11 @@ public class NewsListActivity extends Activity {
 			int categoryIDPrev	= cursor.getInt(inxCategoryID);
 			// Restore cursor position
 			cursor.moveToPosition(position);
-			
+
 			if (categoryID == categoryIDPrev) {
 				return false;
-			} else {
-				return true;
 			}
+			return true;
 		}
 
 
@@ -360,6 +362,20 @@ public class NewsListActivity extends Activity {
 			Bitmap bMap		= BitmapFactory.decodeFile(imgPath);
 			iv.setImageBitmap(bMap);
 			iv.setVisibility(View.VISIBLE);
+		}
+
+
+		/**
+		 * @param read
+		 * @param view
+		 * @param tvTitle
+		 * @param tvDate
+		 * @param tvBlog
+		 */
+		private void loadTheme(boolean read, View view, TextView tvTitle, TextView tvDate) {
+			tvTitle.setTextColor(appTheme.getListHeadingColour(read) );
+			tvDate.setTextColor(appTheme.getListTextColour(read) );
+			view.setBackgroundColor(appTheme.getBackgroundColour() );
 		}
 	}
 	// End of NewsCursorAdapter
