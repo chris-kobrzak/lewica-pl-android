@@ -104,7 +104,7 @@ public class MoreActivity extends Activity {
 	}
 
 
-	class TextClickListener implements View.OnClickListener {
+	private class TextClickListener implements View.OnClickListener {
 		public void onClick(View v) {
 			String urlString;
 			switch (v.getId() ) {
