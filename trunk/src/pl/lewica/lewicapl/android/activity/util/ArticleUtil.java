@@ -1,4 +1,4 @@
-package pl.lewica.lewicapl.android.activity;
+package pl.lewica.lewicapl.android.activity.util;
 
 import android.content.Context;
 import pl.lewica.api.model.Article;

@@ -42,6 +42,8 @@ import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.DialogManager;
 import pl.lewica.lewicapl.android.SliderDialog;
 import pl.lewica.lewicapl.android.UserPreferencesManager;
+import pl.lewica.lewicapl.android.activity.util.StandardTextScreen;
+import pl.lewica.lewicapl.android.activity.util.TextSizeChangeListener;
 import pl.lewica.lewicapl.android.database.BlogPostDAO;
 import pl.lewica.lewicapl.android.theme.Theme;
 
