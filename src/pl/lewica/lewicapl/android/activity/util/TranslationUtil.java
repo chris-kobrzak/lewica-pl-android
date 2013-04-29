@@ -5,9 +5,9 @@ import pl.lewica.api.model.Article;
 import pl.lewica.lewicapl.R;
 
 
-public class ArticleUtil {
+public class TranslationUtil {
 
-	public static String getCategoryLabel(int categoryId, Context context) {
+	public static String getArticleCategoryLabel(int categoryId, Context context) {
 		switch (categoryId) {
 			case Article.SECTION_POLAND:
 				return context.getString(R.string.heading_poland);
