@@ -243,48 +243,37 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 		startManagingCursor(cursor);
 
 		// In order to capture a cell, you need to work what their index
-		int inxWasRead			= cursor.getColumnIndex(BlogPostDAO.FIELD_WAS_READ);
-		int inxTitle				= cursor.getColumnIndex(BlogPostDAO.FIELD_TITLE);
-		int inxText				= cursor.getColumnIndex(BlogPostDAO.FIELD_TEXT);
-		int inxBlogID				= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_ID);
+		int inxWasRead		= cursor.getColumnIndex(BlogPostDAO.FIELD_WAS_READ);
+		int inxTitle			= cursor.getColumnIndex(BlogPostDAO.FIELD_TITLE);
+		int inxText			= cursor.getColumnIndex(BlogPostDAO.FIELD_TEXT);
+		int inxBlogID			= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_ID);
 		int inxBlog				= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_TITLE);
-		int inxDatePub			= cursor.getColumnIndex(BlogPostDAO.FIELD_DATE_PUBLISHED);
-		int inxPublishedBy		= cursor.getColumnIndex(BlogPostDAO.FIELD_AUTHOR);
+		int inxDatePub		= cursor.getColumnIndex(BlogPostDAO.FIELD_DATE_PUBLISHED);
+		int inxPublishedBy	= cursor.getColumnIndex(BlogPostDAO.FIELD_AUTHOR);
 
 		// When using previous-next facility you need to make sure the scroll view's position is at the top of the screen
 		AndroidUtil.scrollToTop(R.id.blog_post_scroll_view, this);
 
-		blogID					= cursor.getInt(inxBlogID);
-		blogPostURL			= URLDictionary.buildURL_BlogPost(cursor.getInt(inxBlogID), ID);
+		blogID			= cursor.getInt(inxBlogID);
+		blogPostURL	= URLDictionary.buildURL_BlogPost(cursor.getInt(inxBlogID), ID);
 
 		// Now start populating all views with data
-		TextView tv;
-		tvTitle					= (TextView) findViewById(R.id.blog_post_title);
+		tvTitle			= (TextView) findViewById(R.id.blog_post_title);
 		tvTitle.setText(cursor.getString(inxTitle) );
 
-		tv							= (TextView) findViewById(R.id.blog_post_category);
-		StringBuilder sb	= new StringBuilder(context.getString(R.string.heading_blog) );
-		sb.append(": ");
-		// By default we want to show blog title but if it's empty, blogger's name will do
-		if (cursor.getString(inxBlog).length() > 0) {
-			sb.append(cursor.getString(inxBlog).toLowerCase() );
-		} else if (cursor.getString(inxPublishedBy).length() > 0) {
-			sb.append(cursor.getString(inxPublishedBy).toLowerCase() );
-		}
-		tv.setTypeface(categoryTypeface);
-		tv.setText(sb.toString() );
+		TextView tv	= (TextView) findViewById(R.id.blog_post_category);
+		loadBlogName(cursor.getString(inxBlog), cursor.getString(inxPublishedBy), tv, context);
 
-		tv							= (TextView) findViewById(R.id.blog_post_date);
-		long unixTime		= cursor.getLong(inxDatePub);	// Dates are stored as Unix timestamps
-		Date d					= new Date(unixTime);
-		tv.setText(dateFormat.format(d) );
+		Date d			= new Date(cursor.getLong(inxDatePub));	// Dates are stored as Unix timestamps
+		TextView tvDate	= (TextView) findViewById(R.id.blog_post_date);
+		tvDate.setText(dateFormat.format(d) );
 
-		tvContent					= (TextView) findViewById(R.id.blog_post_content);
+		tvContent		= (TextView) findViewById(R.id.blog_post_content);
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
 		tvContent.setText(AndroidUtil.removeCarriageReturns(cursor.getString(inxText) ) );
 
 		tvAuthor = (TextView) findViewById(R.id.blog_post_author);
-		String author			= cursor.getString(inxPublishedBy);
+		String author	= cursor.getString(inxPublishedBy);
 
 		if (author.length() > 0) {
 			tvAuthor.setText(author);
@@ -321,6 +310,27 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 		tvTitle.setTextColor(theme.getHeadingColour() );
 		tvContent.setTextColor(theme.getTextColour() );
 		tvAuthor.setTextColor(theme.getTextColour() );
+	}
+
+
+	/**
+	 * Loads the blog title view.  By default, the blog name is displayed but if it's empty it is replaced by the blogger's name
+	 * @param blog
+	 * @param publishedBy
+	 * @param tv
+	 * @param context
+	 */
+	private void loadBlogName(String blog, String publishedBy, TextView tv, Context context) {
+		StringBuilder sb	= new StringBuilder(context.getString(R.string.heading_blog) );
+		sb.append(": ");
+
+		if (blog.length() > 0) {
+			sb.append(blog.toLowerCase() );
+		} else if (publishedBy.length() > 0) {
+			sb.append(publishedBy.toLowerCase() );
+		}
+		tv.setTypeface(categoryTypeface);
+		tv.setText(sb.toString() );
 	}
 
 
