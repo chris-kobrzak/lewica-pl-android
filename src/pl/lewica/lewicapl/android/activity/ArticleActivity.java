@@ -50,9 +50,8 @@ import pl.lewica.lewicapl.R;
 import pl.lewica.lewicapl.android.AndroidUtil;
 import pl.lewica.lewicapl.android.ApplicationRootActivity;
 import pl.lewica.lewicapl.android.BroadcastSender;
-import pl.lewica.lewicapl.android.DialogManager;
-import pl.lewica.lewicapl.android.SliderDialog;
 import pl.lewica.lewicapl.android.UserPreferencesManager;
+import pl.lewica.lewicapl.android.activity.util.TextSizeDialog;
 import pl.lewica.lewicapl.android.activity.util.TranslationUtil;
 import pl.lewica.lewicapl.android.activity.util.StandardTextScreen;
 import pl.lewica.lewicapl.android.activity.util.TextSizeChangeListener;
@@ -213,14 +212,7 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 				return true;
 
 			case R.id.menu_change_text_size:
-				int sizeInPoints	= UserPreferencesManager.convertTextSize(UserPreferencesManager.getTextSize(this) );
-				SliderDialog sd		= new SliderDialog();
-				sd.setSliderValue(sizeInPoints);
-				sd.setSliderMax(UserPreferencesManager.TEXT_SIZES_TOTAL);
-				sd.setTitleResource(R.string.heading_change_text_size);
-				sd.setOkButtonResource(R.string.ok);
-
-				DialogManager.showDialogWithSlider(sd, this, mSeekBarChangeListener);
+				TextSizeDialog.showDefaultTextSizeWidget(mSeekBarChangeListener, this);
 				return true;
 
 			case R.id.menu_change_background:
