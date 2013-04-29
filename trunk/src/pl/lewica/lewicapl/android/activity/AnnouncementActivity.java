@@ -238,15 +238,14 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 		AndroidUtil.scrollToTop(R.id.announcement_scroll_view, this);
 
 		// Now start populating all views with data
-		tvTitle					= (TextView) findViewById(R.id.announcement_title);
+		tvTitle			= (TextView) findViewById(R.id.announcement_title);
 		tvTitle.setText(cursor.getString(idxTitle) );
 
-		TextView tv;
-		tv							= (TextView) findViewById(R.id.announcement_category);
+		TextView tv	= (TextView) findViewById(R.id.announcement_category);
 		tv.setTypeface(categoryTypeface);
 		tv.setText(context.getString(R.string.heading_announcements) );
 
-		tvContent				= (TextView) findViewById(R.id.announcement_content);
+		tvContent		= (TextView) findViewById(R.id.announcement_content);
 		// Fix for carriage returns displayed as rectangle characters in Android 1.6 
 		tvContent.setText(AndroidUtil.removeCarriageReturns(cursor.getString(idxContent) ) );
 
