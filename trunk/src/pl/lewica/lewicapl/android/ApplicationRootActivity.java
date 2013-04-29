@@ -87,16 +87,9 @@ public class ApplicationRootActivity extends TabActivity {
 	}
 
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		init();
-
-		setContentView(R.layout.tab_layout);
-
-		// Tabs layout based on http://developer.android.com/resources/tutorials/views/hello-tabwidget.html
-		Resources res			= getResources(); // Resource object to get Drawables
+	// Tabs layout based on http://developer.android.com/resources/tutorials/views/hello-tabwidget.html
+	private void loadTabs() {
+		Resources res		= getResources(); // Resource object to get Drawables
 		TabHost tabHost	= getTabHost();  // The activity TabHost
 		TabHost.TabSpec spec;  // Reusable TabSpec for each tab
 		Intent intent;  // Reusable Intent for each tab
@@ -131,6 +124,18 @@ public class ApplicationRootActivity extends TabActivity {
 		tabHost.addTab(spec);
 
 		tabHost.setCurrentTab(Tab.NEWS.ordinal() );
+	}
+
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		init();
+
+		setContentView(R.layout.tab_layout);
+
+		loadTabs();
 	}
 
 
