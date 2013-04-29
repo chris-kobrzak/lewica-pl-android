@@ -53,7 +53,7 @@ import pl.lewica.lewicapl.android.BroadcastSender;
 import pl.lewica.lewicapl.android.DialogManager;
 import pl.lewica.lewicapl.android.SliderDialog;
 import pl.lewica.lewicapl.android.UserPreferencesManager;
-import pl.lewica.lewicapl.android.activity.util.ArticleUtil;
+import pl.lewica.lewicapl.android.activity.util.TranslationUtil;
 import pl.lewica.lewicapl.android.activity.util.StandardTextScreen;
 import pl.lewica.lewicapl.android.activity.util.TextSizeChangeListener;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
@@ -413,7 +413,7 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 	private void loadCategoryLabel(int categoryId) {
 		TextView tv		= (TextView) findViewById(R.id.article_category);
 		tv.setTypeface(categoryTypeface);
-		tv.setText(ArticleUtil.getCategoryLabel(categoryId, getApplicationContext() ) );
+		tv.setText(TranslationUtil.getArticleCategoryLabel(categoryId, getApplicationContext() ) );
 	}
 
 

@@ -49,7 +49,7 @@ import pl.lewica.lewicapl.R;
 import pl.lewica.api.url.ArticleURL;
 import pl.lewica.lewicapl.android.AndroidUtil;
 import pl.lewica.lewicapl.android.UserPreferencesManager;
-import pl.lewica.lewicapl.android.activity.util.ArticleUtil;
+import pl.lewica.lewicapl.android.activity.util.TranslationUtil;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 import pl.lewica.lewicapl.android.theme.Theme;
 
@@ -339,7 +339,7 @@ public class NewsListActivity extends Activity {
 			}
 
 			tv.setTypeface(categoryTypeface);
-			tv.setText(ArticleUtil.getCategoryLabel(categoryId, context) );
+			tv.setText(TranslationUtil.getArticleCategoryLabel(categoryId, context) );
 		}
 
 
