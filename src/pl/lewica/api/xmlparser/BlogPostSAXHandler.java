@@ -110,7 +110,7 @@ public class BlogPostSAXHandler extends DefaultHandler implements SAXParserDeleg
 			currentBlogPost.setAuthorID(authorID);
 		}
 		else if (name.equalsIgnoreCase(BLOG_POST_PUB_DATE) ) {
-			Date pubDate = DateUtil.parseDateString(builder.toString(), java.sql.Date.valueOf(defaultDate) );
+			Date pubDate = DateUtil.parseDateString(builder.toString(), DateUtil.DATE_MASK_SQL, java.sql.Date.valueOf(defaultDate) );
 			currentBlogPost.setDatePublished(pubDate);
 		}
 		else if (name.equalsIgnoreCase(BLOG_POST_BLOG_TITLE) ) {

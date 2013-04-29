@@ -113,7 +113,7 @@ public class ArticleSAXHandler extends DefaultHandler implements SAXParserDelega
 			currentArticle.setRelatedIDs(articleIDs);
 		}
 		else if (name.equalsIgnoreCase(ARTICLE_PUB_DATE) ) {
-			Date pubDate = DateUtil.parseDateString(builder.toString(), java.sql.Date.valueOf(defaultDate) );
+			Date pubDate = DateUtil.parseDateString(builder.toString(), DateUtil.DATE_MASK_SQL, java.sql.Date.valueOf(defaultDate) );
 			currentArticle.setDatePublished(pubDate);
 		}
 		else if (name.equalsIgnoreCase(ARTICLE_IMAGE) ) {

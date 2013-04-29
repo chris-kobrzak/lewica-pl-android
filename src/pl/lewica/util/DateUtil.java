@@ -47,18 +47,19 @@ public class DateUtil {
 
 
 	/**
+	 * @param dateFormat TODO
 	 * @return
 	 */
-	public static Date parseDateString(String dateString, Date fallOverDate) {
-		DateFormat df	= new SimpleDateFormat(DATE_MASK_SQL);
-		Date pubDate	;
+	public static Date parseDateString(String dateString, String dateFormat, Date fallOverDate) {
+		Date date;
 
 		try {
-			pubDate	= df.parse(dateString);
+			DateFormat df	= new SimpleDateFormat(dateFormat);
+			date	= df.parse(dateString);
 		} catch (ParseException e) {
 			// We don't want to let an invalid date crash the application so let's just use any date
-			pubDate	= fallOverDate;
+			date	= fallOverDate;
 		}
-		return pubDate;
+		return date;
 	}
 }
