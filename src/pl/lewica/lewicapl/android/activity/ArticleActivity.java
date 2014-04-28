@@ -55,6 +55,7 @@ import pl.lewica.lewicapl.android.activity.util.TextSizeDialog;
 import pl.lewica.lewicapl.android.activity.util.TranslationUtil;
 import pl.lewica.lewicapl.android.activity.util.StandardTextScreen;
 import pl.lewica.lewicapl.android.activity.util.TextSizeChangeListener;
+import pl.lewica.lewicapl.android.activity.util.MessageSharingChooser;
 import pl.lewica.lewicapl.android.database.ArticleDAO;
 import pl.lewica.lewicapl.android.theme.Theme;
 
@@ -195,10 +196,8 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 				return true;
 
 			case R.id.menu_share:
-				intent	= new Intent(Intent.ACTION_SEND);
-				intent.setType("text/plain");
-				intent.putExtra(Intent.EXTRA_TEXT, articleURL);
-				startActivity(Intent.createChooser(intent, getString(R.string.label_share_link) ) );
+				Intent chooserIntent = MessageSharingChooser.getIntent(getString(R.string.label_share_link), articleURL);
+				startActivity(chooserIntent);
 				return true;
 
 			case R.id.menu_comments:
