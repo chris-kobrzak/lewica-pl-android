@@ -53,12 +53,12 @@ public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
 		int i, prevVersion;
 
 		// Version 1
-		initDatabase(db, DATABASE_VERSION);
+		initDatabase(db);
 
 		// Versions 2+
-		i	= 2;
+		i = 2;
 		for ( ; i <= DATABASE_VERSION; i++) {
-			prevVersion	= i - 1;
+			prevVersion = i - 1;
 			upgradeDatabase(db, prevVersion, i);
 		}
 	}
@@ -88,13 +88,13 @@ public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
 	}
 
 
-	private boolean initDatabase(SQLiteDatabase db, int version) {
+	private boolean initDatabase(SQLiteDatabase db) {
 		boolean result	= true;
 		List<String> queries;
 
 		Log.i(TAG, "Creating DB version 1");
 		try {
-			queries = Schema.getDatabaseInitSQL(context, DATABASE_VERSION);
+			queries = Schema.getDatabaseInitSQL(context);
 
 			db.beginTransaction();
 			for (String query: queries) {
@@ -113,7 +113,7 @@ public class LewicaPLSQLiteOpenHelper extends SQLiteOpenHelper {
 
 		// This is unlikely to happen but if it does, there's not much you can do as the application
 		// cannot run without the database.  So let's at least make sure this event is logged.
-		Log.e(TAG, "Failed to create DB version " + DATABASE_VERSION);
+		Log.e(TAG, "Failed to create DB version 1");
 		return false;
 	}
 
