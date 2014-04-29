@@ -78,7 +78,7 @@ public class FileUtil {
 
 
 	public static boolean fetchAndSaveImage(String sourceUrl, String destinationPath, boolean overwrite)
-			throws MalformedURLException, IOException {
+			throws IOException {
 		File destinationFile	= new File(destinationPath);
 		if (destinationFile.exists() && ! overwrite) {
 			return false;
