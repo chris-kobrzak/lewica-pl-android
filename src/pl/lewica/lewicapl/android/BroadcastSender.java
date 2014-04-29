@@ -130,8 +130,7 @@ public class BroadcastSender {
 				break;
 
 			default:
-				return;
-		}
+        }
 	}
 
 

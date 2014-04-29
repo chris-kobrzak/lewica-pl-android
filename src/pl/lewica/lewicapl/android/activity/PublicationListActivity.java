@@ -143,8 +143,6 @@ public class PublicationListActivity extends Activity {
 			TextView tv		= (TextView) view.findViewById(R.id.article_item_title);
 			tv.setTextColor(appTheme.getListHeadingColour(true) );
 			addToClickedItems(id);
-
-			return;
 		}
 	}
 

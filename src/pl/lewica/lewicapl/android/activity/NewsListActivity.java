@@ -143,9 +143,7 @@ public class NewsListActivity extends Activity {
 			appTheme	= UserPreferencesManager.getThemeInstance(context);
 			tv.setTextColor(appTheme.getListHeadingColour(true) );
 			addToClickedItems(id);
-
-			return;
-		}
+        }
 	}
 
 
