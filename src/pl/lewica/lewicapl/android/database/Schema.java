@@ -32,21 +32,18 @@ import pl.lewica.util.FileUtil;
  * @author Krzysztof Kobrzak
  */
 public class Schema {
-	private static final String DATABASE_SCRIPT	= "LewicaPL.sql";
-
 
 	/**
 	 * Returns SQL scripts necessary to initialise the database.
 	 * Since SQLiteDatabse.execSQL() can only run individual queries, this method returns a list queries that can be looped through.
 	 * @param context Android application context
-	 * @param version Not in use yet but will prove useful when there's a need to upgrade the database.
 	 * @return
 	 * @throws IOException
 	 */
-	public static List<String> getDatabaseInitSQL(Context context, int version) 
+	public static List<String> getDatabaseInitSQL(Context context)
 			throws IOException {
-		AssetManager am	= context.getAssets();
-		InputStream is		= am.open(DATABASE_SCRIPT);
+		AssetManager am = context.getAssets();
+		InputStream is = am.open("LewicaPL.sql");
 
 		return extractSqlStatements(is);
 	}
