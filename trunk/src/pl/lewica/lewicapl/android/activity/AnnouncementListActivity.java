@@ -58,7 +58,6 @@ public class AnnouncementListActivity extends Activity {
 	private BaseTextDAO annDAO;
 	private ListAdapter listAdapter;
 	private ListView listView;
-	private AnnouncementsUpdateBroadcastReceiver receiver;
 	private static Theme appTheme;
 
 	private int limitRows		= 15;
@@ -75,7 +74,7 @@ public class AnnouncementListActivity extends Activity {
 		// Register to receive content update messages
 		IntentFilter filter		= new IntentFilter();
 		filter.addAction(RELOAD_VIEW);
-		receiver					= new AnnouncementsUpdateBroadcastReceiver();	// Instance of an inner class
+		AnnouncementsUpdateBroadcastReceiver receiver = new AnnouncementsUpdateBroadcastReceiver();	// Instance of an inner class
 		registerReceiver(receiver, filter);
 
 		// Access data
