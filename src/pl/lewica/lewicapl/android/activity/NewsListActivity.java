@@ -320,11 +320,8 @@ public class NewsListActivity extends Activity {
 			// Restore cursor position
 			cursor.moveToPosition(position);
 
-			if (categoryID == categoryIDPrev) {
-				return false;
-			}
-			return true;
-		}
+            return categoryID != categoryIDPrev;
+        }
 
 
 		/**
