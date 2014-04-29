@@ -520,9 +520,7 @@ public class ContentUpdateManager {
 
 		@Override
 		protected UpdateStatus doInBackground(Void... params) {
-			UpdateStatus status					= fetchAndSaveArticles(context);
-
-			return status;
+            return fetchAndSaveArticles(context);
 		}
 
 		@Override
@@ -573,9 +571,7 @@ public class ContentUpdateManager {
 		
 		@Override
 		protected UpdateStatus doInBackground(Void... params) {
-			UpdateStatus status					= fetchAndSaveBlogPosts(context);
-			
-			return status;
+			return fetchAndSaveBlogPosts(context);
 		}
 		
 		@Override
@@ -596,9 +592,7 @@ public class ContentUpdateManager {
 
 		@Override
 		protected UpdateStatus doInBackground(Void... params) {
-			UpdateStatus status					= fetchAndSaveAnnouncements(context);
-
-			return status;
+			return fetchAndSaveAnnouncements(context);
 		}
 
 		@Override
@@ -619,9 +613,7 @@ public class ContentUpdateManager {
 
 		@Override
 		protected UpdateStatus doInBackground(Void... params) {
-			UpdateStatus status					= fetchAndSaveHistoryEvents(context);
-
-			return status;
+			return fetchAndSaveHistoryEvents(context);
 		}
 
 		@Override
