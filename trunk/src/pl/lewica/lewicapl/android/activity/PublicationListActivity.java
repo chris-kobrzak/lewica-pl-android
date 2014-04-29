@@ -311,12 +311,9 @@ public class PublicationListActivity extends Activity {
 			int categoryIDPrev	= cursor.getInt(inxCategoryID);
 			// Restore cursor position
 			cursor.moveToPosition(position);
-			
-			if (categoryID == categoryIDPrev) {
-				return false;
-			}
-			return true;
-		}
+
+            return categoryID != categoryIDPrev;
+        }
 
 
 		/**

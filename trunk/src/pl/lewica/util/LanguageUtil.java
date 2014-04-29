@@ -19,18 +19,12 @@ public class LanguageUtil {
 
 	// PL Biernik: 2-4, 22-24
 	public static boolean isPolishAccusative(int number) {
-		if ( (number >= 2 && number <= 4) || (number >= 22 && number <= 24) ) {
-			return true;
-		}
-		return false;
-	}
+        return (number >= 2 && number <= 4) || (number >= 22 && number <= 24);
+    }
 
 
 	// PL Dopełniacz: 5-21, 25
 	public static boolean isPolishGenitive(int number) {
-		if ( (number >= 5 && number <= 21) || number == 25) {
-			return true;
-		}
-		return false;
-	}
+        return (number >= 5 && number <= 21) || number == 25;
+    }
 }
