@@ -158,7 +158,6 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		long id;
-		Intent intent;
 
 		switch (item.getItemId()) {
 			case R.id.menu_previous:
