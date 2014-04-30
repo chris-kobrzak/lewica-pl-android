@@ -51,7 +51,7 @@ public class AnnouncementDAO extends BaseTextDAO {
 	public long insert(Announcement announcement) {
 		ContentValues cv	= new ContentValues();
 
-		cv.put(FIELD_ID,							announcement.getID() );
+		cv.put(FIELD_ID,							announcement.getId() );
 		cv.put(FIELD_WAS_READ,				0);	// It's a new announcement so it couldn't be read yet
 		cv.put(FIELD_DATE_EXPIRY,			DateUtil.convertDateToString(announcement.getDateExpiry(), DateUtil.DATE_MASK_SQL) );
 		cv.put(FIELD_WHAT,					announcement.getWhat() );

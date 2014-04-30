@@ -22,9 +22,9 @@ import java.util.Date;
  * @author Krzysztof Kobrzak
  */
 public class BlogPost implements DataModel {
-	private int ID;
-	private int blogID;
-	private int authorID;
+	private int id;
+	private int blogId;
+	private int authorId;
 	private Date datePublished;
 	private boolean wasRead;
 	private String blogTitle;
@@ -33,11 +33,11 @@ public class BlogPost implements DataModel {
 	private String text;
 
 
-	public int getID() {
-		return ID;
+	public int getId() {
+		return id;
 	}
-	public void setID(int id) {
-		ID = id;
+	public void setId(int id) {
+		this.id = id;
 	}
 	public boolean wasRead() {
 		return wasRead;
@@ -45,17 +45,17 @@ public class BlogPost implements DataModel {
 	public void setWasRead(boolean wasRead) {
 		this.wasRead = wasRead;
 	}
-	public int getBlogID() {
-		return blogID;
+	public int getBlogId() {
+		return blogId;
 	}
-	public void setBlogID(int blogID) {
-		this.blogID = blogID;
+	public void setBlogId(int blogId) {
+		this.blogId = blogId;
 	}
-	public int getAuthorID() {
-		return authorID;
+	public int getAuthorId() {
+		return authorId;
 	}
-	public void setAuthorID(int authorID) {
-		this.authorID = authorID;
+	public void setAuthorId(int authorId) {
+		this.authorId = authorId;
 	}
 	public Date getDatePublished() {
 		return datePublished;

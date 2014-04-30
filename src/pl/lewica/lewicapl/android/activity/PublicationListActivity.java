@@ -173,8 +173,8 @@ public class PublicationListActivity extends Activity {
 
 		private LayoutInflater inflater;
 
-		private int inxID;
-		private int inxCategoryID;
+		private int inxId;
+		private int inxCategoryId;
 		private int inxTitle;
 		private int inxDatePub;
 		private int inxWasRead;
@@ -191,8 +191,8 @@ public class PublicationListActivity extends Activity {
 			inflater				= LayoutInflater.from(context);
 
 			// Get and cache column indices
-			inxID					= cursor.getColumnIndex(ArticleDAO.FIELD_ID);
-			inxCategoryID		= cursor.getColumnIndex(ArticleDAO.FIELD_CATEGORY_ID);
+			inxId = cursor.getColumnIndex(ArticleDAO.FIELD_ID);
+			inxCategoryId = cursor.getColumnIndex(ArticleDAO.FIELD_CATEGORY_ID);
 			inxTitle				= cursor.getColumnIndex(ArticleDAO.FIELD_TITLE);
 			inxDatePub			= cursor.getColumnIndex(ArticleDAO.FIELD_DATE_PUBLISHED);
 			inxWasRead			= cursor.getColumnIndex(ArticleDAO.FIELD_WAS_READ);
@@ -217,13 +217,13 @@ public class PublicationListActivity extends Activity {
 			loadImage(cursor, view);
 
 			// If there is a group header, set their values
-			loadCategoryLabel(cursor.getInt(inxCategoryID), view, context);
+			loadCategoryLabel(cursor.getInt(inxCategoryId), view, context);
 
 			// Publications do not have editor's comments so no need for the pencil icon here
 			ImageView iv	= (ImageView) view.findViewById(R.id.ico_pencil);
 			iv.setVisibility(View.GONE);
 
-			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! wasItemClicked(cursor.getLong(inxID) );
+			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! wasItemClicked(cursor.getLong(inxId) );
 			loadTheme(! unread, view, tvTitle, tvDate);
 		}
 
@@ -304,21 +304,16 @@ public class PublicationListActivity extends Activity {
 				return false;
 			}
 			// Get date values for current and previous data items
-			int categoryID		= cursor.getInt(inxCategoryID);
+			int categoryId = cursor.getInt(inxCategoryId);
 			cursor.moveToPosition(position - 1);
-			int categoryIDPrev	= cursor.getInt(inxCategoryID);
+			int categoryIdPrev	= cursor.getInt(inxCategoryId);
 			// Restore cursor position
 			cursor.moveToPosition(position);
 
-            return categoryID != categoryIDPrev;
+            return categoryId != categoryIdPrev;
         }
 
 
-		/**
-		 * @param view
-		 * @param context
-		 * @param cursor
-		 */
 		private void loadCategoryLabel(int categoryId, View view, Context context) {
 			TextView tv	= (TextView) view.findViewById(R.id.article_items_heading);
 			if (tv == null) {
@@ -330,10 +325,6 @@ public class PublicationListActivity extends Activity {
 		}
 
 
-		/**
-		 * @param view
-		 * @param cursor
-		 */
 		private void loadImage(Cursor cursor, View view) {
 			ImageView iv	= (ImageView) view.findViewById(R.id.article_item_icon);
 			iv.setImageBitmap(null);
@@ -341,7 +332,8 @@ public class PublicationListActivity extends Activity {
 			if (cursor.getInt(inxHasThumb) == 0) {
 				return;
 			}
-			String imgPath	= AndroidUtil.getStorageDir().getPath() + "/" + ArticleURL.buildNameThumbnail(cursor.getLong(inxID), cursor.getString(inxThumbExt) );
+			String imgPath	= AndroidUtil.getStorageDir().getPath() + "/" +
+				ArticleURL.buildNameThumbnail(cursor.getInt(inxId), cursor.getString(inxThumbExt) );
 			File img	= new File(imgPath);
 			if (! img.exists() ) {
 				return;
@@ -352,12 +344,6 @@ public class PublicationListActivity extends Activity {
 		}
 
 
-		/**
-		 * @param read
-		 * @param view
-		 * @param tvTitle
-		 * @param tvDate
-		 */
 		private void loadTheme(boolean read, View view, TextView tvTitle, TextView tvDate) {
 			tvTitle.setTextColor(appTheme.getListHeadingColour(read) );
 			tvDate.setTextColor(appTheme.getListTextColour(read) );

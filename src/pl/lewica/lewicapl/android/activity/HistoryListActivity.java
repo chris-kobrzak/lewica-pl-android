@@ -51,10 +51,8 @@ public class HistoryListActivity extends Activity {
 	private static Typeface categoryTypeface;
 	private HistoryDAO historyDAO;
 	private ListAdapter listAdapter;
-	private ListView listView;
-	private HistoryUpdateBroadcastReceiver receiver;
-	private 	int month;
-	private 	int day;
+	private int month;
+	private int day;
 	private int limitRows		= 100;
 
 
@@ -64,7 +62,7 @@ public class HistoryListActivity extends Activity {
 		setContentView(R.layout.list_history);	// This comes from this file's name /res/list_history.xml
 
 		// Load a list view container from list_history.xml
-		listView					= (ListView) findViewById(R.id.list_history_events);
+        ListView listView = (ListView) findViewById(R.id.list_history_events);
 
 		// Custom font used by the category headings
 		categoryTypeface	= Typeface.createFromAsset(getAssets(), "Impact.ttf");
@@ -112,7 +110,7 @@ public class HistoryListActivity extends Activity {
 		// Register to receive content update messages
 		IntentFilter filter		= new IntentFilter();
 		filter.addAction(RELOAD_VIEW);
-		receiver					= new HistoryUpdateBroadcastReceiver();	// Instance of an inner class
+        HistoryUpdateBroadcastReceiver receiver = new HistoryUpdateBroadcastReceiver();	// Instance of an inner class
 		registerReceiver(receiver, filter);
 	}
 
@@ -148,14 +146,14 @@ public class HistoryListActivity extends Activity {
 		// Orange bar
 		TextView tv			= (TextView) findViewById(R.id.bar_category);
 		tv.setTypeface(categoryTypeface);
-		tv.setText(this.getString(R.string.heading_history) );
+		tv.setText(this.getString(R.string.heading_history) ); // TODO Move it to resource bundle
 
 		StringBuilder sb		= new StringBuilder();
 		sb.append(day);
 		sb.append("/");
 		sb.append(month);
 		sb.append(" ");
-		sb.append(this.getString(R.string.heading_history_extra) );
+		sb.append(this.getString(R.string.heading_history_extra) ); // TODO Move it to resource bundle
 
 		tv							= (TextView) findViewById(R.id.bar_date);
 		tv.setText(sb.toString() );

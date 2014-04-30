@@ -66,13 +66,13 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 	public static final String URI_BASE_COMMENTS	= "content://lewicapl/articles/article/comments/";
 
 	private static Typeface categoryTypeface;
-	private static Map<Long, SoftReference<Bitmap>> images	= new HashMap<Long,SoftReference<Bitmap>>();
+	private static Map<Integer, SoftReference<Bitmap>> images	= new HashMap<Integer, SoftReference<Bitmap>>();
 
-	private long articleID;
-	private int categoryID;
+	private int articleId;
+	private int categoryId;
 	private String articleURL;
 	private ArticleDAO articleDAO;
-	private Map<String,Long> nextPrevID;
+	private Map<String, Integer> nextPrevId;
 	private ImageLoadTask imageTask;
 	private ImageCache imageCache;
 	private SeekBar.OnSeekBarChangeListener mSeekBarChangeListener;
@@ -106,14 +106,14 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
 		// article that was loaded through the intent.  In other words, changing the orientation would change the article displayed...
 		// The logic below fixes this issue and it's using the ID set by onRetainNonConfigurationInstance (see docs for details).
-		final Long ID	= (Long) getLastNonConfigurationInstance();
-		if (ID == null) {
-			articleID				= AndroidUtil.filterIDFromUri(getIntent().getData() );
+		final Integer id = (Integer) getLastNonConfigurationInstance();
+		if (id == null) {
+			articleId = AndroidUtil.filterIdFromUri(getIntent().getData());
 		} else {
-			articleID				= ID;
+			articleId = id;
 		}
 		// Fill views with data
-		loadContent(articleID, this);
+		loadContent(articleId, this);
 		loadTextSize(UserPreferencesManager.getTextSize(this) );
 		loadTheme(getApplicationContext() );
 
@@ -154,13 +154,13 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 		showPrevious.setEnabled(true);
 		showNext.setEnabled(true);
 
-		nextPrevID		= articleDAO.fetchPreviousNextID(articleID, categoryID);
+		nextPrevId = articleDAO.fetchPreviousNextId(articleId, categoryId);
 
-		long id	= nextPrevID.get(ArticleDAO.MAP_KEY_PREVIOUS);
+		int id	= nextPrevId.get(ArticleDAO.MAP_KEY_PREVIOUS);
 		if (id == 0) {
 			showPrevious.setEnabled(false);
 		}
-		id	= nextPrevID.get(ArticleDAO.MAP_KEY_NEXT);
+		id	= nextPrevId.get(ArticleDAO.MAP_KEY_NEXT);
 		if (id == 0) {
 			showNext.setEnabled(false);
 		}
@@ -175,23 +175,23 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		long id;
+        int id;
 		Intent intent;
 
 		switch (item.getItemId()) {
 			case R.id.menu_previous:
-				id	= nextPrevID.get(ArticleDAO.MAP_KEY_PREVIOUS);
+				id	= nextPrevId.get(ArticleDAO.MAP_KEY_PREVIOUS);
 				// If there are no newer articles the ID is set to zero by fetchPreviousNextID()
 				if (id > 0) {
-					loadContent(nextPrevID.get(ArticleDAO.MAP_KEY_PREVIOUS), this);
+					loadContent(nextPrevId.get(ArticleDAO.MAP_KEY_PREVIOUS), this);
 				}
 				return true;
 
 			case R.id.menu_next:
-				id	= nextPrevID.get(ArticleDAO.MAP_KEY_NEXT);
+				id	= nextPrevId.get(ArticleDAO.MAP_KEY_NEXT);
 				// If there are no older articles the ID is set to zero by fetchPreviousNextID()
 				if (id > 0) {
-					loadContent(nextPrevID.get(ArticleDAO.MAP_KEY_NEXT), this);
+					loadContent(nextPrevId.get(ArticleDAO.MAP_KEY_NEXT), this);
 				}
 				return true;
 
@@ -204,7 +204,7 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 				// Redirect to article details screen
 				intent	= new Intent(this, ReadersCommentsActivity.class);
 				// Builds a uri in the following format: content://lewicapl/articles/article/[0-9]+
-				Uri uri			= Uri.parse(ArticleActivity.URI_BASE_COMMENTS + Long.toString(articleID) );
+				Uri uri = Uri.parse(ArticleActivity.URI_BASE_COMMENTS + Integer.toString(articleId) );
 				// Passes activity Uri as parameter that can be used to work out ID of requested article.
 				intent.setData(uri);
 				startActivity(intent);
@@ -234,8 +234,8 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 	 */
 	@Override
 	public Object onRetainNonConfigurationInstance() {
-		final Long ID = articleID;
-		return ID;
+		final Integer id = articleId;
+		return id;
 	}
 
 
@@ -244,19 +244,18 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 	 * It is meant to be called every time user accesses this activity, either by selecting an article from the list
 	 * or navigating between articles using the previous-next facility (not yet implemented).
 	 * TODO Break this method down into smaller parts
-	 * @param id
 	 */
-	private void loadContent(long ID, Context context) {
+	private void loadContent(int id, Context context) {
 		// Save it in this object's field
-		articleID	= ID;
+		articleId = id;
 		// Fetch database record
-		Cursor cursor				= articleDAO.selectOne(ID);
+		Cursor cursor = articleDAO.selectOne(id);
 
 		startManagingCursor(cursor);
 
 		// In order to capture a cell, you need to work what their index
 		int inxURL				= cursor.getColumnIndex(ArticleDAO.FIELD_URL);
-		int inxCategoryID	= cursor.getColumnIndex(ArticleDAO.FIELD_CATEGORY_ID);
+		int inxCategoryId	= cursor.getColumnIndex(ArticleDAO.FIELD_CATEGORY_ID);
 		int inxTitle			= cursor.getColumnIndex(ArticleDAO.FIELD_TITLE);
 		int inxDatePub		= cursor.getColumnIndex(ArticleDAO.FIELD_DATE_PUBLISHED);
 		int inxContent		= cursor.getColumnIndex(ArticleDAO.FIELD_TEXT);
@@ -274,9 +273,9 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 
 		// Save the URL in memory so the "share link" option in menu can access it easily
 		articleURL		= cursor.getString(inxURL);
-		categoryID		= cursor.getInt(inxCategoryID);
+		categoryId = cursor.getInt(inxCategoryId);
 
-		loadCategoryLabel(categoryID);
+		loadCategoryLabel(categoryId);
 		loadDateTime(cursor.getLong(inxDatePub) );	// Dates are stored as Unix timestamps
 
 		// Now start populating all views with data
@@ -292,7 +291,7 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 		ImageView iv		= (ImageView) findViewById(R.id.article_image);
 		iv.setImageBitmap(null);
 		if (cursor.getInt(inxHasThumb) == 1) {
-			loadImageFromCacheOrServer(ID, cursor.getString(inxThumbExt) );
+			loadImageFromCacheOrServer(id, cursor.getString(inxThumbExt) );
 		}
 
 		// Only mark the article as read once.  If it's already marked as such - just stop here.
@@ -303,7 +302,7 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 		// Tidy up
 		cursor.close();
 
-		reloadListingTabAndMarkAsRead(ID, context);
+		reloadListingTabAndMarkAsRead(id, context);
 	}
 
 
@@ -379,10 +378,10 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 	}
 
 
-	private void loadImageFromCacheOrServer(long articleId, String extension) {
+	private void loadImageFromCacheOrServer(int articleId, String extension) {
 		// Checking if this image is available in our local cache.
-		if (imageCache.isCached(articleID) ) {
-			Bitmap bitmap	= imageCache.get(articleID);
+		if (imageCache.isCached(articleId) ) {
+			Bitmap bitmap = imageCache.get(articleId);
 			if (bitmap != null) {
 				loadImage(bitmap);
 				return;
@@ -414,8 +413,8 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 	 * @param articleId
 	 * @param context
 	 */
-	private void reloadListingTabAndMarkAsRead(final long articleId, final Context context) {
-		final int categoryIdFinal		= categoryID;
+	private void reloadListingTabAndMarkAsRead(final int articleId, final Context context) {
+		final int categoryIdFinal = categoryId;
 
 		new Thread(new Runnable() {
 			public void run() {
@@ -444,13 +443,13 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 	 */
 	private class ImageCache {
 
-		public boolean isCached(Long articleID) {
-			return images.containsKey(articleID);
+		public boolean isCached(Integer articleId) {
+			return images.containsKey(articleId);
 		}
 
 
-		public Bitmap get(Long articleID) {
-			SoftReference<Bitmap> sf		= images.get(articleID);
+		public Bitmap get(Integer articleId) {
+			SoftReference<Bitmap> sf		= images.get(articleId);
 			if (sf != null) {
 				return sf.get();
 			}
@@ -458,8 +457,8 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 		}
 
 
-		public void put(Long articleID, Bitmap bitmap) {
-			images.put(articleID, new SoftReference<Bitmap>(bitmap) );
+		public void put(Integer articleId, Bitmap bitmap) {
+			images.put(articleId, new SoftReference<Bitmap>(bitmap) );
 		}
 	}
 
@@ -503,7 +502,7 @@ public class ArticleActivity extends Activity implements StandardTextScreen {
 			// Even though relying on articleID might seem risky, loading a wrong image shouldn't ever be the case.
 			// This is because we cancel image loading operations every time loadArticle is called, ie. when users 
 			// navigate between articles using the previous-next facility.
-			imageCache.put(articleID, bitmap);
+			imageCache.put(articleId, bitmap);
 		}
 	}
 }

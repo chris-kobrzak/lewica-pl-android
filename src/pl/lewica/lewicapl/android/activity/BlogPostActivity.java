@@ -54,10 +54,10 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 
 	private static Typeface categoryTypeface;
 
-	private long blogPostID;
-	private int blogID;
+	private int blogPostId;
+	private int blogId;
 	private BlogPostDAO blogPostDAO;
-	private Map<String,Long> nextPrevID;
+	private Map<String,Integer> nextPrevId;
 	private String blogPostURL;
 	private SeekBar.OnSeekBarChangeListener mSeekBarChangeListener;
 
@@ -87,15 +87,15 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
 		// article that was loaded through the intent.  In other words, changing the orientation would change the article displayed...
 		// The logic below fixes this issue and it's using the ID set by onRetainNonConfigurationInstance (see docs for details).
-		final Long ID	= (Long) getLastNonConfigurationInstance();
-		if (ID == null) {
-			blogPostID			= AndroidUtil.filterIDFromUri(getIntent().getData() );
+		final Integer id	= (Integer) getLastNonConfigurationInstance();
+		if (id == null) {
+			blogPostId = AndroidUtil.filterIdFromUri(getIntent().getData());
 		} else {
-			blogPostID			= ID;
+			blogPostId = id;
 		}
 
 		// Fill views with data
-		loadContent(blogPostID, this);
+		loadContent(blogPostId, this);
 		loadTextSize(UserPreferencesManager.getTextSize(this) );
 		loadTheme(getApplicationContext() );
 
@@ -136,13 +136,13 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 		showPrevious.setEnabled(true);
 		showNext.setEnabled(true);
 
-		nextPrevID		= blogPostDAO.fetchPreviousNextID(blogPostID);
+		nextPrevId = blogPostDAO.fetchPreviousNextId(blogPostId);
 
-		long id	= nextPrevID.get(BlogPostDAO.MAP_KEY_PREVIOUS);
+		long id	= nextPrevId.get(BlogPostDAO.MAP_KEY_PREVIOUS);
 		if (id == 0) {
 			showPrevious.setEnabled(false);
 		}
-		id	= nextPrevID.get(BlogPostDAO.MAP_KEY_NEXT);
+		id	= nextPrevId.get(BlogPostDAO.MAP_KEY_NEXT);
 		if (id == 0) {
 			showNext.setEnabled(false);
 		}
@@ -161,18 +161,18 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 
 		switch (item.getItemId()) {
 			case R.id.menu_previous:
-				id	= nextPrevID.get(BlogPostDAO.MAP_KEY_PREVIOUS);
+				id	= nextPrevId.get(BlogPostDAO.MAP_KEY_PREVIOUS);
 				// If there are no newer blog posts the ID is set to zero by fetchPreviousNextID()
 				if (id > 0) {
-					loadContent(nextPrevID.get(BlogPostDAO.MAP_KEY_PREVIOUS), this);
+					loadContent(nextPrevId.get(BlogPostDAO.MAP_KEY_PREVIOUS), this);
 				}
 				return true;
 
 			case R.id.menu_next:
-				id	= nextPrevID.get(BlogPostDAO.MAP_KEY_NEXT);
+				id	= nextPrevId.get(BlogPostDAO.MAP_KEY_NEXT);
 				// If there are no older blog posts the ID is set to zero by fetchPreviousNextID()
 				if (id > 0) {
-					loadContent(nextPrevID.get(BlogPostDAO.MAP_KEY_NEXT), this);
+					loadContent(nextPrevId.get(BlogPostDAO.MAP_KEY_NEXT), this);
 				}
 				return true;
 
@@ -183,7 +183,7 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 
 			case R.id.menu_other_posts:
 				BroadcastSender broadcastSender	= BroadcastSender.getInstance(this);
-				broadcastSender.reloadTab_BlogPostListFilteredByBlogID(blogID);
+				broadcastSender.reloadTab_BlogPostListFilteredByBlogId(blogId);
 				finish();
 				return true;
 
@@ -211,8 +211,8 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 	 */
 	@Override
 	public Object onRetainNonConfigurationInstance() {
-		final Long ID = blogPostID;
-		return ID;
+		final int id = blogPostId;
+		return id;
 	}
 
 
@@ -222,13 +222,12 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 	 * Responsible for loading content to the views and marking the current blog post as read.
 	 * It is meant to be called every time user accesses this activity, either by selecting an blog post from the list
 	 * or navigating between blog posts using the previous-next facility (not yet implemented).
-	 * @param id
 	 */
-	private void loadContent(long ID, Context context) {
+	private void loadContent(int id, Context context) {
 		// Save it in this object's field
-		blogPostID	= ID;
+		blogPostId = id;
 		// Fetch database record
-		Cursor cursor				= blogPostDAO.selectOne(ID);
+		Cursor cursor				= blogPostDAO.selectOne(id);
 
 		startManagingCursor(cursor);
 
@@ -236,7 +235,7 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 		int inxWasRead		= cursor.getColumnIndex(BlogPostDAO.FIELD_WAS_READ);
 		int inxTitle			= cursor.getColumnIndex(BlogPostDAO.FIELD_TITLE);
 		int inxText			= cursor.getColumnIndex(BlogPostDAO.FIELD_TEXT);
-		int inxBlogID			= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_ID);
+		int inxBlogId			= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_ID);
 		int inxBlog				= cursor.getColumnIndex(BlogPostDAO.FIELD_BLOG_TITLE);
 		int inxDatePub		= cursor.getColumnIndex(BlogPostDAO.FIELD_DATE_PUBLISHED);
 		int inxPublishedBy	= cursor.getColumnIndex(BlogPostDAO.FIELD_AUTHOR);
@@ -244,8 +243,8 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 		// When using previous-next facility you need to make sure the scroll view's position is at the top of the screen
 		AndroidUtil.scrollToTop(R.id.blog_post_scroll_view, this);
 
-		blogID			= cursor.getInt(inxBlogID);
-		blogPostURL	= URLDictionary.buildURL_BlogPost(cursor.getInt(inxBlogID), ID);
+		blogId = cursor.getInt(inxBlogId);
+		blogPostURL = URLDictionary.buildURL_BlogPost(cursor.getInt(inxBlogId), id);
 
 		// Now start populating all views with data
 		tvTitle			= (TextView) findViewById(R.id.blog_post_title);
@@ -280,7 +279,7 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 		// Tidy up
 		cursor.close();
 
-		reloadListingTabAndMarkAsRead(ID, context);
+		reloadListingTabAndMarkAsRead(id, context);
 	}
 
 
@@ -327,10 +326,10 @@ public class BlogPostActivity extends Activity implements StandardTextScreen {
 	/**
 	 * 1. Marks this blog post as read without blocking the UI thread (Java threads require variables to be declared as final)
 	 * 2. Asks listing screens to refresh
-	 * @param articleId
+	 * @param id
 	 * @param context
 	 */
-	private void reloadListingTabAndMarkAsRead(final long id, final Context context) {		
+	private void reloadListingTabAndMarkAsRead(final int id, final Context context) {
 		new Thread(new Runnable() {
 			public void run() {
 				blogPostDAO.updateMarkRecordAsRead(id);

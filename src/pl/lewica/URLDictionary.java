@@ -33,8 +33,6 @@ public class URLDictionary {
 	public static final String IMAGE			= "http://lewica.pl/im/";
 	public static final String THUMBNAIL	= "http://lewica.pl/im/thumbs/";
 
-	private static String sBaseReadersComments	= "http://lewica.pl/forum/index.php?fuse=messages.";
-
 	public static class API {
 		public static final String PUBLICATIONS		= "http://lewica.pl/api/publikacje.php";
 		public static final String ANNOUNCEMENTS	= "http://lewica.pl/api/ogloszenia.php";
@@ -43,20 +41,20 @@ public class URLDictionary {
 	}
 
 
-	public static String buildURL_BlogPost(int blogID, Long ID) {
+	public static String buildURL_BlogPost(Integer blogId, Integer Id) {
 		StringBuilder sb	= new StringBuilder(BLOGS);
 		sb.append("?blog=");
-		sb.append(Integer.toString(blogID) );
+		sb.append(Integer.toString(blogId) );
 		sb.append("&id=");
-		sb.append(Long.toString(ID) );
+		sb.append(Integer.toString(Id) );
 
 		return sb.toString();
 	}
 
 
-	public static String buildURL_ReadersComments(Long id, int textSize, int theme) {
-		StringBuilder sb	= new StringBuilder(sBaseReadersComments);
-		sb.append(Long.toString(id) );
+	public static String buildURL_ReadersComments(Integer id, int textSize, int theme) {
+		StringBuilder sb	= new StringBuilder("http://lewica.pl/forum/index.php?fuse=messages.");
+		sb.append(Integer.toString(id) );
 		sb.append("&format=minimal");
 		sb.append("&textSize=");
 		sb.append(Integer.toString(textSize) );

@@ -52,9 +52,9 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 
 	private static Typeface categoryTypeface;
 
-	private long annID;
+	private int annId;
 	private BaseTextDAO annDAO;
-	private Map<String,Long> nextPrevID;
+	private Map<String,Integer> nextPrevId;
 	private SeekBar.OnSeekBarChangeListener mSeekBarChangeListener;
 
 	private TextView tvTitle;
@@ -84,15 +84,15 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 		// the previous-next facility; if they subsequently changed the screen orientation, they would've ended up on the original
 		// article that was loaded through the intent.  In other words, changing the orientation would change the article displayed...
 		// The logic below fixes this issue and it's using the ID set by onRetainNonConfigurationInstance (see docs for details).
-		final Long ID	= (Long) getLastNonConfigurationInstance();
-		if (ID == null) {
-			annID			= AndroidUtil.filterIDFromUri(getIntent().getData() );
+		final Integer id = (Integer) getLastNonConfigurationInstance();
+		if (id == null) {
+			annId = AndroidUtil.filterIdFromUri(getIntent().getData());
 		} else {
-			annID			= ID;
+			annId = id;
 		}
 
 		// Fill views with data
-		loadContent(annID, this);
+		loadContent(annId, this);
 		loadTextSize(UserPreferencesManager.getTextSize(this) );
 		loadTheme(getApplicationContext() );
 
@@ -133,12 +133,12 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 		showPrevious.setEnabled(true);
 		showNext.setEnabled(true);
 
-		nextPrevID		= annDAO.fetchPreviousNextID(annID);
-		long id	= nextPrevID.get(AnnouncementDAO.MAP_KEY_PREVIOUS);
+		nextPrevId = annDAO.fetchPreviousNextId(annId);
+		int id	= nextPrevId.get(AnnouncementDAO.MAP_KEY_PREVIOUS);
 		if (id == 0) {
 			showPrevious.setEnabled(false);
 		}
-		id	= nextPrevID.get(AnnouncementDAO.MAP_KEY_NEXT);
+		id	= nextPrevId.get(AnnouncementDAO.MAP_KEY_NEXT);
 		if (id == 0) {
 			showNext.setEnabled(false);
 		}
@@ -153,22 +153,22 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		long id;
+		int id;
 
 		switch (item.getItemId()) {
 			case R.id.menu_previous:
-				id	= nextPrevID.get(AnnouncementDAO.MAP_KEY_PREVIOUS);
+				id	= nextPrevId.get(AnnouncementDAO.MAP_KEY_PREVIOUS);
 				// If there are no newer announcements the ID is set to zero by fetchPreviousNextID()
 				if (id > 0) {
-					loadContent(nextPrevID.get(AnnouncementDAO.MAP_KEY_PREVIOUS), this);
+					loadContent(nextPrevId.get(AnnouncementDAO.MAP_KEY_PREVIOUS), this);
 				}
 				return true;
 
 			case R.id.menu_next:
-				id	= nextPrevID.get(AnnouncementDAO.MAP_KEY_NEXT);
+				id	= nextPrevId.get(AnnouncementDAO.MAP_KEY_NEXT);
 				// If there are no older announcements the ID is set to zero by fetchPreviousNextID()
 				if (id > 0) {
-					loadContent(nextPrevID.get(AnnouncementDAO.MAP_KEY_NEXT), this);
+					loadContent(nextPrevId.get(AnnouncementDAO.MAP_KEY_NEXT), this);
 				}
 				return true;
 
@@ -196,8 +196,8 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 	 */
 	@Override
 	public Object onRetainNonConfigurationInstance() {
-		final Long ID = annID;
-		return ID;
+		final int id = annId;
+		return id;
 	}
 
 
@@ -207,11 +207,10 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 	 * Responsible for loading content to the views and marking the current announcement as read.
 	 * It is meant to be called every time user accesses this activity, either by selecting an announcement from the list
 	 * or navigating between announcements using the previous-next facility (not yet implemented).
-	 * @param id
 	 */
-	private void loadContent(long id, Context context) {
+	private void loadContent(int id, Context context) {
 		// Save it in this object's field
-		annID	= id;
+		annId = id;
 		// Fetch database record
 		Cursor cursor				= annDAO.selectOne(id);
 
@@ -287,10 +286,6 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 	}
 
 
-	/**
-	 * @param cursor
-	 * @param idxWhere
-	 */
 	private void loadEventLocation(String location) {
 		tvWhere			= (TextView) findViewById(R.id.announcement_where);
 		tvWhereLbl	= (TextView) findViewById(R.id.announcement_where_label);
@@ -300,7 +295,7 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 			// Reset visibility, may be useful when users navigate between announcements (previous-next facility to be added in the future)
 			tvWhere.setVisibility(View.VISIBLE);
 			
-			tvWhereLbl.setText(getString(R.string.label_where) );
+			tvWhereLbl.setText(getString(R.string.label_where) );   // TODO Move it to resource bundle
 			tvWhereLbl.setVisibility(View.VISIBLE);
 			return;
 		}
@@ -313,9 +308,6 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 	}
 
 
-	/**
-	 * @param dateTime
-	 */
 	private void loadEventTime(String dateTime) {
 		tvWhen					= (TextView) findViewById(R.id.announcement_when);
 		tvWhenLbl				= (TextView) findViewById(R.id.announcement_when_label);
@@ -325,7 +317,7 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 			// Reset visibility, may be useful when users navigate between announcements (previous-next facility to be added in the future)
 			tvWhen.setVisibility(View.VISIBLE);
 
-			tvWhenLbl.setText(getString(R.string.label_when) );
+			tvWhenLbl.setText(getString(R.string.label_when) ); // TODO Move it to resource bundle
 			tvWhenLbl.setVisibility(View.VISIBLE);
 			return;
 		}
@@ -350,7 +342,7 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 		}
 		if (author.length() > 0) {
 			if (authorEmail.length() > 0) {
-				String emailSubject	= getString(R.string.email_subject_announcement);
+				String emailSubject	= getString(R.string.email_subject_announcement);  // TODO Move it to resource bundle
 				tvAuthor.setText(Html.fromHtml("<a href=\"mailto:" + authorEmail + "?subject=" + emailSubject + "\">" + author + "</a>") );
 				tvAuthor.setMovementMethod(LinkMovementMethod.getInstance() );
 			} else {
@@ -370,7 +362,7 @@ public class AnnouncementActivity extends Activity implements StandardTextScreen
 	 * @param articleId
 	 * @param context
 	 */
-	private void reloadListingTabAndMarkAsRead(final long articleId, final Context context) {
+	private void reloadListingTabAndMarkAsRead(final int articleId, final Context context) {
 		// Mark this announcement as read without blocking the UI thread
 		// Java threads require variables to be declared as final
 		new Thread(new Runnable() {

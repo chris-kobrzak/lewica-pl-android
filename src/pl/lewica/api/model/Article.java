@@ -31,9 +31,9 @@ public class Article implements DataModel {
 	public static final int SECTION_REVIEWS		= 4;
 	public static final int SECTION_CULTURE		= 5;
 
-	private int ID;
-	private int articleCategoryID;
-	private List<Integer> relatedIDs;
+	private int id;
+	private int articleCategoryId;
+	private List<Integer> relatedIds;
 	private Date datePublished;
 	private boolean wasRead;
 	private boolean hasThumbnail;
@@ -45,23 +45,23 @@ public class Article implements DataModel {
 	private int totalComments;
 
 
-	public int getID() {
-		return ID;
+	public int getId() {
+		return id;
 	}
-	public void setID(int id) {
-		ID = id;
+	public void setId(int id) {
+		this.id = id;
 	}
-	public int getArticleCategoryID() {
-		return articleCategoryID;
+	public int getArticleCategoryId() {
+		return articleCategoryId;
 	}
-	public void setArticleCategoryID(int articleCategoryID) {
-		this.articleCategoryID = articleCategoryID;
+	public void setArticleCategoryId(int articleCategoryId) {
+		this.articleCategoryId = articleCategoryId;
 	}
-	public List<Integer> getRelatedIDs() {
-		return relatedIDs;
+	public List<Integer> getRelatedIds() {
+		return relatedIds;
 	}
-	public void setRelatedIDs(List<Integer> relatedIDs) {
-		this.relatedIDs = relatedIDs;
+	public void setRelatedIds(List<Integer> relatedIds) {
+		this.relatedIds = relatedIds;
 	}
 	public Date getDatePublished() {
 		return datePublished;

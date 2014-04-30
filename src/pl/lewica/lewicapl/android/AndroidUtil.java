@@ -100,12 +100,11 @@ public class AndroidUtil {
 	/**
 	 * Activities on Android are invoked with a Uri string.  This method captures and returns the last bit of this Uri
 	 * which it assumes to be a numeric ID of the current article/announcements etc.
-	 * @param intent
 	 * @return
 	 */
-	public static long filterIDFromUri(Uri uri) {
+	public static int filterIdFromUri(Uri uri) {
 		String id	= uri.getLastPathSegment();
 
-		return Long.valueOf(id);
+		return Integer.valueOf(id);
 	}
 }

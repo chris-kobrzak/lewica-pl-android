@@ -154,7 +154,7 @@ public class AnnouncementListActivity extends Activity {
 
 		public LayoutInflater inflater;
 
-		private int inxID;
+		private int inxId;
 		private int inxWasRead;
 		private int inxTitle;
 		private int inxWhere;
@@ -168,7 +168,7 @@ public class AnnouncementListActivity extends Activity {
 			inflater				= LayoutInflater.from(context);
 
 			// Get and cache column indices
-			inxID					= cursor.getColumnIndex(AnnouncementDAO.FIELD_ID);
+			inxId = cursor.getColumnIndex(AnnouncementDAO.FIELD_ID);
 			inxWasRead			= cursor.getColumnIndex(AnnouncementDAO.FIELD_WAS_READ);
 			inxTitle				= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHAT);
 			inxWhere				= cursor.getColumnIndex(AnnouncementDAO.FIELD_WHERE);
@@ -195,7 +195,7 @@ public class AnnouncementListActivity extends Activity {
 				tvWhereWhen.setVisibility(View.GONE);
 			}
 
-			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! wasItemClicked(cursor.getLong(inxID) );
+			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! wasItemClicked(cursor.getLong(inxId) );
 			loadTheme(! unread, view, tvTitle, tvWhereWhen);
 		}
 
