@@ -41,10 +41,10 @@ public abstract class BaseTextDAO extends BaseLewicaPLDAO implements BaseColumns
 
 	/**
 	 * Meant to be called in a separate thread to avoid blocking UI.
-	 * @param recordID
-	 * @return
+	 * @param recordId
+	 * @return Number of records updated
 	 */
-	public int updateMarkRecordAsRead(long recordID) {
+	public int updateMarkRecordAsRead(int recordId) {
 		ContentValues cv	= new ContentValues();
 
 		cv.put(FIELD_WAS_READ, 1);
@@ -54,7 +54,7 @@ public abstract class BaseTextDAO extends BaseLewicaPLDAO implements BaseColumns
 		int totalUpdates	= databaseWritable.update(
 			databaseTable, 
 			cv, 
-			FIELD_ID + "=" + recordID, 
+			FIELD_ID + "=" + recordId,
 			null
 		);
 		databaseWritable.close();
@@ -84,13 +84,10 @@ public abstract class BaseTextDAO extends BaseLewicaPLDAO implements BaseColumns
 
 	/**
 	 * Fetches one record for a given ID.
-	 * @param recordID
-	 * @return
-	 * @throws SQLException
 	 */
-	public Cursor selectOne(long recordID) throws SQLException {
+	public Cursor selectOne(int recordId) throws SQLException {
 		Cursor cursor = database.query(true, databaseTable, getFieldsForSingleRecord(),
-				FIELD_ID + "=" + recordID, null, null, null, null, "1");
+				FIELD_ID + "=" + recordId, null, null, null, null, "1");
 		if (cursor != null) {
 			cursor.moveToFirst();
 		}
@@ -119,7 +116,7 @@ public abstract class BaseTextDAO extends BaseLewicaPLDAO implements BaseColumns
 	 * Returns the latest announcement ID from the database.
 	 * @return
 	 */
-	public int fetchLastID() {
+	public int fetchLastId() {
 		Cursor cursor = database.query(
 			databaseTable,
 			new String[] { "MAX(" + FIELD_ID + ")" },
@@ -138,8 +135,8 @@ public abstract class BaseTextDAO extends BaseLewicaPLDAO implements BaseColumns
 	}
 
 
-	public Map<String,Long> fetchPreviousNextID(long recordID) {
-		Map<String,Long> map	= new HashMap<String,Long>();
+	public Map<String,Integer> fetchPreviousNextId(int recordId) {
+		Map<String,Integer> map	= new HashMap<String,Integer>();
 		StringBuilder sb				= new StringBuilder();
 
 		// Building SQL query consisting of two "unioned" parts like this one:
@@ -165,7 +162,7 @@ public abstract class BaseTextDAO extends BaseLewicaPLDAO implements BaseColumns
 		sb.append(FIELD_ID);
 		sb.append(" > ? ");
 
-		String idString			= Long.toString(recordID); 
+		String idString = Integer.toString(recordId);
 
 		if (! database.isOpen() ) {
 			database				= dbHelper.getReadableDatabase();
@@ -181,15 +178,15 @@ public abstract class BaseTextDAO extends BaseLewicaPLDAO implements BaseColumns
 
 		// First row = previous article ID, see the UNION query above
 		cursor.moveToFirst();
-		int colIndID		= cursor.getColumnIndex("id");
+		int colIndId		= cursor.getColumnIndex("id");
 		int colIndType	= cursor.getColumnIndex("type");
 
-		map.put(cursor.getString(colIndType), cursor.getLong(colIndID) );
+		map.put(cursor.getString(colIndType), cursor.getInt(colIndId) );
 
 		// Second row = next article ID, see the UNION query above
 		cursor.moveToLast();
 
-		map.put(cursor.getString(colIndType), cursor.getLong(colIndID) );
+		map.put(cursor.getString(colIndType), cursor.getInt(colIndId) );
 
 		cursor.close();
 

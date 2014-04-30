@@ -135,15 +135,15 @@ public class BroadcastSender {
 
 
 	/**
-	 * Asks for a refresh of the blog post listing activity filtered by a blog author 
-	 * @param blogID
-	 */
-	public void reloadTab_BlogPostListFilteredByBlogID(int blogID) {
+	 * Asks for a refresh of the blog post listing activity filtered by a blog author
+     * @param blogId
+     */
+	public void reloadTab_BlogPostListFilteredByBlogId(int blogId) {
 		String action	= BlogPostListActivity.RELOAD_VIEW;
 
 		Intent intent	= new Intent();
 		intent.setAction(action);
-		intent.putExtra(BlogPostListActivity.dataFilters.BLOG_ID.name(), blogID);
+		intent.putExtra(BlogPostListActivity.dataFilters.BLOG_ID.name(), blogId);
 		context.sendBroadcast(intent);
 	}
 }

@@ -101,16 +101,16 @@ public class ArticleSAXHandler extends DefaultHandler implements SAXParserDelega
 		}
 
 		if (name.equalsIgnoreCase(ARTICLE_ID) ) {
-			int ID	= Integer.parseInt(builder.toString() );
-			currentArticle.setID(ID);
+			int id	= Integer.parseInt(builder.toString() );
+			currentArticle.setId(id);
 		}
 		else if (name.equalsIgnoreCase(ARTICLE_CATEGORY_ID) ) {
-			int categoryID	= Integer.parseInt(builder.toString() );
-			currentArticle.setArticleCategoryID(categoryID);
+			int categoryId	= Integer.parseInt(builder.toString() );
+			currentArticle.setArticleCategoryId(categoryId);
 		}
 		else if (name.equalsIgnoreCase(ARTICLE_RELATED_IDS) ) {
-			List<Integer> articleIDs = ListUtil.parseIntegersList(builder.toString() );
-			currentArticle.setRelatedIDs(articleIDs);
+			List<Integer> articleIds = ListUtil.parseIntegersList(builder.toString() );
+			currentArticle.setRelatedIds(articleIds);
 		}
 		else if (name.equalsIgnoreCase(ARTICLE_PUB_DATE) ) {
 			Date pubDate = DateUtil.parseDateString(builder.toString(), DateUtil.DATE_MASK_SQL, java.sql.Date.valueOf(defaultDate) );

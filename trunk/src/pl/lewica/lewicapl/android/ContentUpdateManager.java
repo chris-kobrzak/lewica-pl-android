@@ -187,11 +187,11 @@ public class ContentUpdateManager {
 	private UpdateStatus fetchAndSaveArticles(Context context) {
 		ArticleDAO articleDAO	= new ArticleDAO(context);
 		articleDAO.open();
-		int lastArticleID		= articleDAO.fetchLastID();
+		int lastArticleId		= articleDAO.fetchLastId();
 
 		ArticleURL articleURL	= new ArticleURL();
 		articleURL.setSectionList("1,2,3,4,5");	// TODO This should be done using an array, not a list.
-		articleURL.setNewerThan(lastArticleID);
+		articleURL.setNewerThan(lastArticleId);
 		articleURL.setLimit(5);
 
 		FeedDownloadManager fdm	= new FeedDownloadManager();
@@ -222,7 +222,7 @@ public class ContentUpdateManager {
 			// We're merely listing them here so we can download them in a background thread once this AsyncTask has completed.
 			// This is to be able to show them updated content as soon as possible since text downloads are much faster than images.
 			Map<String,String> imageMeta	= new HashMap<String,String>();
-			imageMeta.put("ID", Integer.toString(article.getID() ) );
+			imageMeta.put("ID", Integer.toString(article.getId() ) );
 			imageMeta.put("Ext", article.getImageExtension() );
 			set.add(imageMeta);
 		}
@@ -251,9 +251,9 @@ public class ContentUpdateManager {
 		Iterator<Map<String, String>> iter	= imageSet.iterator();
 		while (iter.hasNext() ) {
 			Map<String,String> imageMeta	= iter.next();
-			long ID	= Long.parseLong(imageMeta.get("ID") );
+			int id = Integer.parseInt(imageMeta.get("ID") );
 
-			String imageName		= ArticleURL.buildNameThumbnail(ID, imageMeta.get("Ext") );
+			String imageName		= ArticleURL.buildNameThumbnail(id, imageMeta.get("Ext") );
 			// Source image (on the server)
 			String imageURL			= URLDictionary.THUMBNAIL + imageName;
 			// Destination image (on phone's storage)
@@ -280,10 +280,10 @@ public class ContentUpdateManager {
 	private UpdateStatus fetchAndSaveBlogPosts(Context context) {
 		BlogPostDAO blogPostDAO		= new BlogPostDAO(context);
 		blogPostDAO.open();
-		int lastBlogPostID			= blogPostDAO.fetchLastID();
+		int lastBlogPostId			= blogPostDAO.fetchLastId();
 
 		BlogPostURL blogPostURL		= new BlogPostURL();
-		blogPostURL.setNewerThan(lastBlogPostID);
+		blogPostURL.setNewerThan(lastBlogPostId);
 		blogPostURL.setLimit(15);
 
 		FeedDownloadManager fdm		= new FeedDownloadManager();
@@ -320,10 +320,10 @@ public class ContentUpdateManager {
 	private UpdateStatus fetchAndSaveAnnouncements(Context context) {
 		AnnouncementDAO annDao	= new AnnouncementDAO(context);
 		annDao.open();
-		int lastAnnID			= annDao.fetchLastID();
+		int lastAnnId			= annDao.fetchLastId();
 
 		AnnouncementURL annUrl	= new AnnouncementURL();
-		annUrl.setNewerThan(lastAnnID);
+		annUrl.setNewerThan(lastAnnId);
 		annUrl.setLimit(10);
 
 		FeedDownloadManager fdm	= new FeedDownloadManager();

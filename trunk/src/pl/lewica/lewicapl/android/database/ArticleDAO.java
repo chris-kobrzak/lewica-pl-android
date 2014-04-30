@@ -91,7 +91,7 @@ public class ArticleDAO extends BaseTextDAO {
 		}
 
 		String relatedIDs	= "";
-		ArrayList<Integer> relatedIDList	= (ArrayList<Integer>) article.getRelatedIDs();
+		ArrayList<Integer> relatedIDList	= (ArrayList<Integer>) article.getRelatedIds();
 		if (relatedIDList.size() > 0) {
 			StringBuilder sb	= new StringBuilder(); 
 			for (Integer i: relatedIDList) {
@@ -100,8 +100,8 @@ public class ArticleDAO extends BaseTextDAO {
 			relatedIDs	= sb.toString();
 		}
 
-		cv.put(FIELD_ID,							article.getID() );
-		cv.put(FIELD_CATEGORY_ID,		article.getArticleCategoryID() );
+		cv.put(FIELD_ID,							article.getId() );
+		cv.put(FIELD_CATEGORY_ID,		article.getArticleCategoryId() );
 		cv.put(FIELD_RELATED_IDS,			relatedIDs);
 		cv.put(FIELD_DATE_PUBLISHED,	article.getDatePublished().getTime() );	// Storing date as Unix timestamp for better performance
 		cv.put(FIELD_WAS_READ,				0);	// It's a new article so it couldn't be read yet
@@ -273,8 +273,8 @@ public class ArticleDAO extends BaseTextDAO {
 	}
 
 
-	public Map<String,Long> fetchPreviousNextID(long recordID, int categoryID) {
-		Map<String,Long> map	= new HashMap<String,Long>();
+	public Map<String, Integer> fetchPreviousNextId(long recordId, int categoryId) {
+		Map<String, Integer> map	= new HashMap<String, Integer>();
 		StringBuilder sb				= new StringBuilder();
 
 		// Building SQL query consisting of two "unioned" parts like this one:
@@ -302,8 +302,8 @@ public class ArticleDAO extends BaseTextDAO {
 		sb.append(FIELD_CATEGORY_ID);
 		sb.append(" = ?");
 
-		String idString			= Long.toString(recordID); 
-		String idCategString	= Integer.toString(categoryID);
+		String idString			= Long.toString(recordId);
+		String idCategString	= Integer.toString(categoryId);
 
 		if (! database.isOpen() ) {
 			database				= dbHelper.getReadableDatabase();
@@ -319,15 +319,15 @@ public class ArticleDAO extends BaseTextDAO {
 
 		// First row = previous article ID, see the UNION query above
 		cursor.moveToFirst();
-		int colIndID		= cursor.getColumnIndex("id");
-		int colIndType	= cursor.getColumnIndex("type");
+		int colIndID = cursor.getColumnIndex("id");
+		int colIndType = cursor.getColumnIndex("type");
 
-		map.put(cursor.getString(colIndType), cursor.getLong(colIndID) );
+		map.put(cursor.getString(colIndType), cursor.getInt(colIndID) );
 
 		// Second row = next article ID, see the UNION query above
 		cursor.moveToLast();
 
-		map.put(cursor.getString(colIndType), cursor.getLong(colIndID) );
+		map.put(cursor.getString(colIndType), cursor.getInt(colIndID) );
 
 		cursor.close();
 

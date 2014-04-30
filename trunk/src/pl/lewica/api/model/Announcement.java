@@ -22,7 +22,7 @@ import java.util.Date;
  * @author Krzysztof Kobrzak
  */
 public class Announcement implements DataModel {
-	private int ID;
+	private int id;
 	private boolean wasRead;
 	private Date dateExpiry;
 	private String what;
@@ -33,11 +33,11 @@ public class Announcement implements DataModel {
 	private String publishedByEmail;
 
 
-	public int getID() {
-		return ID;
+	public int getId() {
+		return id;
 	}
-	public void setID(int id) {
-		ID = id;
+	public void setId(int id) {
+		this.id = id;
 	}
 	public boolean wasRead() {
 		return wasRead;

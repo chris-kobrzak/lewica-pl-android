@@ -86,7 +86,7 @@ public class ArticleURL implements WebServiceURL {
 	 * @param extension
 	 * @return
 	 */
-	public static String buildURLImage(long id, String extension) {
+	public static String buildURLImage(int id, String extension) {
 		StringBuilder sb	= new StringBuilder(URLDictionary.IMAGE);
 
 		sb.append(id);
@@ -97,7 +97,7 @@ public class ArticleURL implements WebServiceURL {
 	}
 
 
-	public static String buildNameThumbnail(long id, String extension) {
+	public static String buildNameThumbnail(int id, String extension) {
 		// Thumbnails use the th_ prefix
 		StringBuilder sb	= new StringBuilder(PREFIX_THUMBNAIL);
 

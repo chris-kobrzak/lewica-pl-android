@@ -36,7 +36,7 @@ public class ReadersCommentsActivity extends Activity {
 
 		setContentView(R.layout.web_readers_comments);
 
-		long articleId	= AndroidUtil.filterIDFromUri(getIntent().getData() );
+		int articleId	= AndroidUtil.filterIdFromUri(getIntent().getData());
 		float textSize	= UserPreferencesManager.getTextSize(getApplicationContext() );
 		int themeId		= UserPreferencesManager.ThemeType.LIGHT.ordinal();
 		if (! UserPreferencesManager.isLightTheme() ) {

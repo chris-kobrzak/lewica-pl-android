@@ -93,8 +93,8 @@ public class AnnouncementSAXHandler extends DefaultHandler implements SAXParserD
 		}
 
 		if (name.equalsIgnoreCase(ANNOUNCEMENT_ID) ) {
-			int ID	= Integer.parseInt(builder.toString() );
-			currentAnnouncement.setID(ID);
+			int id = Integer.parseInt(builder.toString() );
+			currentAnnouncement.setId(id);
 		}
 		else if (name.equalsIgnoreCase(ANNOUNCEMENT_WHAT) ) {
 			currentAnnouncement.setWhat(builder.toString() );

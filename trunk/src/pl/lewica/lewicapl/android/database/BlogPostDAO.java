@@ -52,9 +52,9 @@ public class BlogPostDAO extends BaseTextDAO {
 	public long insert(BlogPost blogPost) {
 		ContentValues cv	= new ContentValues();
 
-		cv.put(FIELD_ID,							blogPost.getID() );
-		cv.put(FIELD_BLOG_ID,				blogPost.getBlogID() );
-		cv.put(FIELD_AUTHOR_ID,			blogPost.getAuthorID() );
+		cv.put(FIELD_ID,							blogPost.getId() );
+		cv.put(FIELD_BLOG_ID,				blogPost.getBlogId() );
+		cv.put(FIELD_AUTHOR_ID,			blogPost.getAuthorId() );
 		cv.put(FIELD_WAS_READ,				0);	// It's a new blogPost so it couldn't be read yet
 		cv.put(FIELD_DATE_PUBLISHED,	blogPost.getDatePublished().getTime() );
 		cv.put(FIELD_BLOG_TITLE,			blogPost.getBlogTitle() );
@@ -66,13 +66,13 @@ public class BlogPostDAO extends BaseTextDAO {
 	}
 
 
-	public Cursor selectLatestByBlogID(int blogID, int limit)
+	public Cursor selectLatestByBlogId(int blogId, int limit)
 			throws SQLException {
 		Cursor cursor = database.query(
 			true, 
 			DATABASE_TABLE, 
 			getFieldsForRecordSet(),
-			FIELD_BLOG_ID + "=" + blogID,
+			FIELD_BLOG_ID + "=" + blogId,
 			null, null, null, 
 			FIELD_ID + " DESC", 
 			Integer.toString(limit)

@@ -99,15 +99,15 @@ public class BlogPostSAXHandler extends DefaultHandler implements SAXParserDeleg
 
 		if (name.equalsIgnoreCase(BLOG_POST_ID) ) {
 			int ID	= Integer.parseInt(builder.toString() );
-			currentBlogPost.setID(ID);
+			currentBlogPost.setId(ID);
 		}
 		else if (name.equalsIgnoreCase(BLOG_POST_BLOG_ID) ) {
 			int blogID	= Integer.parseInt(builder.toString() );
-			currentBlogPost.setBlogID(blogID);
+			currentBlogPost.setBlogId(blogID);
 		}
 		else if (name.equalsIgnoreCase(BLOG_POST_AUTHOR_ID) ) {
 			int authorID	= Integer.parseInt(builder.toString() );
-			currentBlogPost.setAuthorID(authorID);
+			currentBlogPost.setAuthorId(authorID);
 		}
 		else if (name.equalsIgnoreCase(BLOG_POST_PUB_DATE) ) {
 			Date pubDate = DateUtil.parseDateString(builder.toString(), DateUtil.DATE_MASK_SQL, java.sql.Date.valueOf(defaultDate) );

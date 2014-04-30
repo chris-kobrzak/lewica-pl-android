@@ -110,10 +110,10 @@ public class BlogPostListActivity extends Activity {
 	}
 
 
-	private void reloadRowsFilterByBlogID(int blogID) {
+	private void reloadRowsFilterByBlogId(int blogId) {
 		CursorAdapter ca	= (CursorAdapter) listAdapter;
 		// Reload rows
-		Cursor newCursor	= blogPostDAO.selectLatestByBlogID(blogID, limitRows * 2);
+		Cursor newCursor	= blogPostDAO.selectLatestByBlogId(blogId, limitRows * 2);
 		ca.changeCursor(newCursor);
 	}
 
@@ -158,8 +158,8 @@ public class BlogPostListActivity extends Activity {
 			if (! intent.hasExtra(BlogPostListActivity.dataFilters.BLOG_ID.name() ) ) {
 				reloadRows();
 			} else {
-				int blogID		= intent.getIntExtra(BlogPostListActivity.dataFilters.BLOG_ID.name(), 0);
-				reloadRowsFilterByBlogID(blogID);
+				int blogId = intent.getIntExtra(BlogPostListActivity.dataFilters.BLOG_ID.name(), 0);
+				reloadRowsFilterByBlogId(blogId);
 			}
 			appTheme.setListViewDividerColour(listView, context);
 		}
@@ -176,7 +176,7 @@ public class BlogPostListActivity extends Activity {
 
 		public LayoutInflater inflater;
 
-		private int inxID;
+		private int inxId;
 		private int inxWasRead;
 		private int inxDatePub;
 		private int inxTitle;
@@ -194,7 +194,7 @@ public class BlogPostListActivity extends Activity {
 			inflater				= LayoutInflater.from(context);
 
 			// Get and cache column indices
-			inxID				= cursor.getColumnIndex(BlogPostDAO.FIELD_ID);
+			inxId = cursor.getColumnIndex(BlogPostDAO.FIELD_ID);
 			inxWasRead	= cursor.getColumnIndex(BlogPostDAO.FIELD_WAS_READ);
 			inxDatePub	= cursor.getColumnIndex(BlogPostDAO.FIELD_DATE_PUBLISHED);
 			inxTitle			= cursor.getColumnIndex(BlogPostDAO.FIELD_TITLE);
@@ -219,7 +219,7 @@ public class BlogPostListActivity extends Activity {
 			TextView tvBlog	= (TextView) view.findViewById(R.id.blog_post_item_blog_title);
 			loadBlogTitle(tvBlog, cursor.getString(inxBlog) );
 
-			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! wasItemClicked(cursor.getLong(inxID) );
+			boolean unread	= cursor.getInt(inxWasRead) == 0 && ! wasItemClicked(cursor.getLong(inxId) );
 			loadTheme(! unread, view, tvTitle, tvDate, tvBlog);
 		}
 
@@ -230,11 +230,6 @@ public class BlogPostListActivity extends Activity {
 		}
 
 
-		/**
-		 * @param view
-		 * @param cursor
-		 * @return
-		 */
 		private void loadBlogTitle(TextView tvBlog, String blogTitle) {
 			if (blogTitle.length() > 0) {
 				tvBlog.setText(blogTitle);
