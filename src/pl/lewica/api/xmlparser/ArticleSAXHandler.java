@@ -47,9 +47,6 @@ public class ArticleSAXHandler extends DefaultHandler implements SAXParserDelega
 	public static final  String ARTICLE_CONTENT				= "tekst";
 	public static final  String ARTICLE_EDITOR_COMMENT	= "opinia";
 
-	// In case any parsing problems the date falls back to this value:
-	private String defaultDate	= "2000-01-01";
-
 	private List<DataModel> articles;
 	private Article currentArticle;
 	private StringBuilder builder;
@@ -113,7 +110,7 @@ public class ArticleSAXHandler extends DefaultHandler implements SAXParserDelega
 			currentArticle.setRelatedIds(articleIds);
 		}
 		else if (name.equalsIgnoreCase(ARTICLE_PUB_DATE) ) {
-			Date pubDate = DateUtil.parseDateString(builder.toString(), DateUtil.DATE_MASK_SQL, java.sql.Date.valueOf(defaultDate) );
+			Date pubDate = DateUtil.parseDateString(builder.toString() );
 			currentArticle.setDatePublished(pubDate);
 		}
 		else if (name.equalsIgnoreCase(ARTICLE_IMAGE) ) {

@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
  */
 public class DateUtil {
 	public static final String DATE_MASK_SQL = "yyyy-MM-dd HH:mm:ss";
+    public static final Date FALL_OVER_DATE = new Date(2000, 1, 1);
 
 
 	public static int getCurrentUnixTime() {
@@ -45,6 +46,9 @@ public class DateUtil {
 		return sdf.format(date);
 	}
 
+	public static Date parseDateString(String dateString) {
+		return parseDateString(dateString, DATE_MASK_SQL, FALL_OVER_DATE);
+	}
 
 	/**
 	 * @param dateFormat TODO
