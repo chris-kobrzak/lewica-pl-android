@@ -117,7 +117,7 @@ public class AnnouncementSAXHandler extends DefaultHandler implements SAXParserD
 		else if (name.equalsIgnoreCase(ANNOUNCEMENT) ) {
 			Date dateNow	= new Date();
 
-			currentAnnouncement.setWasRead(false);
+			currentAnnouncement.setAsNotRead();
 			currentAnnouncement.setDateExpiry(dateNow);
 
 			announcements.add(currentAnnouncement);

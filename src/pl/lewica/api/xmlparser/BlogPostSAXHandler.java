@@ -123,7 +123,7 @@ public class BlogPostSAXHandler extends DefaultHandler implements SAXParserDeleg
 			currentBlogPost.setText(builder.toString() );
 		}
 		else if (name.equalsIgnoreCase(BLOG_POST) ) {
-			currentBlogPost.setWasRead(false);
+			currentBlogPost.setAsNotRead();
 
 			blogPosts.add(currentBlogPost);
 		}

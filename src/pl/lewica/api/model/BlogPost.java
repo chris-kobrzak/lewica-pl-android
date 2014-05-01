@@ -42,8 +42,8 @@ public class BlogPost implements DataModel {
 	public boolean wasRead() {
 		return wasRead;
 	}
-	public void setWasRead(boolean wasRead) {
-		this.wasRead = wasRead;
+	public void setAsNotRead() {
+		this.wasRead = false;
 	}
 	public int getBlogId() {
 		return blogId;

@@ -143,7 +143,7 @@ public class ArticleSAXHandler extends DefaultHandler implements SAXParserDelega
 			currentArticle.setEditorComment(builder.toString() );
 		}
 		else if (name.equalsIgnoreCase(ARTICLE) ) {
-			currentArticle.setWasRead(false);
+			currentArticle.setAsNotRead();
 
 			articles.add(currentArticle);
 		}
