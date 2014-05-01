@@ -72,8 +72,8 @@ public class Article implements DataModel {
 	public boolean wasRead() {
 		return wasRead;
 	}
-	public void setWasRead(boolean wasRead) {
-		this.wasRead = wasRead;
+	public void setAsNotRead() {
+		this.wasRead = false;
 	}
 	public boolean hasThumbnail() {
 		return hasThumbnail;
