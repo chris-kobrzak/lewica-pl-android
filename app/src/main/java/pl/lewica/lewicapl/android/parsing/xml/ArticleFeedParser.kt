@@ -16,7 +16,9 @@ class ArticleFeedParser : FeedParser<ArticleDto> {
     var body = ""
     var categoryId = 0
     var publicationDate = ""
-    var editorCommented = false
+    var url = ""
+    var thumbnailExtension: String? = null
+    var editorComment: String? = null
     var insideEntry = false
 
     while (parser.eventType != XmlPullParser.END_DOCUMENT) {
@@ -33,15 +35,18 @@ class ArticleFeedParser : FeedParser<ArticleDto> {
               "id" -> id = text.toIntOrNull() ?: 0
               "id_dzial" -> categoryId = text.toIntOrNull() ?: 0
               "data" -> publicationDate = text
+              "url" -> url = text
+              "obrazek" -> thumbnailExtension = text.ifEmpty { null }
               "tytul" -> title = text
               "tekst" -> body = text
-              "opinia" -> editorCommented = text.isNotEmpty()
+              "opinia" -> editorComment = text.ifEmpty { null }
               "publikacja" -> {
                 if (id > 0) results.add(
-                  ArticleDto(id, title, "", body, categoryId, publicationDate, editorCommented)
+                  ArticleDto(id, title, "", body, categoryId, publicationDate, url, thumbnailExtension, editorComment)
                 )
                 id = 0; title = ""; body = ""; categoryId = 0
-                publicationDate = ""; editorCommented = false; insideEntry = false
+                publicationDate = ""; url = ""; thumbnailExtension = null
+                editorComment = null; insideEntry = false
               }
             }
           }

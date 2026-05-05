@@ -32,7 +32,9 @@ class ArticleSyncService(
           body = dto.body,
           categoryId = dto.categoryId,
           publicationDate = dto.publicationDate,
-          editorCommented = dto.editorCommented
+          url = dto.url,
+          thumbnailExtension = dto.thumbnailExtension,
+          editorComment = dto.editorComment
         )
       }
       store.insert(articles)
