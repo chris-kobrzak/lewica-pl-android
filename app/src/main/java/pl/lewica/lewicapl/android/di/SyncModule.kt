@@ -1,0 +1,47 @@
+package pl.lewica.lewicapl.android.di
+
+import org.koin.core.qualifier.named
+import org.koin.dsl.module
+import pl.lewica.lewicapl.android.data.sync.AnnouncementSyncService
+import pl.lewica.lewicapl.android.data.sync.ArticleSyncService
+import pl.lewica.lewicapl.android.data.sync.BlogPostSyncService
+import pl.lewica.lewicapl.android.data.sync.HistoryEntrySyncService
+import pl.lewica.lewicapl.android.parsing.dto.AnnouncementDto
+import pl.lewica.lewicapl.android.parsing.dto.ArticleDto
+import pl.lewica.lewicapl.android.parsing.dto.BlogPostDto
+import pl.lewica.lewicapl.android.parsing.dto.HistoryEntryDto
+import pl.lewica.lewicapl.android.parsing.xml.AnnouncementFeedParser
+import pl.lewica.lewicapl.android.parsing.xml.ArticleFeedParser
+import pl.lewica.lewicapl.android.parsing.xml.BlogPostFeedParser
+import pl.lewica.lewicapl.android.parsing.xml.HistoryEntryFeedParser
+
+val syncModule = module {
+  single {
+    ArticleSyncService(
+      client = get(),
+      parser = get<ArticleFeedParser>(named("articles")),
+      store = get()
+    )
+  }
+  single {
+    BlogPostSyncService(
+      client = get(),
+      parser = get<BlogPostFeedParser>(named("blogPosts")),
+      store = get()
+    )
+  }
+  single {
+    AnnouncementSyncService(
+      client = get(),
+      parser = get<AnnouncementFeedParser>(named("announcements")),
+      store = get()
+    )
+  }
+  single {
+    HistoryEntrySyncService(
+      client = get(),
+      parser = get<HistoryEntryFeedParser>(named("historyEntries")),
+      store = get()
+    )
+  }
+}
