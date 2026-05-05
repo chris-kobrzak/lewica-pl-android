@@ -63,6 +63,7 @@ dependencies {
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.datastore.preferences)
   implementation(libs.coil.compose)
+  implementation(libs.coil.svg)
   implementation(libs.okhttp)
   implementation(libs.lifecycle.runtime.compose)
   testImplementation(libs.junit)
