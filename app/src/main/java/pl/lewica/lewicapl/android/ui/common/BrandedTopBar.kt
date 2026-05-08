@@ -44,7 +44,7 @@ fun BrandedTopBar(
     color = Color(0xFFFF0000),
     modifier = Modifier.fillMaxWidth()
   ) {
-    Column {
+    Column(modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)) {
       Box(
         modifier = Modifier
           .fillMaxWidth()

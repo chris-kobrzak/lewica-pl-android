@@ -2,6 +2,7 @@ package pl.lewica.lewicapl.android.ui.more
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,7 +28,8 @@ fun MoreScreen() {
   val settings by viewModel.settings.collectAsStateWithLifecycle()
 
   Scaffold(
-    topBar = { BrandedTopBar() }
+    topBar = { BrandedTopBar() },
+    contentWindowInsets = WindowInsets(0.dp)
   ) { padding ->
     Column(
       modifier = Modifier

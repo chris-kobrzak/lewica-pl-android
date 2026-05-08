@@ -1,6 +1,8 @@
 package pl.lewica.lewicapl.android.ui.app
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.filled.Campaign
@@ -53,6 +55,7 @@ private val tabs = listOf(
 fun MainScreen() {
   val navController = rememberNavController()
   Scaffold(
+    contentWindowInsets = WindowInsets(0.dp),
     bottomBar = { BottomNav(navController) }
   ) { padding ->
     NavHost(
