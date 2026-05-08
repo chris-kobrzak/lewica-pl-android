@@ -60,7 +60,7 @@ fun FeedDetailScreen(
         )
       }
       Text(
-        text = date,
+        text = date.withoutSeconds(),
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(bottom = 8.dp)
