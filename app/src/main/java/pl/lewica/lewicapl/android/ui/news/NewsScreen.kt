@@ -10,15 +10,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -87,16 +92,36 @@ private fun CategoryBar(
   selectedCategoryId: Int,
   onCategorySelected: (Int) -> Unit
 ) {
-  LazyRow(
-    contentPadding = PaddingValues(horizontal = 12.dp),
-    horizontalArrangement = Arrangement.spacedBy(8.dp)
-  ) {
-    items(articleCategories, key = { it.id }) { category ->
-      FilterChip(
-        selected = selectedCategoryId == category.id,
-        onClick = { onCategorySelected(category.id) },
-        label = { Text(category.name) }
-      )
+  val brandRed = Color(0xFFFF0000)
+  val pillBackground = if (isSystemInDarkTheme()) Color(0xFF2A2A2A) else Color(0xFFEEEEEE)
+  val panelBackground = if (isSystemInDarkTheme()) Color(0xFF1A1A1A) else Color(0xFFF5F5F5)
+
+  Surface(color = panelBackground) {
+    LazyRow(
+      contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+      horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+      items(articleCategories, key = { it.id }) { category ->
+        val selected = selectedCategoryId == category.id
+        FilterChip(
+          selected = selected,
+          onClick = { onCategorySelected(category.id) },
+          label = { Text(category.name, modifier = Modifier.padding(vertical = 4.dp)) },
+          shape = CircleShape,
+          colors = FilterChipDefaults.filterChipColors(
+            containerColor = pillBackground,
+            labelColor = brandRed,
+            selectedContainerColor = brandRed,
+            selectedLabelColor = Color.White
+          ),
+          border = FilterChipDefaults.filterChipBorder(
+            enabled = true,
+            selected = selected,
+            borderColor = Color.Transparent,
+            selectedBorderColor = Color.Transparent
+          )
+        )
+      }
     }
   }
 }
