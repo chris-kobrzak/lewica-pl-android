@@ -74,6 +74,7 @@ fun NewsScreen(navController: NavController) {
                 unread = !article.opened,
                 thumbnailUrl = thumbnailUrl,
                 thumbnailLeading = index % 2 == 0,
+                withEditorComment = article.editorComment != null,
                 onClick = {
                   viewModel.markRead(article.id)
                   navController.navigate(NavRoute.newsDetail(article.id))

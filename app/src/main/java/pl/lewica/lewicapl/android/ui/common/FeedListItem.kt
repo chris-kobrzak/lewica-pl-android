@@ -10,13 +10,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -31,7 +35,8 @@ fun FeedListItem(
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
   thumbnailUrl: String? = null,
-  thumbnailLeading: Boolean = true
+  thumbnailLeading: Boolean = true,
+  withEditorComment: Boolean = false
 ) {
   Row(
     modifier = modifier
@@ -45,11 +50,23 @@ fun FeedListItem(
       Spacer(modifier = Modifier.width(10.dp))
     }
     Column(modifier = Modifier.weight(1f)) {
-      Text(
-        text = title,
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = if (unread) FontWeight.Bold else FontWeight.Normal
-      )
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+          text = title,
+          style = MaterialTheme.typography.titleMedium,
+          fontWeight = if (unread) FontWeight.Bold else FontWeight.Normal,
+          modifier = Modifier.weight(1f)
+        )
+        if (withEditorComment) {
+          Spacer(modifier = Modifier.width(4.dp))
+          Icon(
+            imageVector = Icons.Filled.Edit,
+            contentDescription = "Artykuł zawiera komentarz edytora",
+            tint = Color(0xFFFF9800),
+            modifier = Modifier.size(16.dp)
+          )
+        }
+      }
       if (lead.isNotBlank()) {
         Text(
           text = lead,
