@@ -1,23 +1,27 @@
 package pl.lewica.lewicapl.android.ui.app
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
+import pl.lewica.lewicapl.android.R
 
 @Composable
 fun RootComposable() {
@@ -36,9 +40,18 @@ fun RootComposable() {
 
 @Composable
 private fun SplashScreen() {
-  Surface(modifier = Modifier.fillMaxSize()) {
+  Surface(
+    modifier = Modifier.fillMaxSize(),
+    color = Color(0xFFFF0000)
+  ) {
     Box(contentAlignment = Alignment.Center) {
-      CircularProgressIndicator()
+      Image(
+        painter = painterResource(R.drawable.launch_screen),
+        contentDescription = null,
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(32.dp)
+      )
     }
   }
 }
