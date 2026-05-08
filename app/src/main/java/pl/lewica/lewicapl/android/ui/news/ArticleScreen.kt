@@ -22,6 +22,7 @@ fun ArticleScreen(id: Int, onBack: () -> Unit) {
     date = article.publicationDate,
     onBack = onBack,
     topBarContent = { CategoryLabel(article.categoryId) },
+    editorComment = article.editorComment,
     onShare = { text ->
       val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
