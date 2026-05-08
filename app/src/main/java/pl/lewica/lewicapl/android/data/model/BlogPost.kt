@@ -6,6 +6,8 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "blog_posts")
 data class BlogPost(
   @PrimaryKey val id: Int,
+  val blogId: Int,
+  val blogName: String,
   val title: String,
   val lead: String,
   val body: String,

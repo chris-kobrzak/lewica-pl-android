@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
@@ -36,6 +37,7 @@ fun FeedListItem(
   modifier: Modifier = Modifier,
   thumbnailUrl: String? = null,
   thumbnailLeading: Boolean = true,
+  thumbnailSize: Dp = 80.dp,
   withEditorComment: Boolean = false
 ) {
   Row(
@@ -46,7 +48,7 @@ fun FeedListItem(
     verticalAlignment = Alignment.Top
   ) {
     if (thumbnailUrl != null && thumbnailLeading) {
-      Thumbnail(url = thumbnailUrl)
+      Thumbnail(url = thumbnailUrl, size = thumbnailSize)
       Spacer(modifier = Modifier.width(10.dp))
     }
     Column(modifier = Modifier.weight(1f)) {
@@ -84,21 +86,21 @@ fun FeedListItem(
     }
     if (thumbnailUrl != null && !thumbnailLeading) {
       Spacer(modifier = Modifier.width(10.dp))
-      Thumbnail(url = thumbnailUrl)
+      Thumbnail(url = thumbnailUrl, size = thumbnailSize)
     }
   }
   HorizontalDivider()
 }
 
 @Composable
-private fun Thumbnail(url: String) {
+private fun Thumbnail(url: String, size: Dp) {
   val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
   AsyncImage(
     model = url,
     contentDescription = null,
     contentScale = ContentScale.Crop,
     modifier = Modifier
-      .size(80.dp)
+      .size(size)
       .clip(RoundedCornerShape(8.dp))
       .background(surfaceVariant)
   )

@@ -53,9 +53,12 @@ fun BlogPostsScreen(navController: NavController) {
           items(state.blogPosts, key = { it.id }) { post ->
             FeedListItem(
               title = post.title,
-              lead = post.lead,
+              lead = "${post.authorName} · ${post.blogName}",
               date = post.publicationDate,
               unread = !post.opened,
+              thumbnailUrl = "http://lewica.pl/blog/img/${post.blogId}.png",
+              thumbnailLeading = true,
+              thumbnailSize = 40.dp,
               onClick = {
                 viewModel.markRead(post.id)
                 navController.navigate(NavRoute.blogPostDetail(post.id))

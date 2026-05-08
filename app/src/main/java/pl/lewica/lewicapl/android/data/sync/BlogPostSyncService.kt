@@ -27,6 +27,8 @@ class BlogPostSyncService(
       val blogPosts = dtos.map { dto ->
         BlogPost(
           id = dto.id,
+          blogId = dto.blogId,
+          blogName = dto.blogName,
           title = dto.title,
           lead = dto.lead,
           body = dto.body,

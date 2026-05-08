@@ -12,6 +12,8 @@ class BlogPostFeedParser : FeedParser<BlogPostDto> {
     val results = mutableListOf<BlogPostDto>()
     val textBuffer = StringBuilder()
     var id = 0
+    var blogId = 0
+    var blogName = ""
     var title = ""
     var body = ""
     var authorName = ""
@@ -30,15 +32,17 @@ class BlogPostFeedParser : FeedParser<BlogPostDto> {
           if (insideEntry) {
             when (parser.name) {
               "id" -> id = text.toIntOrNull() ?: 0
+              "id_blog" -> blogId = text.toIntOrNull() ?: 0
               "data" -> publicationDate = text
+              "blog" -> blogName = text
               "tytul" -> title = text
               "tekst" -> body = text
               "autor" -> authorName = text
               "publikacja" -> {
                 if (id > 0) results.add(
-                  BlogPostDto(id, title, "", body, authorName, publicationDate)
+                  BlogPostDto(id, blogId, blogName, title, "", body, authorName, publicationDate)
                 )
-                id = 0; title = ""; body = ""; authorName = ""
+                id = 0; blogId = 0; blogName = ""; title = ""; body = ""; authorName = ""
                 publicationDate = ""; insideEntry = false
               }
             }

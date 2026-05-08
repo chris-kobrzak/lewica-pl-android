@@ -11,7 +11,7 @@ val appModule = module {
       androidContext(),
       AppDatabase::class.java,
       "lewicapl.db"
-    ).build()
+    ).fallbackToDestructiveMigration().build()
   }
   single { get<AppDatabase>().articleStore() }
   single { get<AppDatabase>().blogPostStore() }
