@@ -36,6 +36,7 @@ private val antonFont = FontFamily(Font(R.font.anton_regular))
 @Composable
 fun BrandedTopBar(
   title: String? = null,
+  centerContent: (@Composable () -> Unit)? = null,
   onBack: (() -> Unit)? = null,
   actions: @Composable RowScope.() -> Unit = {}
 ) {
@@ -68,8 +69,9 @@ fun BrandedTopBar(
             .padding(horizontal = 48.dp),
           contentAlignment = Alignment.Center
         ) {
-          if (title != null) {
-            Text(
+          when {
+            centerContent != null -> centerContent()
+            title != null -> Text(
               text = title,
               color = Color.White,
               fontWeight = FontWeight.Bold,
@@ -78,8 +80,7 @@ fun BrandedTopBar(
               overflow = TextOverflow.Ellipsis,
               textAlign = TextAlign.Center
             )
-          } else {
-            Text(
+            else -> Text(
               text = "lewica.pl",
               color = Color.White,
               fontFamily = antonFont,
