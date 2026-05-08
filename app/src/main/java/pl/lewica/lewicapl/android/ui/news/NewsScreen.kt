@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -59,12 +60,15 @@ fun NewsScreen(navController: NavController) {
           onRefresh = { viewModel.refresh() }
         ) {
           LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(state.articles, key = { it.id }) { article ->
+            itemsIndexed(state.articles, key = { _, article -> article.id }) { index, article ->
+              val thumbnailUrl = article.thumbnailExtension?.let { "http://lewica.pl/im/${article.id}.$it" }
               FeedListItem(
                 title = article.title,
                 lead = article.lead,
                 date = article.publicationDate,
                 unread = !article.opened,
+                thumbnailUrl = thumbnailUrl,
+                thumbnailLeading = index % 2 == 0,
                 onClick = {
                   viewModel.markRead(article.id)
                   navController.navigate(NavRoute.newsDetail(article.id))
