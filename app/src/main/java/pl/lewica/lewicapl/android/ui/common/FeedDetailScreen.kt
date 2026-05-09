@@ -45,14 +45,16 @@ fun FeedDetailScreen(
   onBack: () -> Unit,
   onShare: (() -> Unit)? = null,
   topBarContent: (@Composable () -> Unit)? = null,
+  contentHeader: (@Composable () -> Unit)? = null,
   editorComment: String? = null,
   onForumThread: (() -> Unit)? = null,
   modifier: Modifier = Modifier
 ) {
+  val showTitleInContent = topBarContent != null || contentHeader != null
   Scaffold(
     topBar = {
       BrandedTopBar(
-        title = if (topBarContent == null) title else null,
+        title = if (showTitleInContent) null else title,
         centerContent = topBarContent,
         onBack = onBack,
         actions = {
@@ -73,7 +75,7 @@ fun FeedDetailScreen(
         .verticalScroll(rememberScrollState())
         .padding(16.dp)
     ) {
-      if (topBarContent != null) {
+      if (showTitleInContent) {
         Text(
           text = title,
           style = MaterialTheme.typography.titleLarge,
@@ -81,6 +83,7 @@ fun FeedDetailScreen(
           modifier = Modifier.padding(bottom = 8.dp)
         )
       }
+      contentHeader?.invoke()
       Row(
         modifier = Modifier
           .fillMaxWidth(),
@@ -107,7 +110,7 @@ fun FeedDetailScreen(
           }
         }
       }
-      HorizontalDivider(modifier = Modifier.padding(bottom = 16.dp))
+      HorizontalDivider(modifier = Modifier.padding(top = if (contentHeader != null) 14.dp else 0.dp, bottom = 16.dp))
       Text(
         text = body,
         style = MaterialTheme.typography.bodyLarge
