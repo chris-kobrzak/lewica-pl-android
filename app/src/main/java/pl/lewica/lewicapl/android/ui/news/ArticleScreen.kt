@@ -30,10 +30,10 @@ fun ArticleScreen(id: Int, onBack: () -> Unit) {
     onForumThread = {
       CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(forumUrl))
     },
-    onShare = { text ->
+    onShare = {
       val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
-        putExtra(Intent.EXTRA_TEXT, text)
+        putExtra(Intent.EXTRA_TEXT, article.url)
       }
       context.startActivity(Intent.createChooser(intent, null))
     }
