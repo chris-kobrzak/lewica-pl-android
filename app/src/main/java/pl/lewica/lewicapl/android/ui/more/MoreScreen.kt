@@ -1,70 +1,67 @@
 package pl.lewica.lewicapl.android.ui.more
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import android.net.Uri
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.koin.androidx.compose.koinViewModel
 import pl.lewica.lewicapl.android.ui.common.BrandedTopBar
-import pl.lewica.lewicapl.android.data.model.AppTheme
+
+private data class ExternalLink(
+  val label: String,
+  val urlString: String,
+  val icon: ImageVector
+)
+
+private val links = listOf(
+  ExternalLink("Strona główna", "http://lewica.pl/", Icons.Default.Language),
+  ExternalLink("Wyszukiwarka", "http://lewica.pl/?s=szukaj", Icons.Default.Search),
+  ExternalLink("Katalog linków", "http://lewica.pl/index.php?s=katalog", Icons.Default.Link),
+  ExternalLink("Redakcja", "http://lewica.pl/index.php?s=redakcja", Icons.Default.People),
+  ExternalLink("Facebook", "https://www.facebook.com/Lewicapl/", Icons.Default.ThumbUp)
+)
 
 @Composable
 fun MoreScreen() {
-  val viewModel: SettingsViewModel = koinViewModel()
-  val settings by viewModel.settings.collectAsStateWithLifecycle()
+  val context = LocalContext.current
 
   Scaffold(
     topBar = { BrandedTopBar() },
     contentWindowInsets = WindowInsets(0.dp)
   ) { padding ->
-    Column(
+    LazyColumn(
       modifier = Modifier
         .fillMaxSize()
         .padding(padding)
-        .padding(16.dp)
     ) {
-      Text("Text Size", style = MaterialTheme.typography.labelLarge)
-      Slider(
-        value = settings.textSize,
-        onValueChange = { viewModel.setTextSize(it) },
-        valueRange = 12f..24f,
-        modifier = Modifier.fillMaxWidth()
-      )
-      Text("${settings.textSize.toInt()}sp", style = MaterialTheme.typography.bodySmall)
-
-      Spacer(modifier = Modifier.height(24.dp))
-      HorizontalDivider()
-      Spacer(modifier = Modifier.height(24.dp))
-
-      Text("Theme", style = MaterialTheme.typography.labelLarge)
-      Spacer(modifier = Modifier.height(8.dp))
-      AppTheme.entries.forEach { theme ->
-        TextButton(
-          onClick = { viewModel.setTheme(theme) },
-          modifier = Modifier.fillMaxWidth()
-        ) {
-          Text(
-            text = theme.name,
-            color = if (settings.theme == theme)
-              MaterialTheme.colorScheme.primary
-            else
-              MaterialTheme.colorScheme.onSurface
-          )
-        }
+      items(links) { link ->
+        ListItem(
+          headlineContent = { Text(link.label) },
+          leadingContent = { Icon(link.icon, contentDescription = link.label) },
+          modifier = Modifier.clickable {
+            CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(link.urlString))
+          }
+        )
+        HorizontalDivider()
       }
     }
   }

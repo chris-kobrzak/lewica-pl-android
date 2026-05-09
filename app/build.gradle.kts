@@ -61,7 +61,7 @@ dependencies {
   ksp(libs.room.compiler)
   implementation(libs.work.runtime.ktx)
   implementation(libs.kotlinx.coroutines.android)
-  implementation(libs.datastore.preferences)
+  implementation(libs.browser)
   implementation(libs.coil.compose)
   implementation(libs.coil.svg)
   implementation(libs.okhttp)
