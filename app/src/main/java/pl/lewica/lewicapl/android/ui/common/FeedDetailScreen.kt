@@ -43,7 +43,7 @@ fun FeedDetailScreen(
   body: String,
   date: String,
   onBack: () -> Unit,
-  onShare: () -> Unit,
+  onShare: (() -> Unit)? = null,
   topBarContent: (@Composable () -> Unit)? = null,
   editorComment: String? = null,
   onForumThread: (() -> Unit)? = null,
@@ -56,8 +56,10 @@ fun FeedDetailScreen(
         centerContent = topBarContent,
         onBack = onBack,
         actions = {
-          IconButton(onClick = onShare) {
-            Icon(Icons.Default.Share, contentDescription = "Udostępnij", tint = Color.White)
+          if (onShare != null) {
+            IconButton(onClick = onShare) {
+              Icon(Icons.Default.Share, contentDescription = "Udostępnij", tint = Color.White)
+            }
           }
         }
       )
