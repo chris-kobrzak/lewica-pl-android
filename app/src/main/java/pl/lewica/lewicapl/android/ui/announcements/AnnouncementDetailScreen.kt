@@ -17,6 +17,7 @@ fun AnnouncementDetailScreen(id: Int, onBack: () -> Unit) {
     title = announcement.title,
     body = announcement.body,
     date = announcement.publicationDate,
-    onBack = onBack
+    onBack = onBack,
+    titleInContent = true
   )
 }

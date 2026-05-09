@@ -46,11 +46,12 @@ fun FeedDetailScreen(
   onShare: (() -> Unit)? = null,
   topBarContent: (@Composable () -> Unit)? = null,
   contentHeader: (@Composable () -> Unit)? = null,
+  titleInContent: Boolean = false,
   editorComment: String? = null,
   onForumThread: (() -> Unit)? = null,
   modifier: Modifier = Modifier
 ) {
-  val showTitleInContent = topBarContent != null || contentHeader != null
+  val showTitleInContent = topBarContent != null || contentHeader != null || titleInContent
   Scaffold(
     topBar = {
       BrandedTopBar(
@@ -110,7 +111,10 @@ fun FeedDetailScreen(
           }
         }
       }
-      HorizontalDivider(modifier = Modifier.padding(top = if (contentHeader != null) 14.dp else 0.dp, bottom = 16.dp))
+      val dividerTopPadding = if (titleInContent || contentHeader != null) 14.dp else 0.dp
+      HorizontalDivider(
+        modifier = Modifier.padding(top = dividerTopPadding, bottom = 16.dp)
+      )
       Text(
         text = body,
         style = MaterialTheme.typography.bodyLarge
