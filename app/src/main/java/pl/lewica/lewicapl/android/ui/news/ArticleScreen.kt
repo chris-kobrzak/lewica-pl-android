@@ -1,6 +1,8 @@
 package pl.lewica.lewicapl.android.ui.news
 
 import android.content.Intent
+import android.net.Uri
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
@@ -16,6 +18,8 @@ fun ArticleScreen(id: Int, onBack: () -> Unit) {
 
   val article = (uiState as? NewsUiState.Ready)?.articles?.find { it.id == id } ?: return
 
+  val forumUrl = "http://lewica.pl/forum/index.php?format=minimal&fuse=messages.${article.id}"
+
   FeedDetailScreen(
     title = article.title,
     body = article.body,
@@ -23,6 +27,9 @@ fun ArticleScreen(id: Int, onBack: () -> Unit) {
     onBack = onBack,
     topBarContent = { CategoryLabel(article.categoryId) },
     editorComment = article.editorComment,
+    onForumThread = {
+      CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(forumUrl))
+    },
     onShare = { text ->
       val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"

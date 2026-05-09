@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,6 +27,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +46,7 @@ fun FeedDetailScreen(
   onShare: (String) -> Unit,
   topBarContent: (@Composable () -> Unit)? = null,
   editorComment: String? = null,
+  onForumThread: (() -> Unit)? = null,
   modifier: Modifier = Modifier
 ) {
   Scaffold(
@@ -75,12 +79,33 @@ fun FeedDetailScreen(
           modifier = Modifier.padding(bottom = 8.dp)
         )
       }
-      Text(
-        text = date.withoutSeconds(),
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(bottom = 8.dp)
-      )
+      Row(
+        modifier = Modifier
+          .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        Text(
+          text = date.withoutSeconds(),
+          style = MaterialTheme.typography.labelMedium,
+          color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        if (onForumThread != null) {
+          Spacer(modifier = Modifier.weight(1f))
+          TextButton(
+            onClick = onForumThread,
+            colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF007AFF))
+          ) {
+            Icon(
+              Icons.AutoMirrored.Filled.Chat,
+              contentDescription = null,
+              modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text("komentarze", style = MaterialTheme.typography.labelMedium)
+          }
+        }
+      }
+      HorizontalDivider(modifier = Modifier.padding(bottom = 16.dp))
       Text(
         text = body,
         style = MaterialTheme.typography.bodyLarge
