@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pl.lewica.lewicapl.android.R
 
-private val antonFont = FontFamily(Font(R.font.anton_regular))
+private val brandFont = FontFamily(Font(R.font.anton_regular))
 
 @Composable
 fun BrandedTopBar(
@@ -83,7 +82,7 @@ fun BrandedTopBar(
             else -> Text(
               text = "lewica.pl",
               color = Color.White,
-              fontFamily = antonFont,
+              fontFamily = brandFont,
               fontSize = 28.sp,
               textAlign = TextAlign.Center
             )

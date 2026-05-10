@@ -8,7 +8,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 import pl.lewica.lewicapl.android.R
 
-private val antonFont = FontFamily(Font(R.font.anton_regular))
+private val brandFont = FontFamily(Font(R.font.anton_regular))
 
 data class ArticleCategory(val id: Int, val name: String)
 
@@ -27,7 +27,7 @@ fun CategoryLabel(categoryId: Int) {
   Text(
     text = name,
     color = Color.White,
-    fontFamily = antonFont,
+    fontFamily = brandFont,
     fontSize = 28.sp
   )
 }
