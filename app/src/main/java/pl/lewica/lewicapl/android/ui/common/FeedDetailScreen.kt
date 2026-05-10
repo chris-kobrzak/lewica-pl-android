@@ -2,7 +2,6 @@ package pl.lewica.lewicapl.android.ui.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -100,7 +99,7 @@ fun FeedDetailScreen(
           Spacer(modifier = Modifier.weight(1f))
           TextButton(
             onClick = onForumThread,
-            colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF007AFF))
+            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.primary)
           ) {
             Icon(
               Icons.AutoMirrored.Filled.Chat,
@@ -130,8 +129,8 @@ fun FeedDetailScreen(
 
 @Composable
 private fun EditorCommentBlock(comment: String) {
-  val background = if (isSystemInDarkTheme()) Color(0xFF2C2C2E) else Color(0xFFF2F2F7)
-  val grey = Color(0xFF8E8E93)
+  val background = MaterialTheme.colorScheme.surfaceVariant
+  val grey = MaterialTheme.colorScheme.outline
 
   Row(
     verticalAlignment = Alignment.CenterVertically,
