@@ -3,6 +3,7 @@ package pl.lewica.lewicapl.android.ui.app
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.filled.Campaign
@@ -105,7 +106,7 @@ private fun BottomNav(navController: NavController) {
           }
         },
         icon = { Icon(tab.icon, contentDescription = tab.label) },
-        label = { Text(tab.label) }
+        label = { Text(tab.label, fontSize = 12.sp) }
       )
     }
   }

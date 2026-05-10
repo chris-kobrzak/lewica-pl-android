@@ -25,6 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
 @Composable
@@ -78,8 +79,8 @@ fun FeedListItem(
         )
       }
       Text(
-        text = date.withoutSeconds(),
-        style = MaterialTheme.typography.labelSmall,
+        text = date.formatDate(),
+        style = MaterialTheme.typography.labelSmall.copy(fontSize = 13.sp),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(top = 4.dp)
       )

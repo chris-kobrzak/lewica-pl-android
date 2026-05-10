@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,7 +80,7 @@ fun FeedDetailScreen(
       if (showTitleInContent) {
         Text(
           text = title,
-          style = MaterialTheme.typography.titleLarge,
+          style = MaterialTheme.typography.titleLarge.copy(fontSize = 26.sp, lineHeight = 34.sp),
           fontWeight = FontWeight.Bold,
           modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -91,8 +92,8 @@ fun FeedDetailScreen(
         verticalAlignment = Alignment.CenterVertically
       ) {
         Text(
-          text = date.withoutSeconds(),
-          style = MaterialTheme.typography.labelMedium,
+          text = date.formatDate(),
+          style = MaterialTheme.typography.labelMedium.copy(fontSize = 15.sp),
           color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         if (onForumThread != null) {
@@ -117,7 +118,7 @@ fun FeedDetailScreen(
       )
       Text(
         text = body,
-        style = MaterialTheme.typography.bodyLarge
+        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp, lineHeight = 30.sp)
       )
       if (!editorComment.isNullOrEmpty()) {
         HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
@@ -158,7 +159,7 @@ private fun EditorCommentBlock(comment: String) {
   ) {
     Text(
       text = comment,
-      style = MaterialTheme.typography.bodyLarge,
+      style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp, lineHeight = 30.sp),
       modifier = Modifier.padding(top = 26.dp, start = 14.dp, end = 14.dp, bottom = 14.dp)
     )
     Box(
