@@ -1,48 +1,27 @@
 package pl.lewica.lewicapl.android.parsing.xml
 
-import android.util.Xml
-import org.xmlpull.v1.XmlPullParser
-import pl.lewica.lewicapl.android.parsing.FeedParser
 import pl.lewica.lewicapl.android.parsing.dto.AnnouncementDto
 
-class AnnouncementFeedParser : FeedParser<AnnouncementDto> {
-  override fun parse(data: ByteArray): List<AnnouncementDto> {
-    val parser = Xml.newPullParser()
-    parser.setInput(data.inputStream(), "UTF-8")
-    val results = mutableListOf<AnnouncementDto>()
-    val textBuffer = StringBuilder()
-    var id = 0
-    var title = ""
-    var body = ""
-    var publicationDate = ""
-    var insideEntry = false
+class AnnouncementFeedParser : XmlFeedParser<AnnouncementDto>() {
+  override val entryTag = "ogloszenie"
 
-    while (parser.eventType != XmlPullParser.END_DOCUMENT) {
-      when (parser.eventType) {
-        XmlPullParser.START_TAG -> {
-          textBuffer.clear()
-          if (parser.name == "ogloszenie") insideEntry = true
-        }
-        XmlPullParser.TEXT -> textBuffer.append(parser.text)
-        XmlPullParser.END_TAG -> {
-          val text = textBuffer.toString().trim()
-          if (insideEntry) {
-            when (parser.name) {
-              "id" -> id = text.toIntOrNull() ?: 0
-              "co" -> title = text
-              "opis" -> body = text
-              "kiedy" -> publicationDate = text
-              "ogloszenie" -> {
-                if (id > 0) results.add(AnnouncementDto(id, title, body, publicationDate))
-                id = 0; title = ""; body = ""; publicationDate = ""; insideEntry = false
-              }
-            }
-          }
-          textBuffer.clear()
-        }
-      }
-      parser.next()
+  private var id = 0
+  private var title = ""
+  private var body = ""
+  private var publicationDate = ""
+
+  override fun onField(name: String, text: String) {
+    when (name) {
+      "id" -> id = text.toIntOrNull() ?: 0
+      "co" -> title = text
+      "opis" -> body = text
+      "kiedy" -> publicationDate = text
     }
-    return results
+  }
+
+  override fun buildEntry() = if (id > 0) AnnouncementDto(id, title, body, publicationDate) else null
+
+  override fun resetEntry() {
+    id = 0; title = ""; body = ""; publicationDate = ""
   }
 }
