@@ -35,6 +35,7 @@ import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
 import pl.lewica.lewicapl.android.ui.app.NavRoute
 import pl.lewica.lewicapl.android.ui.common.BrandedTopBar
+import pl.lewica.lewicapl.android.ui.common.brandPrimaryColour
 import pl.lewica.lewicapl.android.ui.common.ErrorBanner
 import pl.lewica.lewicapl.android.ui.common.FeedListItem
 import pl.lewica.lewicapl.android.ui.common.PullToRefreshContainer
@@ -99,7 +100,6 @@ private fun CategoryBar(
   selectedCategoryId: Int,
   onCategorySelected: (Int) -> Unit
 ) {
-  val brandRed = Color(0xFFFF0000)
   val pillBackground = if (isSystemInDarkTheme()) Color(0xFF2A2A2A) else Color(0xFFEEEEEE)
   val panelBackground = if (isSystemInDarkTheme()) Color(0xFF1A1A1A) else Color(0xFFF5F5F5)
 
@@ -137,8 +137,8 @@ private fun CategoryBar(
             shape = CircleShape,
             colors = FilterChipDefaults.filterChipColors(
               containerColor = pillBackground,
-              labelColor = brandRed,
-              selectedContainerColor = brandRed,
+              labelColor = brandPrimaryColour,
+              selectedContainerColor = brandPrimaryColour,
               selectedLabelColor = Color.White
             ),
             border = FilterChipDefaults.filterChipBorder(

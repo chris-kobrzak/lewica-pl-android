@@ -30,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pl.lewica.lewicapl.android.R
 
+internal val brandPrimaryColour = Color(0xFFFF0000)
+
 private val brandFont = FontFamily(Font(R.font.anton_regular))
 
 @Composable
@@ -40,7 +42,7 @@ fun BrandedTopBar(
   actions: @Composable RowScope.() -> Unit = {}
 ) {
   Surface(
-    color = Color(0xFFFF0000),
+    color = brandPrimaryColour,
     modifier = Modifier.fillMaxWidth()
   ) {
     Column(modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)) {
