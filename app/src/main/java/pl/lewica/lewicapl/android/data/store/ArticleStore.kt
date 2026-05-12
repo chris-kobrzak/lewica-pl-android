@@ -23,4 +23,7 @@ interface ArticleStore {
 
   @Query("UPDATE articles SET opened = 1 WHERE id = :id")
   suspend fun markRead(id: Int)
+
+  @Query("UPDATE articles SET commentCount = :count WHERE id = :id")
+  suspend fun updateCommentCount(id: Int, count: Int?)
 }

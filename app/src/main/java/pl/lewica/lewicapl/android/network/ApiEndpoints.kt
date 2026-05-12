@@ -14,4 +14,7 @@ object ApiEndpoints {
 
   fun historyEntries(month: Int, day: Int): String =
     "$BASE_URL/kalendarium.php?miesiac=$month&dzien=$day&kodowanie=utf-8"
+
+  fun articleCommentCount(categoryId: Int, articleId: Int): String =
+    "$BASE_URL/publikacje.php?dzialy=$categoryId&limit=3&od=${articleId - 1}&kodowanie=utf-8"
 }

@@ -4,11 +4,13 @@ import android.content.Intent
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import pl.lewica.lewicapl.android.ui.common.FeedDetailScreen
+import pl.lewica.lewicapl.android.ui.common.formatCommentCount
 
 @Composable
 fun ArticleScreen(id: Int, onBack: () -> Unit) {
@@ -18,7 +20,15 @@ fun ArticleScreen(id: Int, onBack: () -> Unit) {
 
   val article = (uiState as? NewsUiState.Ready)?.articles?.find { it.id == id } ?: return
 
+  LaunchedEffect(article.id) {
+    viewModel.refreshCommentCount(article.id, article.categoryId)
+  }
+
   val forumUrl = "http://lewica.pl/forum/index.php?format=minimal&fuse=messages.${article.id}"
+  val commentCount = article.commentCount ?: 0
+  val openForumThread: (() -> Unit)? = if (commentCount > 0) {
+    { CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(forumUrl)) }
+  } else null
 
   FeedDetailScreen(
     title = article.title,
@@ -27,9 +37,8 @@ fun ArticleScreen(id: Int, onBack: () -> Unit) {
     onBack = onBack,
     topBarContent = { CategoryLabel(article.categoryId) },
     editorComment = article.editorComment,
-    onForumThread = {
-      CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(forumUrl))
-    },
+    onForumThread = openForumThread,
+    forumThreadLabel = formatCommentCount(commentCount),
     onShare = {
       val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"

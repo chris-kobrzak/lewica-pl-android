@@ -9,5 +9,6 @@ data class ArticleDto(
   val publicationDate: String,
   val url: String,
   val thumbnailExtension: String?,
-  val editorComment: String?
+  val editorComment: String?,
+  val commentCount: Int? = null
 )

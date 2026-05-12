@@ -24,8 +24,18 @@ class ArticleSyncService(
     publicationDate = dto.publicationDate,
     url = dto.url,
     thumbnailExtension = dto.thumbnailExtension,
-    editorComment = dto.editorComment
+    editorComment = dto.editorComment,
+    commentCount = dto.commentCount
   )
 
   override suspend fun insert(models: List<Article>) = store.insert(models)
+
+  suspend fun refreshCommentCount(articleId: Int, categoryId: Int) {
+    try {
+      val endpoint = ApiEndpoints.articleCommentCount(categoryId, articleId)
+      val data = client.fetchFeed(endpoint)
+      val dto = parser.parse(data).firstOrNull { it.id == articleId } ?: return
+      store.updateCommentCount(articleId, dto.commentCount)
+    } catch (_: Exception) {}
+  }
 }

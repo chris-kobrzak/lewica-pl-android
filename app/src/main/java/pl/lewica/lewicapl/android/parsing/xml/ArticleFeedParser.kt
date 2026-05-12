@@ -13,6 +13,7 @@ class ArticleFeedParser : XmlFeedParser<ArticleDto>() {
   private var url = ""
   private var thumbnailExtension: String? = null
   private var editorComment: String? = null
+  private var commentCount: Int? = null
 
   override fun onField(name: String, text: String) {
     when (name) {
@@ -24,15 +25,17 @@ class ArticleFeedParser : XmlFeedParser<ArticleDto>() {
       "tytul" -> title = text
       "tekst" -> body = text
       "opinia" -> editorComment = text.ifEmpty { null }
+      "komentarzy" -> commentCount = text.toIntOrNull()
     }
   }
 
   override fun buildEntry() = if (id > 0) {
-    ArticleDto(id, title, "", body, categoryId, publicationDate, url, thumbnailExtension, editorComment)
+    ArticleDto(id, title, "", body, categoryId, publicationDate, url, thumbnailExtension, editorComment, commentCount)
   } else null
 
   override fun resetEntry() {
     id = 0; title = ""; body = ""; categoryId = 0
     publicationDate = ""; url = ""; thumbnailExtension = null; editorComment = null
+    commentCount = null
   }
 }

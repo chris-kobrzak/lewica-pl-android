@@ -14,5 +14,6 @@ data class Article(
   val url: String,
   val thumbnailExtension: String?,
   val editorComment: String?,
-  val opened: Boolean = false
+  val opened: Boolean = false,
+  val commentCount: Int? = null
 )

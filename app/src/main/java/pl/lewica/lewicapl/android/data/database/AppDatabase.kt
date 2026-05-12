@@ -13,7 +13,7 @@ import pl.lewica.lewicapl.android.data.store.HistoryEntryStore
 
 @Database(
   entities = [Article::class, BlogPost::class, Announcement::class, HistoryEntry::class],
-  version = 2,
+  version = 1,
   exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

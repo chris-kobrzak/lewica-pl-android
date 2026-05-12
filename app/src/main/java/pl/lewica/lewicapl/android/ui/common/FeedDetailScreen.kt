@@ -49,6 +49,7 @@ fun FeedDetailScreen(
   titleInContent: Boolean = false,
   editorComment: String? = null,
   onForumThread: (() -> Unit)? = null,
+  forumThreadLabel: String = "komentarze",
   modifier: Modifier = Modifier
 ) {
   val showTitleInContent = topBarContent != null || contentHeader != null || titleInContent
@@ -87,7 +88,8 @@ fun FeedDetailScreen(
       contentHeader?.invoke()
       Row(
         modifier = Modifier
-          .fillMaxWidth(),
+          .fillMaxWidth()
+          .padding(bottom = if (onForumThread == null) 8.dp else 0.dp),
         verticalAlignment = Alignment.CenterVertically
       ) {
         Text(
@@ -107,7 +109,7 @@ fun FeedDetailScreen(
               modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(4.dp))
-            Text("komentarze", style = MaterialTheme.typography.labelMedium)
+            Text(forumThreadLabel, style = MaterialTheme.typography.labelMedium)
           }
         }
       }

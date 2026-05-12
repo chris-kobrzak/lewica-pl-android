@@ -7,8 +7,8 @@ import pl.lewica.lewicapl.android.network.FeedClient
 import pl.lewica.lewicapl.android.parsing.FeedParser
 
 abstract class FeedSyncService<Dto, Model>(
-  private val client: FeedClient,
-  private val parser: FeedParser<Dto>
+  protected val client: FeedClient,
+  protected val parser: FeedParser<Dto>
 ) {
   private val _state = MutableStateFlow<SyncState>(SyncState.Idle)
   val state: StateFlow<SyncState> = _state.asStateFlow()

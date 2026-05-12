@@ -39,6 +39,10 @@ class NewsViewModel(
     viewModelScope.launch { syncService.sync() }
   }
 
+  fun refreshCommentCount(articleId: Int, categoryId: Int) {
+    viewModelScope.launch { syncService.refreshCommentCount(articleId, categoryId) }
+  }
+
   fun markRead(id: Int) {
     viewModelScope.launch { repository.markRead(id) }
   }
