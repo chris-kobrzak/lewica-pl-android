@@ -9,7 +9,7 @@ import pl.lewica.lewicapl.android.data.model.Announcement
 
 @Dao
 interface AnnouncementStore {
-  @Query("SELECT * FROM announcements ORDER BY publicationDate DESC")
+  @Query("SELECT * FROM announcements ORDER BY COALESCE(publishedAt, '') DESC")
   fun getAll(): Flow<List<Announcement>>
 
   @Query("SELECT COALESCE(MAX(id), 0) FROM announcements")

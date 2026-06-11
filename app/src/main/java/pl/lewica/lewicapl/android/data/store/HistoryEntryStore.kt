@@ -9,7 +9,7 @@ import pl.lewica.lewicapl.android.data.model.HistoryEntry
 
 @Dao
 interface HistoryEntryStore {
-  @Query("SELECT * FROM history_entries ORDER BY eventDate ASC")
+  @Query("SELECT * FROM history_entries ORDER BY year ASC")
   fun getAll(): Flow<List<HistoryEntry>>
 
   @Query("SELECT COALESCE(MAX(id), 0) FROM history_entries")

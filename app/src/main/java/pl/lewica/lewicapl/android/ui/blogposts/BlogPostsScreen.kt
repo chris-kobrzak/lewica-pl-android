@@ -39,9 +39,9 @@ fun BlogPostsScreen(navController: NavController) {
             FeedListItem(
               title = post.title,
               lead = "${post.authorName} · ${post.blogName}",
-              date = post.publicationDate,
+              date = post.publishedAt,
               unread = !post.opened,
-              thumbnailUrl = "http://lewica.pl/blog/img/${post.blogId}.png",
+              thumbnailUrl = "https://lewica.pl/blog/img/${post.blogId}.png",
               thumbnailLeading = true,
               thumbnailSize = 40.dp,
               onClick = {

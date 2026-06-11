@@ -11,6 +11,7 @@ coroutines = "1.9.0"
 browser = "1.8.0"
 coil = "2.7.0"
 okHttp = "4.12.0"
+moshi = "1.15.0"
 coreKtx = "1.16.0"
 activityCompose = "1.10.1"
 lifecycleRuntimeCompose = "2.8.7"
@@ -42,6 +43,9 @@ browser = { group = "androidx.browser", name = "browser", version.ref = "browser
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 coil-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okHttp" }
+moshi = { group = "com.squareup.moshi", name = "moshi", version.ref = "moshi" }
+moshi-adapters = { group = "com.squareup.moshi", name = "moshi-adapters", version.ref = "moshi" }
+moshi-kotlin-codegen = { group = "com.squareup.moshi", name = "moshi-kotlin-codegen", version.ref = "moshi" }
 lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }

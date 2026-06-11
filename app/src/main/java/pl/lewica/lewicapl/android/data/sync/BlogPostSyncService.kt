@@ -18,12 +18,11 @@ class BlogPostSyncService(
   override fun transform(dto: BlogPostDto) = BlogPost(
     id = dto.id,
     blogId = dto.blogId,
-    blogName = dto.blogName,
+    blogName = dto.blog,
     title = dto.title,
-    lead = dto.lead,
     body = dto.body,
-    authorName = dto.authorName,
-    publicationDate = dto.publicationDate
+    authorName = dto.author,
+    publishedAt = dto.publishedAt
   )
 
   override suspend fun insert(models: List<BlogPost>) = store.insert(models)

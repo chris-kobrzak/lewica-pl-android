@@ -2,10 +2,10 @@ package pl.lewica.lewicapl.android.di
 
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import pl.lewica.lewicapl.android.parsing.xml.AnnouncementFeedParser
-import pl.lewica.lewicapl.android.parsing.xml.ArticleFeedParser
-import pl.lewica.lewicapl.android.parsing.xml.BlogPostFeedParser
-import pl.lewica.lewicapl.android.parsing.xml.HistoryEntryFeedParser
+import pl.lewica.lewicapl.android.parsing.json.AnnouncementFeedParser
+import pl.lewica.lewicapl.android.parsing.json.ArticleFeedParser
+import pl.lewica.lewicapl.android.parsing.json.BlogPostFeedParser
+import pl.lewica.lewicapl.android.parsing.json.HistoryEntryFeedParser
 
 val parsingModule = module {
   single(named("articles")) { ArticleFeedParser() }

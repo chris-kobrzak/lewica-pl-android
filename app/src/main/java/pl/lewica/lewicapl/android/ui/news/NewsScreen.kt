@@ -59,11 +59,11 @@ fun NewsScreen(navController: NavController) {
         ) {
           LazyColumn(modifier = Modifier.fillMaxSize()) {
             itemsIndexed(state.articles, key = { _, article -> article.id }) { index, article ->
-              val thumbnailUrl = article.thumbnailExtension?.let { "http://lewica.pl/im/${article.id}.$it" }
+              val thumbnailUrl = article.thumbnailExtension?.let { "https://lewica.pl/uploads/images/${article.id}.$it" }
               FeedListItem(
                 title = article.title,
-                lead = article.lead,
-                date = article.publicationDate,
+                lead = article.body.extractLead(),
+                date = article.publishedAt,
                 unread = !article.opened,
                 thumbnailUrl = thumbnailUrl,
                 thumbnailLeading = index % 2 == 0,
@@ -106,7 +106,7 @@ private fun CategoryBar(
             startX = size.width - gradientWidth
           ),
           topLeft = Offset(size.width - gradientWidth, 0f),
-          size = Size(gradientWidth, size.height)
+          size = Size(gradientWidth, 0f)
         )
       }
     ) {
@@ -139,3 +139,12 @@ private fun CategoryBar(
     }
   }
 }
+
+private fun String.extractLead(): String {
+  val text = stripHtmlTags()
+  val truncated = text.take(150)
+  return if (text.length > 150) "$truncated…" else truncated
+}
+
+private fun String.stripHtmlTags(): String =
+  replace(Regex("<[^>]*>"), "").replace("&nbsp;", " ").replace("&amp;", "&").replace("&quot;", "\"").trim()

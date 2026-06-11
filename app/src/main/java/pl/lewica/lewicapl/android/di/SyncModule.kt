@@ -10,10 +10,10 @@ import pl.lewica.lewicapl.android.parsing.dto.AnnouncementDto
 import pl.lewica.lewicapl.android.parsing.dto.ArticleDto
 import pl.lewica.lewicapl.android.parsing.dto.BlogPostDto
 import pl.lewica.lewicapl.android.parsing.dto.HistoryEntryDto
-import pl.lewica.lewicapl.android.parsing.xml.AnnouncementFeedParser
-import pl.lewica.lewicapl.android.parsing.xml.ArticleFeedParser
-import pl.lewica.lewicapl.android.parsing.xml.BlogPostFeedParser
-import pl.lewica.lewicapl.android.parsing.xml.HistoryEntryFeedParser
+import pl.lewica.lewicapl.android.parsing.json.AnnouncementFeedParser
+import pl.lewica.lewicapl.android.parsing.json.ArticleFeedParser
+import pl.lewica.lewicapl.android.parsing.json.BlogPostFeedParser
+import pl.lewica.lewicapl.android.parsing.json.HistoryEntryFeedParser
 
 val syncModule = module {
   single {

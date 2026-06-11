@@ -2,13 +2,14 @@ package pl.lewica.lewicapl.android.parsing.dto
 
 data class ArticleDto(
   val id: Int,
+  val slug: String,
   val title: String,
-  val lead: String,
   val body: String,
   val categoryId: Int,
-  val publicationDate: String,
-  val url: String,
+  val categorySlug: String,
+  val publishedAt: String,
+  val commentCount: Int,
   val thumbnailExtension: String?,
   val editorComment: String?,
-  val commentCount: Int? = null
+  val authors: List<String>
 )

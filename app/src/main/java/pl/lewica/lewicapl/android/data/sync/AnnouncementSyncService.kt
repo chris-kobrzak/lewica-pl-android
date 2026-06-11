@@ -18,8 +18,11 @@ class AnnouncementSyncService(
   override fun transform(dto: AnnouncementDto) = Announcement(
     id = dto.id,
     title = dto.title,
+    place = dto.place,
+    happeningAt = dto.happeningAt,
     body = dto.body,
-    publicationDate = dto.publicationDate
+    publishedBy = dto.publishedBy,
+    publishedAt = dto.publishedAt
   )
 
   override suspend fun insert(models: List<Announcement>) = store.insert(models)

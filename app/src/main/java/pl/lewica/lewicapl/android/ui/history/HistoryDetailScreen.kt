@@ -14,9 +14,10 @@ fun HistoryDetailScreen(id: Int, onBack: () -> Unit) {
   val entry = (uiState as? HistoryUiState.Ready)?.entries?.find { it.id == id } ?: return
 
   FeedDetailScreen(
-    title = entry.title,
-    body = entry.body,
+    title = entry.event,
+    body = "",
     date = entry.eventDate,
-    onBack = onBack
+    onBack = onBack,
+    titleInContent = true
   )
 }

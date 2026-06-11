@@ -33,10 +33,10 @@ private data class ExternalLink(
 )
 
 private val links = listOf(
-  ExternalLink("Strona główna", "http://lewica.pl/", Icons.Default.Language),
-  ExternalLink("Wyszukiwarka", "http://lewica.pl/?s=szukaj", Icons.Default.Search),
-  ExternalLink("Katalog linków", "http://lewica.pl/index.php?s=katalog", Icons.Default.Link),
-  ExternalLink("Redakcja", "http://lewica.pl/index.php?s=redakcja", Icons.Default.People),
+  ExternalLink("Strona główna", "https://lewica.pl/", Icons.Default.Language),
+  ExternalLink("Wyszukiwarka", "https://lewica.pl/?s=szukaj", Icons.Default.Search),
+  ExternalLink("Katalog linków", "https://lewica.pl/index.php?s=katalog", Icons.Default.Link),
+  ExternalLink("Redakcja", "https://lewica.pl/index.php?s=redakcja", Icons.Default.People),
   ExternalLink("Facebook", "https://www.facebook.com/Lewicapl/", Icons.Default.ThumbUp)
 )
 

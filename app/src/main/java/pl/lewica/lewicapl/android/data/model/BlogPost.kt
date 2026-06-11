@@ -9,9 +9,8 @@ data class BlogPost(
   val blogId: Int,
   val blogName: String,
   val title: String,
-  val lead: String,
   val body: String,
   val authorName: String,
-  val publicationDate: String,
+  val publishedAt: String,
   val opened: Boolean = false
 )

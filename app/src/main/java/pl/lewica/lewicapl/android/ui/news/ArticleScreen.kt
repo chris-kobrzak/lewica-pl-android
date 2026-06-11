@@ -21,11 +21,12 @@ fun ArticleScreen(id: Int, onBack: () -> Unit) {
   val article = (uiState as? NewsUiState.Ready)?.articles?.find { it.id == id } ?: return
 
   LaunchedEffect(article.id) {
-    viewModel.refreshCommentCount(article.id, article.categoryId)
+    viewModel.refreshCommentCount(article.id)
   }
 
-  val forumUrl = "http://lewica.pl/forum/index.php?format=minimal&fuse=messages.${article.id}"
-  val commentCount = article.commentCount ?: 0
+  val articleUrl = "https://lewica.pl/${article.slug}"
+  val forumUrl = "https://lewica.pl/forum/index.php?format=minimal&fuse=messages.${article.id}"
+  val commentCount = article.commentCount
   val openForumThread: (() -> Unit)? = if (commentCount > 0) {
     { CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(forumUrl)) }
   } else null
@@ -33,7 +34,7 @@ fun ArticleScreen(id: Int, onBack: () -> Unit) {
   FeedDetailScreen(
     title = article.title,
     body = article.body,
-    date = article.publicationDate,
+    date = article.publishedAt,
     onBack = onBack,
     topBarContent = { CategoryLabel(article.categoryId) },
     editorComment = article.editorComment,
@@ -42,7 +43,7 @@ fun ArticleScreen(id: Int, onBack: () -> Unit) {
     onShare = {
       val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
-        putExtra(Intent.EXTRA_TEXT, article.url)
+        putExtra(Intent.EXTRA_TEXT, articleUrl)
       }
       context.startActivity(Intent.createChooser(intent, null))
     }

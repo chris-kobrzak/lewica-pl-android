@@ -9,10 +9,10 @@ import pl.lewica.lewicapl.android.data.model.Article
 
 @Dao
 interface ArticleStore {
-  @Query("SELECT * FROM articles ORDER BY publicationDate DESC")
+  @Query("SELECT * FROM articles ORDER BY publishedAt DESC")
   fun getAll(): Flow<List<Article>>
 
-  @Query("SELECT * FROM articles WHERE categoryId = :categoryId ORDER BY publicationDate DESC")
+  @Query("SELECT * FROM articles WHERE categoryId = :categoryId ORDER BY publishedAt DESC")
   fun getByCategory(categoryId: Int): Flow<List<Article>>
 
   @Query("SELECT COALESCE(MAX(id), 0) FROM articles")
@@ -25,5 +25,5 @@ interface ArticleStore {
   suspend fun markRead(id: Int)
 
   @Query("UPDATE articles SET commentCount = :count WHERE id = :id")
-  suspend fun updateCommentCount(id: Int, count: Int?)
+  suspend fun updateCommentCount(id: Int, count: Int)
 }

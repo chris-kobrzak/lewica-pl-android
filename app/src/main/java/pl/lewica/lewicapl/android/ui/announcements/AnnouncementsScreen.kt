@@ -8,6 +8,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
@@ -37,8 +38,8 @@ fun AnnouncementsScreen(navController: NavController) {
           items(state.announcements, key = { it.id }) { announcement ->
             FeedListItem(
               title = announcement.title,
-              lead = "",
-              date = announcement.publicationDate,
+              lead = announcement.place.takeIf { it.isNotBlank() } ?: announcement.happeningAt.takeIf { it.isNotBlank() } ?: "",
+              date = announcement.publishedAt ?: announcement.happeningAt ?: "",
               unread = !announcement.opened,
               onClick = {
                 viewModel.markRead(announcement.id)

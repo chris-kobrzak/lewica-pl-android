@@ -16,14 +16,16 @@ class HistoryEntrySyncService(
 
   override suspend fun buildEndpoint(): String {
     val today = LocalDate.now()
-    return ApiEndpoints.historyEntries(today.monthValue, today.dayOfMonth)
+    return ApiEndpoints.calendarEntries(today.monthValue, today.dayOfMonth)
   }
 
   override fun transform(dto: HistoryEntryDto) = HistoryEntry(
     id = dto.id,
-    title = dto.title,
-    body = dto.body,
-    eventDate = dto.eventDate
+    year = dto.year,
+    month = dto.month,
+    day = dto.day,
+    event = dto.event,
+    eventDate = "%04d-%02d-%02d".format(dto.year, dto.month, dto.day)
   )
 
   override suspend fun insert(models: List<HistoryEntry>) = store.insert(models)

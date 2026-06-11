@@ -24,7 +24,7 @@ fun BlogPostDetailScreen(id: Int, onBack: () -> Unit) {
   FeedDetailScreen(
     title = post.title,
     body = post.body,
-    date = post.publicationDate,
+    date = post.publishedAt,
     onBack = onBack,
     contentHeader = {
       Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
