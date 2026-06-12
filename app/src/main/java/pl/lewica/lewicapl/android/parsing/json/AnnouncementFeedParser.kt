@@ -20,7 +20,7 @@ class AnnouncementFeedParser : FeedParser<AnnouncementDto> {
         place = item.place ?: "",
         happeningAt = item.happeningAt ?: "",
         body = item.body ?: "",
-        publishedBy = item.publishedBy,
+        publishedBy = item.publishedBy ?: "",
         publishedByEmail = item.publishedByEmail ?: "",
         publishedAt = item.publishedAt
       )

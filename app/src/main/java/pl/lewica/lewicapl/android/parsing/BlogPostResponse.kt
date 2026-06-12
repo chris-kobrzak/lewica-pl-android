@@ -11,11 +11,11 @@ data class BlogPostPageResponse(
 @JsonClass(generateAdapter = true)
 data class BlogPostItemResponse(
   val id: Int,
-  val title: String,
-  val body: String,
-  val blog: BlogRefResponse,
-  val authors: List<BlogAuthorResponse>,
-  @Json(name = "published_at") val publishedAt: String
+  val title: String?,
+  val body: String?,
+  val blog: BlogRefResponse?,
+  val authors: List<BlogAuthorResponse>?,
+  val publishedAt: String?
 )
 
 @JsonClass(generateAdapter = true)

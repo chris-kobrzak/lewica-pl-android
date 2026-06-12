@@ -14,8 +14,8 @@ data class AnnouncementItemResponse(
   val title: String? = null,
   val body: String? = null,
   val place: String? = null,
-  @Json(name = "happening_at") val happeningAt: String? = null,
-  @Json(name = "published_by") val publishedBy: String,
-  @Json(name = "published_by_email") val publishedByEmail: String? = null,
-  @Json(name = "published_at") val publishedAt: String? = null
+  val happeningAt: String? = null,
+  val publishedBy: String? = null,
+  val publishedByEmail: String? = null,
+  val publishedAt: String? = null
 )

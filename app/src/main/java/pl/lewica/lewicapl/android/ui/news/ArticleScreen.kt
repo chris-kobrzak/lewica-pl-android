@@ -31,12 +31,15 @@ fun ArticleScreen(id: Int, onBack: () -> Unit) {
     { CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(forumUrl)) }
   } else null
 
+  val thumbnailUrl = article.thumbnailExtension?.let { "https://lewica.pl/uploads/images/${article.id}.$it" }
+
   FeedDetailScreen(
     title = article.title,
     body = article.body,
     date = article.publishedAt,
     onBack = onBack,
     topBarContent = { CategoryLabel(article.categoryId) },
+    thumbnailUrl = thumbnailUrl,
     editorComment = article.editorComment,
     onForumThread = openForumThread,
     forumThreadLabel = formatCommentCount(commentCount),

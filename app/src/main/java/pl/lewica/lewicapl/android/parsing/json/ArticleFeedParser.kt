@@ -16,16 +16,16 @@ class ArticleFeedParser : FeedParser<ArticleDto> {
     return page.items.map { item ->
       ArticleDto(
         id = item.id,
-        slug = item.slug,
-        title = item.title,
-        body = item.body,
-        categoryId = item.categoryId,
-        categorySlug = item.categorySlug,
-        publishedAt = item.publishedAt,
-        commentCount = item.commentCount,
+        slug = item.slug ?: "",
+        title = item.title ?: "",
+        body = item.body ?: "",
+        categoryId = item.categoryId ?: 0,
+        categorySlug = item.categorySlug ?: "",
+        publishedAt = item.publishedAt ?: "",
+        commentCount = item.commentCount ?: 0,
         thumbnailExtension = item.thumbnailExtension,
         editorComment = item.editorComment,
-        authors = item.authors.map { it.name }
+        authors = item.authors?.map { it.name } ?: emptyList()
       )
     }
   }
