@@ -41,7 +41,7 @@ fun BlogPostsScreen(navController: NavController) {
               lead = "${post.authorName} · ${post.blogName}",
               date = post.publishedAt,
               unread = !post.opened,
-              thumbnailUrl = "https://lewica.pl/blog/img/${post.blogId}.png",
+              thumbnailUrl = "https://lewica.pl/uploads/blog/img/${post.blogId}.png",
               thumbnailLeading = true,
               thumbnailSize = 40.dp,
               onClick = {

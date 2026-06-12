@@ -6,10 +6,6 @@ import pl.lewica.lewicapl.android.data.sync.AnnouncementSyncService
 import pl.lewica.lewicapl.android.data.sync.ArticleSyncService
 import pl.lewica.lewicapl.android.data.sync.BlogPostSyncService
 import pl.lewica.lewicapl.android.data.sync.HistoryEntrySyncService
-import pl.lewica.lewicapl.android.parsing.dto.AnnouncementDto
-import pl.lewica.lewicapl.android.parsing.dto.ArticleDto
-import pl.lewica.lewicapl.android.parsing.dto.BlogPostDto
-import pl.lewica.lewicapl.android.parsing.dto.HistoryEntryDto
 import pl.lewica.lewicapl.android.parsing.json.AnnouncementFeedParser
 import pl.lewica.lewicapl.android.parsing.json.ArticleFeedParser
 import pl.lewica.lewicapl.android.parsing.json.BlogPostFeedParser

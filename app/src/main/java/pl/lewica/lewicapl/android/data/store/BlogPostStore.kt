@@ -9,7 +9,7 @@ import pl.lewica.lewicapl.android.data.model.BlogPost
 
 @Dao
 interface BlogPostStore {
-  @Query("SELECT * FROM blog_posts ORDER BY publishedAt DESC")
+  @Query("SELECT * FROM blog_posts ORDER BY id DESC")
   fun getAll(): Flow<List<BlogPost>>
 
   @Query("SELECT COALESCE(MAX(id), 0) FROM blog_posts")
