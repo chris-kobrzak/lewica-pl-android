@@ -26,7 +26,8 @@ fun AnnouncementsScreen(navController: NavController) {
   FeedScreenLayout(
     loading = uiState is AnnouncementsUiState.Loading,
     errorMessage = (uiState as? AnnouncementsUiState.Failed)?.message,
-    onRetry = { viewModel.refresh() }
+    onRetry = { viewModel.refresh() },
+    onBack = { navController.popBackStack() }
   ) { padding ->
     (uiState as? AnnouncementsUiState.Ready)?.let { state ->
       PullToRefreshContainer(

@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.automirrored.filled.More
 import androidx.compose.material.icons.filled.Newspaper
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -47,10 +48,10 @@ private data class TabItem(
 )
 
 private val tabs = listOf(
-  TabItem(NavRoute.NEWS_LIST, "Aktualności", Icons.Default.Newspaper),
+  TabItem(NavRoute.NEWS_LIST, "Teksty", Icons.Default.Newspaper),
+  TabItem(NavRoute.HISTORY_LIST, "Kalendarz", Icons.Default.History),
   TabItem(NavRoute.BLOG_POSTS_LIST, "Blog", Icons.AutoMirrored.Filled.Article),
-  TabItem(NavRoute.ANNOUNCEMENTS_LIST, "Ogłoszenia", Icons.Default.Campaign),
-  TabItem(NavRoute.HISTORY_LIST, "Historia", Icons.Default.History),
+  TabItem(NavRoute.SEARCH, "Szukaj", Icons.Default.Search),
   TabItem(NavRoute.MORE, "Więcej", Icons.AutoMirrored.Filled.More)
 )
 

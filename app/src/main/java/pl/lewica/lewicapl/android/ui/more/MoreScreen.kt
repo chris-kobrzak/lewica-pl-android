@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.People
@@ -44,8 +45,7 @@ fun MoreScreen(navController: NavController) {
   val context = LocalContext.current
 
   val items = listOf(
-    MoreItem("Strona główna", Icons.Default.Language, MoreItemAction.External("https://lewica.pl/")),
-    MoreItem("Wyszukiwarka", Icons.Default.Search, MoreItemAction.Navigate(NavRoute.SEARCH)),
+    MoreItem("Ogłoszenia", Icons.Default.Campaign, MoreItemAction.Navigate(NavRoute.ANNOUNCEMENTS_LIST)),
     MoreItem("Katalog linków", Icons.Default.Link, MoreItemAction.External("https://lewica.pl/index.php?s=katalog")),
     MoreItem("Redakcja", Icons.Default.People, MoreItemAction.External("https://lewica.pl/index.php?s=redakcja")),
     MoreItem("Facebook", Icons.Default.ThumbUp, MoreItemAction.External("https://www.facebook.com/Lewicapl/"))
