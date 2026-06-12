@@ -23,7 +23,10 @@ val articleCategories: List<ArticleCategory> = listOf(
 
 @Composable
 fun CategoryLabel(categoryId: Int) {
-  val name = articleCategories.find { it.id == categoryId }?.name ?: "lewica.pl"
+  var name = "lewica.pl"
+  if (categoryId != 0) {
+    name = articleCategories.find { it.id == categoryId }?.name ?: "lewica.pl"
+  }
   Text(
     text = name,
     color = Color.White,
