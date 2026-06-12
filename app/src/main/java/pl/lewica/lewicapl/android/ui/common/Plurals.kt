@@ -9,3 +9,6 @@ fun formatCommentCount(count: Int): String {
   }
   return "$count $suffix"
 }
+
+fun String.stripHtmlTags(): String =
+  replace(Regex("<[^>]*>"), "").replace("&nbsp;", " ").replace("&amp;", "&").replace("&quot;", "\"").trim()

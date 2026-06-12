@@ -24,25 +24,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import pl.lewica.lewicapl.android.ui.app.NavRoute
 import pl.lewica.lewicapl.android.ui.common.BrandedTopBar
 
-private data class ExternalLink(
+private data class MoreItem(
   val label: String,
-  val urlString: String,
-  val icon: ImageVector
+  val icon: ImageVector,
+  val action: MoreItemAction
 )
 
-private val links = listOf(
-  ExternalLink("Strona główna", "https://lewica.pl/", Icons.Default.Language),
-  ExternalLink("Wyszukiwarka", "https://lewica.pl/?s=szukaj", Icons.Default.Search),
-  ExternalLink("Katalog linków", "https://lewica.pl/index.php?s=katalog", Icons.Default.Link),
-  ExternalLink("Redakcja", "https://lewica.pl/index.php?s=redakcja", Icons.Default.People),
-  ExternalLink("Facebook", "https://www.facebook.com/Lewicapl/", Icons.Default.ThumbUp)
-)
+private sealed interface MoreItemAction {
+  data class External(val urlString: String) : MoreItemAction
+  data class Navigate(val route: String) : MoreItemAction
+}
 
 @Composable
-fun MoreScreen() {
+fun MoreScreen(navController: NavController) {
   val context = LocalContext.current
+
+  val items = listOf(
+    MoreItem("Strona główna", Icons.Default.Language, MoreItemAction.External("https://lewica.pl/")),
+    MoreItem("Wyszukiwarka", Icons.Default.Search, MoreItemAction.Navigate(NavRoute.SEARCH)),
+    MoreItem("Katalog linków", Icons.Default.Link, MoreItemAction.External("https://lewica.pl/index.php?s=katalog")),
+    MoreItem("Redakcja", Icons.Default.People, MoreItemAction.External("https://lewica.pl/index.php?s=redakcja")),
+    MoreItem("Facebook", Icons.Default.ThumbUp, MoreItemAction.External("https://www.facebook.com/Lewicapl/"))
+  )
 
   Scaffold(
     topBar = { BrandedTopBar() },
@@ -53,12 +60,19 @@ fun MoreScreen() {
         .fillMaxSize()
         .padding(padding)
     ) {
-      items(links) { link ->
+      items(items) { item ->
         ListItem(
-          headlineContent = { Text(link.label) },
-          leadingContent = { Icon(link.icon, contentDescription = link.label) },
+          headlineContent = { Text(item.label) },
+          leadingContent = { Icon(item.icon, contentDescription = item.label) },
           modifier = Modifier.clickable {
-            CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(link.urlString))
+            when (item.action) {
+              is MoreItemAction.External -> {
+                CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse((item.action as MoreItemAction.External).urlString))
+              }
+              is MoreItemAction.Navigate -> {
+                navController.navigate((item.action as MoreItemAction.Navigate).route)
+              }
+            }
           }
         )
         HorizontalDivider()

@@ -34,6 +34,7 @@ import pl.lewica.lewicapl.android.ui.common.FeedListItem
 import pl.lewica.lewicapl.android.ui.common.FeedScreenLayout
 import pl.lewica.lewicapl.android.ui.common.PullToRefreshContainer
 import pl.lewica.lewicapl.android.ui.common.brandPrimaryColour
+import pl.lewica.lewicapl.android.ui.common.stripHtmlTags
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -145,6 +146,3 @@ private fun String.extractLead(): String {
   val truncated = text.take(150)
   return if (text.length > 150) "$truncated…" else truncated
 }
-
-private fun String.stripHtmlTags(): String =
-  replace(Regex("<[^>]*>"), "").replace("&nbsp;", " ").replace("&amp;", "&").replace("&quot;", "\"").trim()

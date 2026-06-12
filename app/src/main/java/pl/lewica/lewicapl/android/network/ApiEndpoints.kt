@@ -1,5 +1,7 @@
 package pl.lewica.lewicapl.android.network
 
+import android.net.Uri
+
 object ApiEndpoints {
   private const val BASE_URL = "https://lewica.pl/api/v2"
 
@@ -20,4 +22,7 @@ object ApiEndpoints {
 
   fun article(id: Int): String =
     "$BASE_URL/articles/$id"
+
+  fun searchResults(query: String, offset: Int): String =
+    "$BASE_URL/search-results?query=${Uri.encode(query)}&offset=$offset"
 }

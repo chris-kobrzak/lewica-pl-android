@@ -7,6 +7,7 @@ import pl.lewica.lewicapl.android.ui.app.AppViewModel
 import pl.lewica.lewicapl.android.ui.blogposts.BlogPostsViewModel
 import pl.lewica.lewicapl.android.ui.history.HistoryViewModel
 import pl.lewica.lewicapl.android.ui.news.NewsViewModel
+import pl.lewica.lewicapl.android.ui.search.SearchViewModel
 
 val viewModelModule = module {
   viewModel { AppViewModel(get(), get(), get(), get()) }
@@ -14,4 +15,5 @@ val viewModelModule = module {
   viewModel { BlogPostsViewModel(get(), get()) }
   viewModel { AnnouncementsViewModel(get(), get()) }
   viewModel { HistoryViewModel(get(), get()) }
+  viewModel { SearchViewModel(get()) }
 }
