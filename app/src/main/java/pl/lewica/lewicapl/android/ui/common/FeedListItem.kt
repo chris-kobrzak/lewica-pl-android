@@ -45,7 +45,7 @@ fun FeedListItem(
     modifier = modifier
       .fillMaxWidth()
       .clickable(onClick = onClick)
-      .padding(horizontal = 16.dp, vertical = 12.dp),
+      .padding(horizontal = 16.dp, vertical = 16.dp),
     verticalAlignment = Alignment.Top
   ) {
     if (thumbnailUrl != null && thumbnailLeading) {
