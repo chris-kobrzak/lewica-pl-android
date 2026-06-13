@@ -13,6 +13,9 @@ object NavRoute {
   const val SEARCH = "search"
   const val SEARCH_ARTICLE_DETAIL = "search_article_detail/{id}"
   const val EDITORIAL_TEAM = "editorial_team"
+  const val CATALOGUE_CATEGORIES = "catalogue_categories"
+  const val CATALOGUE_SUBCATEGORIES = "catalogue_subcategories"
+  const val CATALOGUE_LINKS = "catalogue_links"
 
   fun newsDetail(id: Int) = "news_detail/$id"
   fun blogPostDetail(id: Int) = "blog_post_detail/$id"

@@ -28,4 +28,7 @@ object ApiEndpoints {
 
   fun editors(): String =
     "$BASE_URL/editors?type=editorial"
+
+  fun catalogueLinks(): String =
+    "$BASE_URL/catalogue-links"
 }

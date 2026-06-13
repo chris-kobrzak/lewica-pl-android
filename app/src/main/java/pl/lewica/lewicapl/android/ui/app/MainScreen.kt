@@ -32,6 +32,9 @@ import pl.lewica.lewicapl.android.ui.blogposts.BlogPostDetailScreen
 import pl.lewica.lewicapl.android.ui.blogposts.BlogPostsScreen
 import pl.lewica.lewicapl.android.ui.history.HistoryDetailScreen
 import pl.lewica.lewicapl.android.ui.history.HistoryScreen
+import pl.lewica.lewicapl.android.ui.catalogue.CategoriesScreen
+import pl.lewica.lewicapl.android.ui.catalogue.LinksScreen
+import pl.lewica.lewicapl.android.ui.catalogue.SubcategoriesScreen
 import pl.lewica.lewicapl.android.ui.editorial.EditorialTeamScreen
 
 import pl.lewica.lewicapl.android.ui.news.ArticleScreen
@@ -95,6 +98,9 @@ fun MainScreen() {
          SearchArticleScreen(id = id, onBack = { navController.popBackStack() })
        }
        composable(NavRoute.EDITORIAL_TEAM) { EditorialTeamScreen(navController) }
+       composable(NavRoute.CATALOGUE_CATEGORIES) { CategoriesScreen(navController) }
+       composable(NavRoute.CATALOGUE_SUBCATEGORIES) { SubcategoriesScreen(navController) }
+       composable(NavRoute.CATALOGUE_LINKS) { LinksScreen(navController) }
     }
   }
 }
