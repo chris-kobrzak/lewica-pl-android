@@ -5,15 +5,17 @@ import androidx.room.RoomDatabase
 import pl.lewica.lewicapl.android.data.model.Announcement
 import pl.lewica.lewicapl.android.data.model.Article
 import pl.lewica.lewicapl.android.data.model.BlogPost
+import pl.lewica.lewicapl.android.data.model.Editor
 import pl.lewica.lewicapl.android.data.model.HistoryEntry
 import pl.lewica.lewicapl.android.data.store.AnnouncementStore
 import pl.lewica.lewicapl.android.data.store.ArticleStore
 import pl.lewica.lewicapl.android.data.store.BlogPostStore
+import pl.lewica.lewicapl.android.data.store.EditorStore
 import pl.lewica.lewicapl.android.data.store.HistoryEntryStore
 
 @Database(
-  entities = [Article::class, BlogPost::class, Announcement::class, HistoryEntry::class],
-  version = 2,
+  entities = [Article::class, BlogPost::class, Announcement::class, HistoryEntry::class, Editor::class],
+  version = 3,
   exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -21,4 +23,5 @@ abstract class AppDatabase : RoomDatabase() {
   abstract fun blogPostStore(): BlogPostStore
   abstract fun announcementStore(): AnnouncementStore
   abstract fun historyEntryStore(): HistoryEntryStore
+  abstract fun editorStore(): EditorStore
 }

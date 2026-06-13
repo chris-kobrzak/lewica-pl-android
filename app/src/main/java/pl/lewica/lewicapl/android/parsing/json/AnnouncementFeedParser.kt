@@ -1,10 +1,9 @@
 package pl.lewica.lewicapl.android.parsing.json
 
-import pl.lewica.lewicapl.android.parsing.AnnouncementItemResponse
 import pl.lewica.lewicapl.android.parsing.AnnouncementPageResponse
 import pl.lewica.lewicapl.android.parsing.FeedParser
 import pl.lewica.lewicapl.android.parsing.dto.AnnouncementDto
-import pl.lewica.lewicapl.android.parsing.json.jsonAdapter
+
 
 class AnnouncementFeedParser : FeedParser<AnnouncementDto> {
 

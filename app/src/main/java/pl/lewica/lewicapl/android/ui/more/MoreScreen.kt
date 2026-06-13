@@ -47,7 +47,7 @@ fun MoreScreen(navController: NavController) {
   val items = listOf(
     MoreItem("Ogłoszenia", Icons.Default.Campaign, MoreItemAction.Navigate(NavRoute.ANNOUNCEMENTS_LIST)),
     MoreItem("Katalog linków", Icons.Default.Link, MoreItemAction.External("https://lewica.pl/index.php?s=katalog")),
-    MoreItem("Redakcja", Icons.Default.People, MoreItemAction.External("https://lewica.pl/index.php?s=redakcja")),
+    MoreItem("Redakcja", Icons.Default.People, MoreItemAction.Navigate(NavRoute.EDITORIAL_TEAM)),
     MoreItem("Facebook", Icons.Default.ThumbUp, MoreItemAction.External("https://www.facebook.com/Lewicapl/"))
   )
 

@@ -17,4 +17,5 @@ val appModule = module {
   single { get<AppDatabase>().blogPostStore() }
   single { get<AppDatabase>().announcementStore() }
   single { get<AppDatabase>().historyEntryStore() }
+  single { get<AppDatabase>().editorStore() }
 }

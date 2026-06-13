@@ -9,6 +9,9 @@ object ApiEndpoints {
     if (lastId > 0) "$BASE_URL/articles?limit=20&newerThan=$lastId"
     else "$BASE_URL/articles?limit=20"
 
+  fun article(id: Int): String =
+    "$BASE_URL/articles/$id"
+
   fun blogPosts(lastId: Int): String =
     if (lastId > 0) "$BASE_URL/blog-posts?after=$lastId"
     else "$BASE_URL/blog-posts"
@@ -20,9 +23,9 @@ object ApiEndpoints {
   fun calendarEntries(month: Int, day: Int): String =
     "$BASE_URL/calendar?month=$month&day=$day"
 
-  fun article(id: Int): String =
-    "$BASE_URL/articles/$id"
-
   fun searchResults(query: String, offset: Int): String =
     "$BASE_URL/search-results?query=${Uri.encode(query)}&offset=$offset"
+
+  fun editors(): String =
+    "$BASE_URL/editors?type=editorial"
 }

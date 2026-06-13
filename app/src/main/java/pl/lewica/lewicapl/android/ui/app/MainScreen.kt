@@ -6,7 +6,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Article
-import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.automirrored.filled.More
 import androidx.compose.material.icons.filled.Newspaper
@@ -33,10 +32,12 @@ import pl.lewica.lewicapl.android.ui.blogposts.BlogPostDetailScreen
 import pl.lewica.lewicapl.android.ui.blogposts.BlogPostsScreen
 import pl.lewica.lewicapl.android.ui.history.HistoryDetailScreen
 import pl.lewica.lewicapl.android.ui.history.HistoryScreen
-import pl.lewica.lewicapl.android.ui.more.MoreScreen
+import pl.lewica.lewicapl.android.ui.editorial.EditorialTeamScreen
+
 import pl.lewica.lewicapl.android.ui.news.ArticleScreen
 import pl.lewica.lewicapl.android.ui.news.NewsScreen
 import pl.lewica.lewicapl.android.ui.search.SearchArticleScreen
+import pl.lewica.lewicapl.android.ui.more.MoreScreen
 import pl.lewica.lewicapl.android.ui.search.SearchScreen
 
 private fun NavBackStackEntry.intArg(key: String): Int? = arguments?.getString(key)?.toIntOrNull()
@@ -87,12 +88,13 @@ fun MainScreen() {
         val id = backStack.intArg("id") ?: return@composable
         HistoryDetailScreen(id = id, onBack = { navController.popBackStack() })
       }
-      composable(NavRoute.MORE) { MoreScreen(navController) }
-      composable(NavRoute.SEARCH) { SearchScreen(navController) }
-      composable(NavRoute.SEARCH_ARTICLE_DETAIL) { backStack ->
-        val id = backStack.intArg("id") ?: return@composable
-        SearchArticleScreen(id = id, onBack = { navController.popBackStack() })
-      }
+       composable(NavRoute.MORE) { MoreScreen(navController) }
+       composable(NavRoute.SEARCH) { SearchScreen(navController) }
+       composable(NavRoute.SEARCH_ARTICLE_DETAIL) { backStack ->
+         val id = backStack.intArg("id") ?: return@composable
+         SearchArticleScreen(id = id, onBack = { navController.popBackStack() })
+       }
+       composable(NavRoute.EDITORIAL_TEAM) { EditorialTeamScreen(navController) }
     }
   }
 }

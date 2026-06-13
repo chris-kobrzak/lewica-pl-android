@@ -13,12 +13,14 @@ import kotlinx.coroutines.launch
 import pl.lewica.lewicapl.android.data.sync.AnnouncementSyncService
 import pl.lewica.lewicapl.android.data.sync.ArticleSyncService
 import pl.lewica.lewicapl.android.data.sync.BlogPostSyncService
+import pl.lewica.lewicapl.android.data.sync.EditorSyncService
 import pl.lewica.lewicapl.android.data.sync.HistoryEntrySyncService
 
 class AppViewModel(
   private val articleSyncService: ArticleSyncService,
   private val blogPostSyncService: BlogPostSyncService,
   private val announcementSyncService: AnnouncementSyncService,
+  private val editorSyncService: EditorSyncService,
   private val historyEntrySyncService: HistoryEntrySyncService
 ) : ViewModel() {
 
@@ -39,9 +41,10 @@ class AppViewModel(
       try {
         coroutineScope {
           awaitAll(
+            async { announcementSyncService.sync() },
             async { articleSyncService.sync() },
             async { blogPostSyncService.sync() },
-            async { announcementSyncService.sync() },
+            async { editorSyncService.sync() },
             async { historyEntrySyncService.sync() }
           )
         }
