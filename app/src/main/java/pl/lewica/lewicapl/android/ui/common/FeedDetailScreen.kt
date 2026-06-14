@@ -1,8 +1,11 @@
 package pl.lewica.lewicapl.android.ui.common
 
+import android.text.method.LinkMovementMethod
+import android.widget.TextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +20,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.text.HtmlCompat
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import androidx.compose.material.icons.Icons
@@ -37,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,6 +65,7 @@ fun FeedDetailScreen(
   modifier: Modifier = Modifier
 ) {
   val showTitleInContent = topBarContent != null || contentHeader != null || titleInContent
+  val panelBackground = if (isSystemInDarkTheme()) Color(0xFF1A1A1A) else Color(0xFFF5F5F5)
   Scaffold(
     topBar = {
       BrandedTopBar(
@@ -93,12 +100,14 @@ fun FeedDetailScreen(
           modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(16f / 9f)
+            .padding(bottom = 15.dp)
+            .background(panelBackground)
             .clickable { /* could open full-screen viewer */ }
         )
       }
       if (showTitleInContent) {
         Text(
-          text = title,
+          text = title.decodeHtml(),
           style = MaterialTheme.typography.titleLarge.copy(fontSize = 26.sp, lineHeight = 34.sp),
           fontWeight = FontWeight.Bold,
           modifier = Modifier.padding(bottom = 8.dp)
@@ -136,16 +145,30 @@ fun FeedDetailScreen(
       HorizontalDivider(
         modifier = Modifier.padding(top = dividerTopPadding, bottom = 16.dp)
       )
-      Text(
-        text = body,
-        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp, lineHeight = 30.sp)
-      )
+      HtmlText(html = body)
       if (!editorComment.isNullOrEmpty()) {
         HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
         EditorCommentBlock(comment = editorComment)
       }
     }
   }
+}
+
+@Composable
+fun HtmlText(html: String, modifier: Modifier = Modifier) {
+  val textColor = MaterialTheme.colorScheme.onSurface
+  AndroidView(
+    modifier = modifier,
+    factory = { context ->
+      TextView(context).apply {
+        textSize = 20f
+        setLineSpacing(0f, 1.2f)
+        setTextColor(textColor.toArgb())
+        movementMethod = LinkMovementMethod.getInstance()
+      }
+    },
+    update = { it.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY) }
+  )
 }
 
 @Composable
@@ -177,9 +200,8 @@ private fun EditorCommentBlock(comment: String) {
       .background(background)
       .border(1.dp, grey)
   ) {
-    Text(
-      text = comment,
-      style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp, lineHeight = 30.sp),
+    HtmlText(
+      html = comment,
       modifier = Modifier.padding(top = 26.dp, start = 14.dp, end = 14.dp, bottom = 14.dp)
     )
     Box(

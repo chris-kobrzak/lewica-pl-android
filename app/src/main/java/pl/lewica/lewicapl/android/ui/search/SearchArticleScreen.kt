@@ -8,7 +8,6 @@ import androidx.compose.ui.platform.LocalContext
 import org.koin.androidx.compose.koinViewModel
 import pl.lewica.lewicapl.android.ui.common.FeedDetailScreen
 import pl.lewica.lewicapl.android.ui.common.formatCommentCount
-import pl.lewica.lewicapl.android.ui.common.stripHtmlTags
 
 @Composable
 fun SearchArticleScreen(id: Int, onBack: () -> Unit) {
@@ -33,12 +32,12 @@ fun SearchArticleScreen(id: Int, onBack: () -> Unit) {
 
   FeedDetailScreen(
     title = article.title,
-    body = article.body.stripHtmlTags(),
+    body = article.body,
     date = article.publishedAt,
     onBack = onBack,
     topBarContent = null,
     thumbnailUrl = thumbnailUrl,
-    editorComment = article.editorComment?.stripHtmlTags(),
+    editorComment = article.editorComment,
     onForumThread = openForumThread,
     forumThreadLabel = formatCommentCount(commentCount),
     onShare = {

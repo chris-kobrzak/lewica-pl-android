@@ -55,7 +55,7 @@ fun FeedListItem(
     Column(modifier = Modifier.weight(1f)) {
       Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
-          text = title,
+          text = title.decodeHtml(),
           style = MaterialTheme.typography.titleMedium,
           fontWeight = if (unread) FontWeight.Bold else FontWeight.Normal,
           modifier = Modifier.weight(1f)
@@ -72,7 +72,7 @@ fun FeedListItem(
       }
       if (lead.isNotBlank()) {
         Text(
-          text = lead,
+          text = lead.decodeHtml(),
           style = MaterialTheme.typography.bodyMedium,
           maxLines = 2,
           modifier = Modifier.padding(top = 4.dp)

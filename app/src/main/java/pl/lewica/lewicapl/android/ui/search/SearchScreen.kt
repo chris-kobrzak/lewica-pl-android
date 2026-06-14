@@ -45,6 +45,7 @@ import org.koin.androidx.compose.koinViewModel
 import pl.lewica.lewicapl.android.parsing.dto.ArticleDto
 import pl.lewica.lewicapl.android.ui.app.NavRoute
 import pl.lewica.lewicapl.android.ui.common.brandPrimaryColour
+import pl.lewica.lewicapl.android.ui.common.decodeHtml
 import pl.lewica.lewicapl.android.ui.common.formatDate
 
 @Composable
@@ -181,7 +182,7 @@ private fun SearchResultRow(
     ) {
       Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
-          text = dto.title,
+          text = dto.title.decodeHtml(),
           style = MaterialTheme.typography.titleMedium,
           modifier = Modifier.weight(1f)
         )

@@ -73,7 +73,7 @@ fun BrandedTopBar(
           when {
             centerContent != null -> centerContent()
             title != null -> Text(
-              text = title,
+              text = title.decodeHtml(),
               color = Color.White,
               fontWeight = FontWeight.Bold,
               fontSize = 18.sp,
