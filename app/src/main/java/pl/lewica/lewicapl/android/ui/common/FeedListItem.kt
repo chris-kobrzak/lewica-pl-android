@@ -2,6 +2,7 @@ package pl.lewica.lewicapl.android.ui.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -55,16 +57,25 @@ fun FeedListItem(
     Column(modifier = Modifier.weight(1f)) {
       Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
-          text = title.decodeHtml(),
+          text = title,
           style = MaterialTheme.typography.titleMedium,
-          fontWeight = if (unread) FontWeight.Bold else FontWeight.Normal,
+          fontWeight = FontWeight.Bold,
           modifier = Modifier.weight(1f)
         )
+        if (unread) {
+          Spacer(modifier = Modifier.width(8.dp))
+          Box(
+            modifier = Modifier
+              .size(8.dp)
+              .clip(CircleShape)
+              .background(MaterialTheme.colorScheme.primary)
+          )
+        }
         if (withEditorComment) {
-          Spacer(modifier = Modifier.width(4.dp))
+          Spacer(modifier = Modifier.width(8.dp))
           Icon(
             imageVector = Icons.Filled.Edit,
-            contentDescription = "Artykuł zawiera komentarz edytora",
+            contentDescription = "Artykuł zawiera komentarz redakcyjny",
             tint = Color(0xFFFF9800),
             modifier = Modifier.size(16.dp)
           )
