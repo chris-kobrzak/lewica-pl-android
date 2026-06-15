@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,12 +59,33 @@ fun FeedListItem(
       Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
           text = title,
-          style = MaterialTheme.typography.titleMedium,
+          style = MaterialTheme.typography.titleMedium.copy(lineHeight = 20.sp),
           fontWeight = FontWeight.Bold,
-          modifier = Modifier.weight(1f)
+          modifier = Modifier.weight(1f),
+          maxLines = 3,
+          overflow = TextOverflow.Ellipsis
         )
+      }
+      if (lead.isNotBlank()) {
+        Text(
+          text = lead.decodeHtml(),
+          style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 18.sp),
+          maxLines = 2,
+          overflow = TextOverflow.Ellipsis,
+          modifier = Modifier.padding(top = 10.dp)
+        )
+      }
+      Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        Text(
+          text = date.formatDate(),
+          style = MaterialTheme.typography.labelSmall.copy(fontSize = 13.sp),
+          color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.weight(1f))
         if (unread) {
-          Spacer(modifier = Modifier.width(8.dp))
           Box(
             modifier = Modifier
               .size(8.dp)
@@ -71,30 +93,18 @@ fun FeedListItem(
               .background(MaterialTheme.colorScheme.primary)
           )
         }
-        if (withEditorComment) {
+        if (unread && withEditorComment) {
           Spacer(modifier = Modifier.width(8.dp))
+        }
+        if (withEditorComment) {
           Icon(
-            imageVector = Icons.Filled.Edit,
+            imageVector = Icons.Default.Edit,
             contentDescription = "Artykuł zawiera komentarz redakcyjny",
             tint = Color(0xFFFF9800),
             modifier = Modifier.size(16.dp)
           )
         }
       }
-      if (lead.isNotBlank()) {
-        Text(
-          text = lead.decodeHtml(),
-          style = MaterialTheme.typography.bodyMedium,
-          maxLines = 2,
-          modifier = Modifier.padding(top = 4.dp)
-        )
-      }
-      Text(
-        text = date.formatDate(),
-        style = MaterialTheme.typography.labelSmall.copy(fontSize = 13.sp),
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(top = 4.dp)
-      )
     }
     if (thumbnailUrl != null && !thumbnailLeading) {
       Spacer(modifier = Modifier.width(10.dp))

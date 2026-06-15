@@ -63,7 +63,7 @@ fun NewsScreen(navController: NavController) {
               val thumbnailUrl = article.thumbnailExtension?.let { "https://lewica.pl/uploads/images/${article.id}.$it" }
               FeedListItem(
                 title = article.title,
-                lead = article.body.extractLead(),
+                lead = article.body.stripHtmlTags().take(150),
                 date = article.publishedAt,
                 unread = !article.opened,
                 thumbnailUrl = thumbnailUrl,
@@ -139,10 +139,4 @@ private fun CategoryBar(
       }
     }
   }
-}
-
-private fun String.extractLead(): String {
-  val text = stripHtmlTags()
-  val truncated = text.take(150)
-  return if (text.length > 150) "$truncated…" else truncated
 }

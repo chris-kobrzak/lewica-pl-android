@@ -37,6 +37,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,6 +50,7 @@ import pl.lewica.lewicapl.android.ui.app.NavRoute
 import pl.lewica.lewicapl.android.ui.common.brandPrimaryColour
 import pl.lewica.lewicapl.android.ui.common.decodeHtml
 import pl.lewica.lewicapl.android.ui.common.formatDate
+import pl.lewica.lewicapl.android.ui.common.stripHtmlTags
 
 @Composable
 fun SearchScreen(
@@ -195,14 +198,39 @@ private fun SearchResultRow(
     Column(
       modifier = Modifier.weight(1f)
     ) {
-      Row(verticalAlignment = Alignment.CenterVertically) {
+      Text(
+        text = dto.title.decodeHtml(),
+        style = MaterialTheme.typography.titleMedium.copy(lineHeight = 20.sp),
+        fontWeight = FontWeight.Bold,
+        maxLines = 3,
+        overflow = TextOverflow.Ellipsis
+      )
+      Text(
+        text = dto.body.stripHtmlTags().take(150).decodeHtml(),
+        style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 18.sp),
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.padding(top = 10.dp)
+      )
+      if (dto.authors.isNotEmpty()) {
         Text(
-          text = dto.title.decodeHtml(),
-          style = MaterialTheme.typography.titleMedium,
-          modifier = Modifier.weight(1f)
+          text = dto.authors.joinToString(", "),
+          style = MaterialTheme.typography.labelSmall.copy(fontSize = 13.sp),
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          modifier = Modifier.padding(top = 10.dp)
+        )
+      }
+      Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        Text(
+          text = dto.publishedAt.formatDate(),
+          style = MaterialTheme.typography.labelSmall.copy(fontSize = 13.sp),
+          color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         if (dto.editorComment != null) {
-          Spacer(modifier = Modifier.width(8.dp))
+          Spacer(modifier = Modifier.weight(1f))
           Icon(
             imageVector = Icons.Default.Edit,
             contentDescription = "Artykuł zawiera komentarz edytora",
@@ -210,20 +238,6 @@ private fun SearchResultRow(
             modifier = Modifier.size(16.dp)
           )
         }
-      }
-      Text(
-        text = dto.publishedAt.formatDate(),
-        style = MaterialTheme.typography.labelSmall.copy(fontSize = 13.sp),
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(top = 4.dp)
-      )
-      if (dto.authors.isNotEmpty()) {
-        Text(
-          text = dto.authors.joinToString(", "),
-          style = MaterialTheme.typography.labelSmall.copy(fontSize = 13.sp),
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-          modifier = Modifier.padding(top = 4.dp)
-        )
       }
     }
   }
