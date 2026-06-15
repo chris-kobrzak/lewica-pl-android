@@ -3,7 +3,6 @@ package pl.lewica.lewicapl.android.ui.news
 import android.content.Intent
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import pl.lewica.lewicapl.android.ui.common.FeedDetailScreen
@@ -48,9 +48,8 @@ fun ArticleScreen(id: Int, onBack: () -> Unit) {
       if (article.authors.isNotEmpty()) {
         Text(
           text = article.authors,
-          style = MaterialTheme.typography.labelMedium,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-          modifier = Modifier.padding(bottom = 10.dp)
+          style = MaterialTheme.typography.labelMedium.copy(fontSize = 15.sp),
+          color = MaterialTheme.colorScheme.onSurfaceVariant
         )
       }
     },

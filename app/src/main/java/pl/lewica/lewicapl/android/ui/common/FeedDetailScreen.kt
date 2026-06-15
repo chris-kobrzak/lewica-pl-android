@@ -113,7 +113,10 @@ fun FeedDetailScreen(
           modifier = Modifier.padding(bottom = 8.dp)
         )
       }
-      contentHeader?.invoke()
+      contentHeader?.let {
+        it.invoke()
+        Spacer(modifier = Modifier.height(8.dp))
+      }
       Row(
         modifier = Modifier
           .fillMaxWidth()
