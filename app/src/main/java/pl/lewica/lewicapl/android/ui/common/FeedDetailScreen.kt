@@ -170,7 +170,10 @@ fun HtmlText(html: String, modifier: Modifier = Modifier) {
         movementMethod = LinkMovementMethod.getInstance()
       }
     },
-    update = { it.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY) }
+    update = {
+      val processedHtml = html.replace("\n", "<br>")
+      it.text = HtmlCompat.fromHtml(processedHtml, HtmlCompat.FROM_HTML_MODE_LEGACY)
+    }
   )
 }
 
