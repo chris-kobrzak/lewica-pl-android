@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -49,8 +50,10 @@ import pl.lewica.lewicapl.android.ui.common.decodeHtml
 import pl.lewica.lewicapl.android.ui.common.formatDate
 
 @Composable
-fun SearchScreen(navController: NavController) {
-  val viewModel: SearchViewModel = koinViewModel()
+fun SearchScreen(
+  navController: NavController,
+  viewModel: SearchViewModel = koinViewModel()
+) {
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
   val query by viewModel.query.collectAsStateWithLifecycle()
   val keyboardController = LocalSoftwareKeyboardController.current
@@ -172,13 +175,25 @@ private fun SearchResultRow(
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(horizontal = 16.dp, vertical = 8.dp)
-      .clickable(onClick = onClick),
+      .clickable(onClick = onClick)
+      .padding(horizontal = 16.dp, vertical = 16.dp),
     verticalAlignment = Alignment.Top
   ) {
+    val thumbnailUrl = dto.thumbnailExtension?.let { "https://lewica.pl/uploads/images/${dto.id}.$it" }
+    if (thumbnailUrl != null) {
+      AsyncImage(
+        model = thumbnailUrl,
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+          .size(80.dp)
+          .clip(RoundedCornerShape(8.dp))
+          .background(MaterialTheme.colorScheme.surfaceVariant)
+      )
+      Spacer(modifier = Modifier.width(10.dp))
+    }
     Column(
-      modifier = Modifier.weight(1f),
-      verticalArrangement = Arrangement.spacedBy(4.dp)
+      modifier = Modifier.weight(1f)
     ) {
       Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
@@ -187,7 +202,7 @@ private fun SearchResultRow(
           modifier = Modifier.weight(1f)
         )
         if (dto.editorComment != null) {
-          Spacer(modifier = Modifier.width(4.dp))
+          Spacer(modifier = Modifier.width(8.dp))
           Icon(
             imageVector = Icons.Default.Edit,
             contentDescription = "Artykuł zawiera komentarz edytora",
@@ -198,29 +213,18 @@ private fun SearchResultRow(
       }
       Text(
         text = dto.publishedAt.formatDate(),
-        style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
+        style = MaterialTheme.typography.labelSmall.copy(fontSize = 13.sp),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(top = 4.dp)
       )
       if (dto.authors.isNotEmpty()) {
         Text(
           text = dto.authors.joinToString(", "),
-          style = MaterialTheme.typography.labelSmall,
-          color = MaterialTheme.colorScheme.onSurfaceVariant
+          style = MaterialTheme.typography.labelSmall.copy(fontSize = 13.sp),
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          modifier = Modifier.padding(top = 4.dp)
         )
       }
-    }
-    val thumbnailUrl = dto.thumbnailExtension?.let { "https://lewica.pl/uploads/images/${dto.id}.$it" }
-    if (thumbnailUrl != null) {
-      Spacer(modifier = Modifier.width(10.dp))
-      AsyncImage(
-        model = thumbnailUrl,
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = Modifier
-          .size(80.dp)
-          .clip(RoundedCornerShape(6.dp))
-          .background(MaterialTheme.colorScheme.surfaceVariant)
-      )
     }
   }
   HorizontalDivider()

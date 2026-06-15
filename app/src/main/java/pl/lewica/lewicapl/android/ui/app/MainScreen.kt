@@ -17,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -26,6 +27,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import org.koin.androidx.compose.koinViewModel
 import pl.lewica.lewicapl.android.ui.announcements.AnnouncementDetailScreen
 import pl.lewica.lewicapl.android.ui.announcements.AnnouncementsScreen
 import pl.lewica.lewicapl.android.ui.blogposts.BlogPostDetailScreen
@@ -95,7 +97,14 @@ fun MainScreen() {
        composable(NavRoute.SEARCH) { SearchScreen(navController) }
        composable(NavRoute.SEARCH_ARTICLE_DETAIL) { backStack ->
          val id = backStack.intArg("id") ?: return@composable
-         SearchArticleScreen(id = id, onBack = { navController.popBackStack() })
+         val searchEntry = remember(backStack) {
+           navController.getBackStackEntry(NavRoute.SEARCH)
+         }
+         SearchArticleScreen(
+           id = id,
+           onBack = { navController.popBackStack() },
+           viewModel = koinViewModel(viewModelStoreOwner = searchEntry)
+         )
        }
        composable(NavRoute.EDITORIAL_TEAM) { EditorialTeamScreen(navController) }
        composable(NavRoute.CATALOGUE_CATEGORIES) { CategoriesScreen(navController) }
