@@ -26,7 +26,7 @@ fun ArticleScreen(id: Int, onBack: () -> Unit) {
   val article = (uiState as? NewsUiState.Ready)?.articles?.find { it.id == id } ?: return
 
   LaunchedEffect(article.id) {
-    viewModel.refreshCommentCount(article.id)
+    viewModel.refreshArticle(article.id)
   }
 
   val articleUrl = if (article.categorySlug.isNotEmpty() && article.slug.isNotEmpty()) {

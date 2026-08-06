@@ -33,14 +33,14 @@ class ArticleSyncService(
     authors = dto.authors.joinToString(", ")
   )
 
-  override suspend fun insert(models: List<Article>) = store.insert(models)
+  override suspend fun upsert(models: List<Article>) = store.upsert(models)
 
-  suspend fun refreshCommentCount(articleId: Int) {
+  suspend fun refreshArticle(articleId: Int) {
     try {
       val endpoint = ApiEndpoints.article(articleId)
       val data = client.fetchFeed(endpoint)
       val dto = parser.parse(data).firstOrNull { it.id == articleId } ?: return
-      store.updateCommentCount(articleId, dto.commentCount)
+      store.upsert(listOf(transform(dto)))
     } catch (_: Exception) {}
   }
 }

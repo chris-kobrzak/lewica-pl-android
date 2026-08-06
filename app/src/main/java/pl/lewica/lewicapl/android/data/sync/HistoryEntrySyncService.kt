@@ -28,5 +28,5 @@ class HistoryEntrySyncService(
     eventDate = "%04d-%02d-%02d".format(dto.year, dto.month, dto.day)
   )
 
-  override suspend fun insert(models: List<HistoryEntry>) = store.insert(models)
+  override suspend fun upsert(models: List<HistoryEntry>) = store.upsert(models)
 }

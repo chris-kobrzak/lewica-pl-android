@@ -23,5 +23,5 @@ class EditorSyncService(
     blogTitle = dto.blog?.title
   )
 
-  override suspend fun insert(models: List<Editor>) = store.insert(models)
+  override suspend fun upsert(models: List<Editor>) = store.upsert(models)
 }

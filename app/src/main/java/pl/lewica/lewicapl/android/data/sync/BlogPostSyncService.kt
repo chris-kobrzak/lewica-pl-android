@@ -25,5 +25,5 @@ class BlogPostSyncService(
     publishedAt = dto.publishedAt
   )
 
-  override suspend fun insert(models: List<BlogPost>) = store.insert(models)
+  override suspend fun upsert(models: List<BlogPost>) = store.upsert(models)
 }

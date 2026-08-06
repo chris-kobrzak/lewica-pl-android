@@ -44,8 +44,8 @@ class NewsViewModel(
     viewModelScope.launch { syncService.sync() }
   }
 
-  fun refreshCommentCount(articleId: Int) {
-    viewModelScope.launch { syncService.refreshCommentCount(articleId) }
+  fun refreshArticle(articleId: Int) {
+    viewModelScope.launch { syncService.refreshArticle(articleId) }
   }
 
   fun markRead(id: Int) {

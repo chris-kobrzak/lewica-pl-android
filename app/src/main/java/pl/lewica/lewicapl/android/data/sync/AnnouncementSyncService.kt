@@ -25,5 +25,5 @@ class AnnouncementSyncService(
     publishedAt = dto.publishedAt
   )
 
-  override suspend fun insert(models: List<Announcement>) = store.insert(models)
+  override suspend fun upsert(models: List<Announcement>) = store.upsert(models)
 }
