@@ -16,9 +16,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -28,6 +30,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
+import pl.lewica.lewicapl.android.data.deeplink.DeepLinkDispatcher
 import pl.lewica.lewicapl.android.ui.announcements.AnnouncementDetailScreen
 import pl.lewica.lewicapl.android.ui.announcements.AnnouncementsScreen
 import pl.lewica.lewicapl.android.ui.blogposts.BlogPostDetailScreen
@@ -64,6 +68,15 @@ private val tabs = listOf(
 @Composable
 fun MainScreen() {
   val navController = rememberNavController()
+
+  val deepLinkDispatcher: DeepLinkDispatcher = koinInject()
+  val pendingArticleId by deepLinkDispatcher.pendingArticleId.collectAsStateWithLifecycle()
+  LaunchedEffect(pendingArticleId) {
+    val articleId = pendingArticleId ?: return@LaunchedEffect
+    navController.navigate(NavRoute.newsDetail(articleId))
+    deepLinkDispatcher.consumePendingArticle()
+  }
+
   Scaffold(
     contentWindowInsets = WindowInsets(0.dp),
     bottomBar = { BottomNav(navController) }

@@ -12,6 +12,9 @@ object ApiEndpoints {
   fun article(id: Int): String =
     "$BASE_URL/articles/$id"
 
+  fun article(slug: String): String =
+    "$BASE_URL/articles/$slug"
+
   fun blogPosts(lastId: Int): String =
     if (lastId > 0) "$BASE_URL/blog-posts?after=$lastId"
     else "$BASE_URL/blog-posts"

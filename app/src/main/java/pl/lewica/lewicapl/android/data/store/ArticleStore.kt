@@ -18,6 +18,12 @@ interface ArticleStore {
   @Query("SELECT COALESCE(MAX(id), 0) FROM articles")
   suspend fun getMaxId(): Int
 
+  @Query("SELECT * FROM articles WHERE id = :id LIMIT 1")
+  suspend fun findById(id: Int): Article?
+
+  @Query("SELECT * FROM articles WHERE categorySlug = :categorySlug AND slug = :slug LIMIT 1")
+  suspend fun findBySlug(categorySlug: String, slug: String): Article?
+
   @Query(
     """
     UPDATE articles SET

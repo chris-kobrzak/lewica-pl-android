@@ -2,6 +2,7 @@ package pl.lewica.lewicapl.android.di
 
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import pl.lewica.lewicapl.android.data.deeplink.DeepLinkDispatcher
 import pl.lewica.lewicapl.android.data.sync.AnnouncementSyncService
 import pl.lewica.lewicapl.android.data.sync.ArticleSyncService
 import pl.lewica.lewicapl.android.data.sync.BlogPostSyncService
@@ -49,4 +50,5 @@ val syncModule = module {
       store = get()
     )
   }
+  single { DeepLinkDispatcher(articleSyncService = get()) }
 }
