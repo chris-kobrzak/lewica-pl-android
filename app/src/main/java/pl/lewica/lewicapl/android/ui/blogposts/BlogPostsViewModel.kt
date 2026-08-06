@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import pl.lewica.lewicapl.android.data.repository.BlogPostRepository
 import pl.lewica.lewicapl.android.data.sync.BlogPostSyncService
+import pl.lewica.lewicapl.android.data.sync.SyncState
 
 class BlogPostsViewModel(
   private val repository: BlogPostRepository,
@@ -19,6 +20,10 @@ class BlogPostsViewModel(
     .getAll()
     .map { blogPosts -> BlogPostsUiState.Ready(blogPosts) }
     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), BlogPostsUiState.Loading)
+
+  val refreshing: StateFlow<Boolean> = syncService.state
+    .map { it is SyncState.Syncing }
+    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 
   fun refresh() {
     viewModelScope.launch { syncService.sync() }

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import pl.lewica.lewicapl.android.data.repository.HistoryEntryRepository
 import pl.lewica.lewicapl.android.data.sync.HistoryEntrySyncService
+import pl.lewica.lewicapl.android.data.sync.SyncState
 
 class HistoryViewModel(
   private val repository: HistoryEntryRepository,
@@ -19,6 +20,10 @@ class HistoryViewModel(
     .getAll()
     .map { entries -> HistoryUiState.Ready(entries) }
     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HistoryUiState.Loading)
+
+  val refreshing: StateFlow<Boolean> = syncService.state
+    .map { it is SyncState.Syncing }
+    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 
   fun refresh() {
     viewModelScope.launch { syncService.sync() }

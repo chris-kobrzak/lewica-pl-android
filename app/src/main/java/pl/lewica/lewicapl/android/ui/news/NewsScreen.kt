@@ -42,6 +42,7 @@ fun NewsScreen(navController: NavController) {
   val viewModel: NewsViewModel = koinViewModel()
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
   val selectedCategoryId by viewModel.selectedCategoryId.collectAsStateWithLifecycle()
+  val refreshing by viewModel.refreshing.collectAsStateWithLifecycle()
 
   FeedScreenLayout(
     loading = uiState is NewsUiState.Loading,
@@ -55,7 +56,7 @@ fun NewsScreen(navController: NavController) {
           onCategorySelected = { viewModel.selectCategory(it) }
         )
         PullToRefreshContainer(
-          refreshing = false,
+          refreshing = refreshing,
           onRefresh = { viewModel.refresh() }
         ) {
           LazyColumn(modifier = Modifier.fillMaxSize()) {

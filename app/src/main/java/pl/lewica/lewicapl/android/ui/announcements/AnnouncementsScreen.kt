@@ -22,6 +22,7 @@ import pl.lewica.lewicapl.android.ui.common.PullToRefreshContainer
 fun AnnouncementsScreen(navController: NavController) {
   val viewModel: AnnouncementsViewModel = koinViewModel()
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+  val refreshing by viewModel.refreshing.collectAsStateWithLifecycle()
 
   FeedScreenLayout(
     loading = uiState is AnnouncementsUiState.Loading,
@@ -31,7 +32,7 @@ fun AnnouncementsScreen(navController: NavController) {
   ) { padding ->
     (uiState as? AnnouncementsUiState.Ready)?.let { state ->
       PullToRefreshContainer(
-        refreshing = false,
+        refreshing = refreshing,
         onRefresh = { viewModel.refresh() },
         modifier = Modifier.padding(padding)
       ) {

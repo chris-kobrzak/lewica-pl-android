@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import pl.lewica.lewicapl.android.data.repository.ArticleRepository
 import pl.lewica.lewicapl.android.data.sync.ArticleSyncService
+import pl.lewica.lewicapl.android.data.sync.SyncState
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NewsViewModel(
@@ -30,6 +31,10 @@ class NewsViewModel(
     }
     .map { articles -> NewsUiState.Ready(articles) }
     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NewsUiState.Loading)
+
+  val refreshing: StateFlow<Boolean> = syncService.state
+    .map { it is SyncState.Syncing }
+    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 
   fun selectCategory(id: Int) {
     _selectedCategoryId.value = id

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import pl.lewica.lewicapl.android.data.repository.AnnouncementRepository
 import pl.lewica.lewicapl.android.data.sync.AnnouncementSyncService
+import pl.lewica.lewicapl.android.data.sync.SyncState
 
 class AnnouncementsViewModel(
   private val repository: AnnouncementRepository,
@@ -19,6 +20,10 @@ class AnnouncementsViewModel(
     .getAll()
     .map { announcements -> AnnouncementsUiState.Ready(announcements) }
     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AnnouncementsUiState.Loading)
+
+  val refreshing: StateFlow<Boolean> = syncService.state
+    .map { it is SyncState.Syncing }
+    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 
   fun refresh() {
     viewModelScope.launch { syncService.sync() }

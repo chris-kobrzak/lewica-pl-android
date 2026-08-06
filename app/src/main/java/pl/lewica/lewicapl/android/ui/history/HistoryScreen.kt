@@ -26,6 +26,7 @@ import pl.lewica.lewicapl.android.ui.common.PullToRefreshContainer
 fun HistoryScreen(navController: NavController) {
   val viewModel: HistoryViewModel = koinViewModel()
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+  val refreshing by viewModel.refreshing.collectAsStateWithLifecycle()
 
   FeedScreenLayout(
     loading = uiState is HistoryUiState.Loading,
@@ -34,7 +35,7 @@ fun HistoryScreen(navController: NavController) {
   ) { padding ->
     (uiState as? HistoryUiState.Ready)?.let { state ->
       PullToRefreshContainer(
-        refreshing = false,
+        refreshing = refreshing,
         onRefresh = { viewModel.refresh() },
         modifier = Modifier.padding(padding)
       ) {
