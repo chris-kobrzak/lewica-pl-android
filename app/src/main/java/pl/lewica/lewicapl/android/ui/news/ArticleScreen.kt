@@ -29,7 +29,11 @@ fun ArticleScreen(id: Int, onBack: () -> Unit) {
     viewModel.refreshCommentCount(article.id)
   }
 
-  val articleUrl = "https://lewica.pl/${article.slug}"
+  val articleUrl = if (article.categorySlug.isNotEmpty() && article.slug.isNotEmpty()) {
+    "https://lewica.pl/${article.categorySlug}/${article.slug}"
+  } else {
+    "https://lewica.pl/?id=${article.id}"
+  }
   val forumUrl = "https://lewica.pl/forum/index.php?format=minimal&fuse=messages.${article.id}"
   val commentCount = article.commentCount
   val openForumThread: (() -> Unit)? = if (commentCount > 0) {
