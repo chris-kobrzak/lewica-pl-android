@@ -1,5 +1,8 @@
 package pl.lewica.lewicapl.android.data.sync
 
+import java.io.IOException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,8 +28,15 @@ abstract class FeedSyncService<Dto, Model>(
       insert(models)
       _state.value = SyncState.Idle
     } catch (exception: Exception) {
-      _state.value = SyncState.Failed(exception.message ?: "Sync failed")
+      _state.value = SyncState.Failed(describeSyncFailure(exception))
       throw exception
     }
   }
+}
+
+private fun describeSyncFailure(exception: Exception): String = when (exception) {
+  is UnknownHostException -> "Brak połączenia z internetem"
+  is SocketTimeoutException -> "Przekroczono limit czasu połączenia"
+  is IOException -> "Błąd połączenia z serwerem"
+  else -> exception.message ?: "Błąd synchronizacji"
 }

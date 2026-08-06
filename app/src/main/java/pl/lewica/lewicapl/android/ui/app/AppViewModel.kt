@@ -2,6 +2,9 @@ package pl.lewica.lewicapl.android.ui.app
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import java.io.IOException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -52,8 +55,15 @@ class AppViewModel(
       } catch (cancellation: CancellationException) {
         throw cancellation
       } catch (exception: Exception) {
-        _appState.value = AppState.Failed(exception.message ?: "Sync failed")
+        _appState.value = AppState.Failed(describeSyncFailure(exception))
       }
     }
   }
+}
+
+private fun describeSyncFailure(exception: Exception): String = when (exception) {
+  is UnknownHostException -> "Brak połączenia z internetem"
+  is SocketTimeoutException -> "Przekroczono limit czasu połączenia"
+  is IOException -> "Błąd połączenia z serwerem"
+  else -> exception.message ?: "Błąd synchronizacji"
 }
