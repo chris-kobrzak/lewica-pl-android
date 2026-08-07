@@ -1,0 +1,23 @@
+package pl.lewica.lewicapl.android.di
+
+import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.module
+import pl.lewica.lewicapl.android.ui.announcements.AnnouncementsViewModel
+import pl.lewica.lewicapl.android.ui.app.AppViewModel
+import pl.lewica.lewicapl.android.ui.blogposts.BlogPostsViewModel
+import pl.lewica.lewicapl.android.ui.catalogue.CatalogueViewModel
+import pl.lewica.lewicapl.android.ui.editorial.EditorsViewModel
+import pl.lewica.lewicapl.android.ui.history.HistoryViewModel
+import pl.lewica.lewicapl.android.ui.news.NewsViewModel
+import pl.lewica.lewicapl.android.ui.search.SearchViewModel
+
+val viewModelModule = module {
+  viewModel { AppViewModel(get(), get(), get(), get(), get()) }
+  viewModel { AnnouncementsViewModel(get(), get()) }
+  viewModel { BlogPostsViewModel(get(), get()) }
+  viewModel { CatalogueViewModel(get()) }
+  viewModel { EditorsViewModel(get(), get()) }
+  viewModel { HistoryViewModel(get(), get()) }
+  viewModel { NewsViewModel(get(), get()) }
+  viewModel { SearchViewModel(get()) }
+}
