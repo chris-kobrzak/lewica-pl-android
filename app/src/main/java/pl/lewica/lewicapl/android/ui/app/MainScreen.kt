@@ -46,6 +46,7 @@ import pl.lewica.lewicapl.android.ui.editorial.EditorialTeamScreen
 import pl.lewica.lewicapl.android.ui.news.ArticleScreen
 import pl.lewica.lewicapl.android.ui.news.NewsScreen
 import pl.lewica.lewicapl.android.ui.search.SearchArticleScreen
+import pl.lewica.lewicapl.android.ui.more.AboutScreen
 import pl.lewica.lewicapl.android.ui.more.MoreScreen
 import pl.lewica.lewicapl.android.ui.search.SearchScreen
 
@@ -107,6 +108,7 @@ fun MainScreen() {
         HistoryDetailScreen(id = id, onBack = { navController.popBackStack() })
       }
        composable(NavRoute.MORE) { MoreScreen(navController) }
+       composable(NavRoute.ABOUT) { AboutScreen(navController) }
        composable(NavRoute.SEARCH) { SearchScreen(navController) }
        composable(NavRoute.SEARCH_ARTICLE_DETAIL) { backStack ->
          val id = backStack.intArg("id") ?: return@composable

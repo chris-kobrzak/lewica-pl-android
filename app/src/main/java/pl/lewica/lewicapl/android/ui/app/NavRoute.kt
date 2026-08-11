@@ -10,6 +10,7 @@ object NavRoute {
   const val HISTORY_LIST = "history_list"
   const val HISTORY_DETAIL = "history_detail/{id}"
   const val MORE = "more"
+  const val ABOUT = "about"
   const val SEARCH = "search"
   const val SEARCH_ARTICLE_DETAIL = "search_article_detail/{id}"
   const val EDITORIAL_TEAM = "editorial_team"

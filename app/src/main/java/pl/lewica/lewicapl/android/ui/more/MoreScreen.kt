@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.People
@@ -45,10 +46,11 @@ fun MoreScreen(navController: NavController) {
   val context = LocalContext.current
 
   val items = listOf(
-    MoreItem("Ogłoszenia", Icons.Default.Campaign, MoreItemAction.Navigate(NavRoute.ANNOUNCEMENTS_LIST)),
+    MoreItem("O aplikacji", Icons.Default.Info, MoreItemAction.Navigate(NavRoute.ABOUT)),
     MoreItem("Katalog linków", Icons.Default.Link, MoreItemAction.Navigate(NavRoute.CATALOGUE_CATEGORIES)),
     MoreItem("Redakcja", Icons.Default.People, MoreItemAction.Navigate(NavRoute.EDITORIAL_TEAM)),
-    MoreItem("Facebook", Icons.Default.ThumbUp, MoreItemAction.External("https://www.facebook.com/Lewicapl/"))
+    MoreItem("Facebook", Icons.Default.ThumbUp, MoreItemAction.External("https://www.facebook.com/Lewicapl/")),
+    MoreItem("Ogłoszenia", Icons.Default.Campaign, MoreItemAction.Navigate(NavRoute.ANNOUNCEMENTS_LIST))
   )
 
   Scaffold(
