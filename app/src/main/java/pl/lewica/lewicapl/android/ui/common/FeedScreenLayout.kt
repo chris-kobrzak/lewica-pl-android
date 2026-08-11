@@ -20,10 +20,11 @@ fun FeedScreenLayout(
   errorMessage: String?,
   onRetry: () -> Unit,
   onBack: (() -> Unit)? = null,
+  title: String? = null,
   readyContent: @Composable (PaddingValues) -> Unit
 ) {
   Scaffold(
-    topBar = { BrandedTopBar(onBack = onBack) },
+    topBar = { BrandedTopBar(title = title, onBack = onBack) },
     contentWindowInsets = WindowInsets(0.dp)
   ) { padding ->
     when {

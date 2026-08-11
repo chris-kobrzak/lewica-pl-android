@@ -19,7 +19,7 @@ fun AboutScreen(navController: NavController) {
     contentWindowInsets = WindowInsets(0.dp)
   ) { padding ->
     Text(
-      text = "Aplikacja \"lewica.pl\" jest niezależnym portalem informacyjnym i nie reprezentuje żadnego podmiotu rządowego. Oficjalne źródło informacji rządowych: gov.pl.",
+      text = "Aplikacja LewicaPL jest zoptymalizowanym dla systemu Android czytnikiem treści z niezależnego portalu informacyjnego \"lewica.pl\". Wszelkie treści zawarte w tej aplikacji są autorskie albo są przedrukami z innych źródeł.\n\nKolektyw redakcyjny nie reprezentuje żadnej konkretnej partii politycznej, choć oczywiście wspiera rozmaite lewicowe partie, organizacje czy związki zawodowe.\n\nAni kolektyw lewica.pl ani aplikacja LewicaPL nie reprezentuje żadnego podmiotu rządowego. Oficjalne źródło informacji rządowych: gov.pl.",
       style = MaterialTheme.typography.bodyLarge,
       modifier = Modifier
         .fillMaxSize()

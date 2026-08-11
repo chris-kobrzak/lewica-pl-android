@@ -28,7 +28,8 @@ fun AnnouncementsScreen(navController: NavController) {
     loading = uiState is AnnouncementsUiState.Loading,
     errorMessage = (uiState as? AnnouncementsUiState.Failed)?.message,
     onRetry = { viewModel.refresh() },
-    onBack = { navController.popBackStack() }
+    onBack = { navController.popBackStack() },
+    title = "ogłoszenia"
   ) { padding ->
     (uiState as? AnnouncementsUiState.Ready)?.let { state ->
       PullToRefreshContainer(

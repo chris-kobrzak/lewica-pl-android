@@ -76,7 +76,7 @@ fun BrandedTopBar(
               text = title.decodeHtml(),
               color = Color.White,
               fontWeight = FontWeight.Bold,
-              fontSize = 18.sp,
+              fontSize = 26.sp,
               maxLines = 1,
               overflow = TextOverflow.Ellipsis,
               textAlign = TextAlign.Center
