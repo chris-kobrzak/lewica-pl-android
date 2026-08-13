@@ -7,12 +7,12 @@ plugins {
 
 android {
   namespace = "pl.lewica.lewicapl.android"
-  compileSdk = 35
+  compileSdk = 37
 
   defaultConfig {
     applicationId = "pl.lewica.lewicapl"
     minSdk = 26
-    targetSdk = 35
+    targetSdk = 36
     versionCode = 1
     versionName = "1.0"
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
