@@ -26,6 +26,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.AddComment
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -62,6 +63,7 @@ fun FeedDetailScreen(
   editorComment: String? = null,
   onForumThread: (() -> Unit)? = null,
   forumThreadLabel: String = "komentarze",
+  onAddComment: (() -> Unit)? = null,
   modifier: Modifier = Modifier
 ) {
   val showTitleInContent = topBarContent != null || contentHeader != null || titleInContent
@@ -120,7 +122,7 @@ fun FeedDetailScreen(
       Row(
         modifier = Modifier
           .fillMaxWidth()
-          .padding(bottom = if (onForumThread == null) 8.dp else 0.dp),
+          .padding(bottom = if (onForumThread == null && onAddComment == null) 8.dp else 0.dp),
         verticalAlignment = Alignment.CenterVertically
       ) {
         Text(
@@ -128,8 +130,19 @@ fun FeedDetailScreen(
           style = MaterialTheme.typography.labelMedium.copy(fontSize = 15.sp),
           color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        if (onForumThread != null) {
+        if (onForumThread != null || onAddComment != null) {
           Spacer(modifier = Modifier.weight(1f))
+        }
+        if (onAddComment != null) {
+          IconButton(onClick = onAddComment) {
+            Icon(
+              Icons.Default.AddComment,
+              contentDescription = "Dodaj komentarz",
+              tint = MaterialTheme.colorScheme.primary
+            )
+          }
+        }
+        if (onForumThread != null) {
           TextButton(
             onClick = onForumThread,
             colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.primary)

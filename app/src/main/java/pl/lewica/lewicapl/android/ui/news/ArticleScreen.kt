@@ -35,10 +35,14 @@ fun ArticleScreen(id: Int, onBack: () -> Unit) {
     "https://lewica.pl/?id=${article.id}"
   }
   val forumUrl = "https://lewica.pl/forum/index.php?format=minimal&fuse=messages.${article.id}"
+  val addCommentUrl = "https://lewica.pl/forum/index.php?format=minimal&fuse=message_add.${article.id}"
   val commentCount = article.commentCount
   val openForumThread: (() -> Unit)? = if (commentCount > 0) {
     { CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(forumUrl)) }
   } else null
+  val addComment: () -> Unit = {
+    CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(addCommentUrl))
+  }
 
   val thumbnailUrl = article.thumbnailExtension?.let { "https://lewica.pl/uploads/images/${article.id}.$it" }
 
@@ -61,6 +65,7 @@ fun ArticleScreen(id: Int, onBack: () -> Unit) {
     editorComment = article.editorComment,
     onForumThread = openForumThread,
     forumThreadLabel = formatCommentCount(commentCount),
+    onAddComment = addComment,
     onShare = {
       val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
