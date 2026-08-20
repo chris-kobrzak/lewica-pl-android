@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.android)
@@ -12,7 +14,7 @@ android {
   defaultConfig {
     applicationId = "pl.lewica.lewicapl"
     minSdk = 26
-    targetSdk = 36
+    targetSdk = 37
     versionCode = 10
     versionName = "2.1"
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -34,12 +36,14 @@ android {
     targetCompatibility = JavaVersion.VERSION_11
   }
 
-  kotlinOptions {
-    jvmTarget = "11"
-  }
-
   buildFeatures {
     compose = true
+  }
+}
+
+kotlin {
+  compilerOptions {
+    jvmTarget.set(JvmTarget.JVM_11)
   }
 }
 
