@@ -56,17 +56,17 @@ fun FeedDetailScreen(
   body: String,
   date: String,
   onBack: () -> Unit,
+  modifier: Modifier = Modifier,
   onShare: (() -> Unit)? = null,
+  onForumThread: (() -> Unit)? = null,
+  onAddComment: (() -> Unit)? = null,
   topBarContent: (@Composable () -> Unit)? = null,
   contentHeader: (@Composable () -> Unit)? = null,
   titleInContent: Boolean = false,
   thumbnailUrl: String? = null,
   editorComment: String? = null,
-  onForumThread: (() -> Unit)? = null,
   forumThreadLabel: String = "komentarze",
-  onAddComment: (() -> Unit)? = null,
-  viewCountLabel: String? = null,
-  modifier: Modifier = Modifier
+  viewCountLabel: String? = null
 ) {
   val showTitleInContent = topBarContent != null || contentHeader != null || titleInContent
   val panelBackground = if (isSystemInDarkTheme()) Color(0xFF1A1A1A) else Color(0xFFF5F5F5)
