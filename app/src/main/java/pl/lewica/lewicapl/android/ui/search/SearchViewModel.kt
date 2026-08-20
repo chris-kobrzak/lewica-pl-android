@@ -10,10 +10,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pl.lewica.lewicapl.android.data.repository.SearchRepository
+import pl.lewica.lewicapl.android.data.sync.ArticleSyncService
 import pl.lewica.lewicapl.android.parsing.dto.ArticleDto
 
 class SearchViewModel(
-  private val repository: SearchRepository
+  private val repository: SearchRepository,
+  private val articleSyncService: ArticleSyncService
 ) : ViewModel() {
 
   private val _uiState = MutableStateFlow<SearchUiState>(SearchUiState.Idle)
@@ -76,6 +78,10 @@ class SearchViewModel(
 
   fun selectArticle(article: ArticleDto) {
     selectedArticle = article
+  }
+
+  fun recordView(articleId: Int) {
+    viewModelScope.launch { articleSyncService.recordView(articleId) }
   }
 
   fun retry() {

@@ -48,6 +48,10 @@ class NewsViewModel(
     viewModelScope.launch { syncService.refreshArticle(articleId) }
   }
 
+  fun recordView(articleId: Int) {
+    viewModelScope.launch { syncService.recordView(articleId) }
+  }
+
   fun markRead(id: Int) {
     viewModelScope.launch { repository.markRead(id) }
   }

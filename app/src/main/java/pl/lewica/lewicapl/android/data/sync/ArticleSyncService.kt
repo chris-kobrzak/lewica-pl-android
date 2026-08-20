@@ -7,6 +7,7 @@ import pl.lewica.lewicapl.android.network.ApiEndpoints
 import pl.lewica.lewicapl.android.network.FeedClient
 import pl.lewica.lewicapl.android.parsing.ArticleItemResponse
 import pl.lewica.lewicapl.android.parsing.FeedParser
+import pl.lewica.lewicapl.android.parsing.ViewCountResponse
 import pl.lewica.lewicapl.android.parsing.dto.ArticleDto
 import pl.lewica.lewicapl.android.parsing.json.jsonAdapter
 import pl.lewica.lewicapl.android.parsing.json.toDto
@@ -18,6 +19,7 @@ class ArticleSyncService(
 ) : FeedSyncService<ArticleDto, Article>(client, parser) {
 
   private val singleArticleAdapter = jsonAdapter<ArticleItemResponse>()
+  private val viewCountAdapter = jsonAdapter<ViewCountResponse>()
 
   override suspend fun buildEndpoint() = ApiEndpoints.articles(store.getMaxId())
 
@@ -32,6 +34,7 @@ class ArticleSyncService(
     thumbnailExtension = dto.thumbnailExtension,
     editorComment = dto.editorComment,
     commentCount = dto.commentCount,
+    viewCount = dto.viewCount,
     authors = dto.authors.joinToString(", ")
   )
 
@@ -41,6 +44,14 @@ class ArticleSyncService(
     try {
       val dto = fetchSingleArticle(ApiEndpoints.article(articleId)) ?: return
       store.upsert(listOf(transform(dto)))
+    } catch (_: Exception) {}
+  }
+
+  suspend fun recordView(articleId: Int) {
+    try {
+      val data = client.postFeed(ApiEndpoints.articleViews(articleId))
+      val viewCount = viewCountAdapter.fromJson(data.decodeToString())?.viewCount ?: return
+      store.updateViewCount(articleId, viewCount)
     } catch (_: Exception) {}
   }
 

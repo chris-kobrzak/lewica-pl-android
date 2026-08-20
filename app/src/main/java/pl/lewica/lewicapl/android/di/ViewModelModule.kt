@@ -19,5 +19,5 @@ val viewModelModule = module {
   viewModel { EditorsViewModel(get(), get()) }
   viewModel { HistoryViewModel(get(), get()) }
   viewModel { NewsViewModel(get(), get()) }
-  viewModel { SearchViewModel(get()) }
+  viewModel { SearchViewModel(get(), get()) }
 }

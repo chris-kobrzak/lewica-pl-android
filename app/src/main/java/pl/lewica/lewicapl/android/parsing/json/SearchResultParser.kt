@@ -21,6 +21,7 @@ class SearchResultParser {
           categorySlug = item.categorySlug ?: "",
           publishedAt = item.publishedAt ?: "",
           commentCount = item.commentCount ?: 0,
+          viewCount = item.viewCount ?: 0,
           thumbnailExtension = item.thumbnailExtension,
           editorComment = item.editorComment,
           authors = item.authors?.map { it.name } ?: emptyList()

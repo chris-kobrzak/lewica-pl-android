@@ -22,6 +22,7 @@ data class ArticleItemResponse(
   val categorySlug: String?,
   val publishedAt: String?,
   val commentCount: Int?,
+  val viewCount: Int?,
   val thumbnailExtension: String?,
   val editorComment: String?,
   val authors: List<AuthorResponse>?
@@ -30,4 +31,9 @@ data class ArticleItemResponse(
 @JsonClass(generateAdapter = true)
 data class AuthorResponse(
   val name: String
+)
+
+@JsonClass(generateAdapter = true)
+data class ViewCountResponse(
+  val viewCount: Int
 )

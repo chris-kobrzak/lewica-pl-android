@@ -15,6 +15,7 @@ fun ArticleItemResponse.toDto() = ArticleDto(
   categorySlug = categorySlug ?: "",
   publishedAt = publishedAt ?: "",
   commentCount = commentCount ?: 0,
+  viewCount = viewCount ?: 0,
   thumbnailExtension = thumbnailExtension,
   editorComment = editorComment,
   authors = authors?.map { it.name } ?: emptyList()

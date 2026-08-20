@@ -29,6 +29,7 @@ import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.AddComment
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -64,6 +65,7 @@ fun FeedDetailScreen(
   onForumThread: (() -> Unit)? = null,
   forumThreadLabel: String = "komentarze",
   onAddComment: (() -> Unit)? = null,
+  viewCountLabel: String? = null,
   modifier: Modifier = Modifier
 ) {
   val showTitleInContent = topBarContent != null || contentHeader != null || titleInContent
@@ -122,7 +124,7 @@ fun FeedDetailScreen(
       Row(
         modifier = Modifier
           .fillMaxWidth()
-          .padding(bottom = if (onForumThread == null && onAddComment == null) 8.dp else 0.dp),
+          .padding(bottom = if (onForumThread == null && onAddComment == null && viewCountLabel == null) 8.dp else 0.dp),
         verticalAlignment = Alignment.CenterVertically
       ) {
         Text(
@@ -130,8 +132,23 @@ fun FeedDetailScreen(
           style = MaterialTheme.typography.labelMedium.copy(fontSize = 15.sp),
           color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        if (onForumThread != null || onAddComment != null) {
+        if (onForumThread != null || onAddComment != null || viewCountLabel != null) {
           Spacer(modifier = Modifier.weight(1f))
+        }
+        if (viewCountLabel != null) {
+          Icon(
+            Icons.Default.Visibility,
+            contentDescription = null,
+            modifier = Modifier.size(16.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+          )
+          Spacer(modifier = Modifier.width(4.dp))
+          Text(
+            viewCountLabel,
+            style = MaterialTheme.typography.labelMedium.copy(fontSize = 15.sp),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(end = 12.dp)
+          )
         }
         if (onAddComment != null) {
           IconButton(onClick = onAddComment) {

@@ -16,6 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import pl.lewica.lewicapl.android.ui.common.FeedDetailScreen
 import pl.lewica.lewicapl.android.ui.common.formatCommentCount
+import pl.lewica.lewicapl.android.ui.common.formatViewCount
 
 @Composable
 fun ArticleScreen(id: Int, onBack: () -> Unit) {
@@ -27,6 +28,7 @@ fun ArticleScreen(id: Int, onBack: () -> Unit) {
 
   LaunchedEffect(article.id) {
     viewModel.refreshArticle(article.id)
+    viewModel.recordView(article.id)
   }
 
   val articleUrl = if (article.categorySlug.isNotEmpty() && article.slug.isNotEmpty()) {
@@ -66,6 +68,7 @@ fun ArticleScreen(id: Int, onBack: () -> Unit) {
     onForumThread = openForumThread,
     forumThreadLabel = formatCommentCount(commentCount),
     onAddComment = addComment,
+    viewCountLabel = formatViewCount(article.viewCount),
     onShare = {
       val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"

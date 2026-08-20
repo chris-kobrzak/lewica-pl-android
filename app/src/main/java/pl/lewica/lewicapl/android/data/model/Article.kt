@@ -15,6 +15,7 @@ data class Article(
   val thumbnailExtension: String?,
   val editorComment: String?,
   val commentCount: Int,
+  val viewCount: Int,
   val authors: String,
   val opened: Boolean = false
 )

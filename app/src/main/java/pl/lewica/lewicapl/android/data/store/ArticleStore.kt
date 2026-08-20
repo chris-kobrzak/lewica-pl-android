@@ -36,6 +36,7 @@ interface ArticleStore {
       thumbnailExtension = :thumbnailExtension,
       editorComment = :editorComment,
       commentCount = :commentCount,
+      viewCount = :viewCount,
       authors = :authors
     WHERE id = :id
     """
@@ -51,6 +52,7 @@ interface ArticleStore {
     thumbnailExtension: String?,
     editorComment: String?,
     commentCount: Int,
+    viewCount: Int,
     authors: String
   ): Int
 
@@ -71,6 +73,7 @@ interface ArticleStore {
         thumbnailExtension = article.thumbnailExtension,
         editorComment = article.editorComment,
         commentCount = article.commentCount,
+        viewCount = article.viewCount,
         authors = article.authors
       )
       if (rowsUpdated == 0) insertOne(article)
@@ -79,4 +82,7 @@ interface ArticleStore {
 
   @Query("UPDATE articles SET opened = 1 WHERE id = :id")
   suspend fun markRead(id: Int)
+
+  @Query("UPDATE articles SET viewCount = :viewCount WHERE id = :id")
+  suspend fun updateViewCount(id: Int, viewCount: Int)
 }

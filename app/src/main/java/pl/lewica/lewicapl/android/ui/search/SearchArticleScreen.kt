@@ -6,11 +6,13 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
 import org.koin.androidx.compose.koinViewModel
 import pl.lewica.lewicapl.android.ui.common.FeedDetailScreen
 import pl.lewica.lewicapl.android.ui.common.formatCommentCount
+import pl.lewica.lewicapl.android.ui.common.formatViewCount
 import pl.lewica.lewicapl.android.ui.news.CategoryLabel
 
 @Composable
@@ -24,6 +26,10 @@ fun SearchArticleScreen(
   val article = viewModel.selectedArticle
     ?: (viewModel.uiState.value as? SearchUiState.Loaded)?.results?.find { it.id == id }
     ?: return
+
+  LaunchedEffect(article.id) {
+    viewModel.recordView(article.id)
+  }
 
   val articleUrl = if (article.categorySlug.isNotEmpty() && article.slug.isNotEmpty()) {
     "https://lewica.pl/${article.categorySlug}/${article.slug}"
@@ -63,6 +69,7 @@ fun SearchArticleScreen(
     onForumThread = openForumThread,
     forumThreadLabel = formatCommentCount(commentCount),
     onAddComment = addComment,
+    viewCountLabel = formatViewCount(article.viewCount),
     onShare = {
       val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
